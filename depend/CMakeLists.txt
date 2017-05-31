@@ -21,13 +21,25 @@ SET(DEPEND_IGNORE
     gamma icon tearing empty events msaa cursor threads clipboard title joysticks sharing windows timeout
 )
 
-SET_TARGET_PROPERTIES(
-    liblua glfw 
+SET(DEPEND
+    liblua glfw
     ${DEPEND_IGNORE}
-    PROPERTIES FOLDER "depend")
+)
 
-SET_TARGET_PROPERTIES(
-    ${DEPEND_IGNORE}
-    PROPERTIES
-    EXCLUDE_FROM_ALL 1
-    EXCLUDE_FROM_DEFAULT_BUILD 1)
+FOREACH(depend ITEMS ${DEPEND})
+    IF(TARGET ${depend})
+        SET_TARGET_PROPERTIES(
+            ${depend}
+            PROPERTIES FOLDER "depend")
+    ENDIF()
+ENDFOREACH()
+
+FOREACH(depend ITEMS ${DEPEND})
+    IF(TARGET ${depend})
+        SET_TARGET_PROPERTIES(
+            ${depend}
+            PROPERTIES
+            EXCLUDE_FROM_ALL 1
+            EXCLUDE_FROM_DEFAULT_BUILD 1)
+    ENDIF()
+ENDFOREACH()
