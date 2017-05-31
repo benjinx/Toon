@@ -16,12 +16,13 @@ SET(GLFW_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/glfw/include")
 
 SET(DEPEND_IGNORE
     glm_dummy
-    lua luac
-    glfwinfo heightmap gears boing particles wave simple splitview reopen monitors iconify gamma
-    icon tearing empty events msaa cursor threads clipboard title joysticks sharing windows timeout
+    lua wlua luac
+    glfwinfo docs uninstall heightmap gears boing particles wave simple splitview reopen monitors iconify 
+    gamma icon tearing empty events msaa cursor threads clipboard title joysticks sharing windows timeout
 )
 
 SET_TARGET_PROPERTIES(
+    liblua glfw 
     ${DEPEND_IGNORE}
     PROPERTIES FOLDER "depend")
 
