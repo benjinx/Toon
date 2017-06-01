@@ -2,10 +2,13 @@ cmake_minimum_required(VERSION 3.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-add_subdirectory(depend)
-
 # Initialize Projects
 project(Temporality)
+
+add_subdirectory(depend)
+
+# Allow for custom organization of files in VisualStudio
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Adding Defines
 
@@ -24,14 +27,18 @@ include_directories(BEFORE SYSTEM
     ${LUA_INCLUDE_DIRS}
 )
 
-set(COMMON_LIBS
+SET(COMMON_LIBS
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARIES}
     ${LUA_LIBRARIES}
+    ${GLFW_LIBRARIES}
 )
-
-SET(COMMON_DEPEND
-    glm liblua glfw
+SET(COMMON_LIBS_DEBUG
+    ${LUA_LIBRARIES_DEBUG}
+    ${GLFW_LIBRARIES_DEBUG}
+)
+SET(COMMON_LIBS_RELEASE
+    ${LUA_LIBRARIES_RELEASE}
+    ${GLFW_LIBRARIES_RELEASE}
 )
 
 # Source files
@@ -106,17 +113,40 @@ add_executable(
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-add_dependencies(${PROJECT_NAME} ${COMMON_DEPEND})
-target_link_libraries(${PROJECT_NAME} ${COMMON_LIBS})
+add_dependencies(${PROJECT_NAME} depend)
 
-IF(UNIX)
-    add_custom_target(
-        run
-        COMMAND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
-        DEPENDS ${PROJECT_NAME}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+# Configuration-independant libraries
+target_link_libraries(
+    ${PROJECT_NAME}
+    ${COMMON_LIBS}
+)
+
+# Debug-only libraries
+foreach(debug_lib IN ITEMS ${COMMON_LIBS_DEBUG})
+    target_link_libraries(
+        ${PROJECT_NAME}
+        debug ${debug_lib}
     )
-ENDIF()
+endforeach()
+
+# Release-only libraries
+foreach(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
+    target_link_libraries(
+        ${PROJECT_NAME}
+        optimized ${release_lib}
+    )
+endforeach()
+
+add_custom_target(
+    run
+    COMMAND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
+    DEPENDS ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+set_target_properties(
+    run
+    PROPERTIES FOLDER "Automation"
+)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

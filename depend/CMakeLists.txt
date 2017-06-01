@@ -1,45 +1,98 @@
 
-IF(NOT DEFINED CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
-    SET(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "No dev warnings")
-ENDIF()
+ADD_CUSTOM_TARGET(depend)
 
-ADD_SUBDIRECTORY(glm)
+### glm
+MESSAGE("Adding dependency: glm")
+
 SET(GLM_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/glm" PARENT_SCOPE)
 
-ADD_SUBDIRECTORY(lua)
-SET(LUA_LIBRARIES liblua PARENT_SCOPE)
-SET(LUA_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/lua/src" "${CMAKE_BINARY_DIR}/depend/lua" PARENT_SCOPE)
+ADD_CUSTOM_TARGET(glm)
+ADD_DEPENDENCIES(depend glm)
 
-ADD_SUBDIRECTORY(glfw)
-SET(GLFW_LIBRARIES glfw PARENT_SCOPE)
-SET(GLFW_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/glfw/include")
+### lua
+MESSAGE("Adding dependency: lua")
 
-SET(DEPEND_IGNORE
-    glm_dummy
-    lua wlua luac
-    glfwinfo docs uninstall heightmap gears boing particles wave simple splitview reopen monitors iconify 
-    gamma icon tearing empty events msaa cursor threads clipboard title joysticks sharing windows timeout
+SET(LUA_OPTIONS
 )
 
-SET(DEPEND
-    liblua glfw
-    ${DEPEND_IGNORE}
+SET(LUA_INCLUDE_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}/lua/src"
+    "${CMAKE_BINARY_DIR}/depend/lua"
+    PARENT_SCOPE
 )
 
-FOREACH(depend ITEMS ${DEPEND})
-    IF(TARGET ${depend})
-        SET_TARGET_PROPERTIES(
-            ${depend}
-            PROPERTIES FOLDER "depend")
-    ENDIF()
-ENDFOREACH()
+IF(MSVC)
+    SET(LUA_LIBRARIES_DEBUG
+        "${CMAKE_BINARY_DIR}/depend/lua/Debug/lua.lib"
+        PARENT_SCOPE
+    )
+    SET(LUA_LIBRARIES_RELEASE
+        "${CMAKE_BINARY_DIR}/depend/lua/Release/lua.lib"
+        PARENT_SCOPE
+    )
+ELSE()
+    SET(LUA_LIBRARIES "${CMAKE_BINARY_DIR}/depend/lua/liblua" PARENT_SCOPE)
+ENDIF()
 
-FOREACH(depend ITEMS ${DEPEND})
-    IF(TARGET ${depend})
-        SET_TARGET_PROPERTIES(
-            ${depend}
-            PROPERTIES
-            EXCLUDE_FROM_ALL 1
-            EXCLUDE_FROM_DEFAULT_BUILD 1)
-    ENDIF()
-ENDFOREACH()
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua)
+EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/lua ${LUA_OPTIONS}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+)
+
+ADD_CUSTOM_TARGET(lua)
+ADD_CUSTOM_COMMAND(
+    TARGET lua PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} --build . --target liblua
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+)
+ADD_DEPENDENCIES(depend lua)
+
+### GLFW
+MESSAGE("Adding dependency: glfw")
+
+SET(GLFW_OPTIONS
+    -DGLFW_BUILD_EXAMPLES=OFF
+    -DGLFW_BUILD_TESTS=OFF
+    -DGLFW_BUILD_DOCS=OFF
+    -DGLFW_INSTALL=OFF
+)
+
+SET(GLFW_INCLUDE_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}/glfw/include"
+    PARENT_SCOPE
+)
+
+IF(MSVC)
+    SET(GLFW_LIBRARIES_DEBUG
+        "${CMAKE_BINARY_DIR}/depend/glfw/src/Debug/glfw3.lib"
+        PARENT_SCOPE
+    )
+    SET(GLFW_LIBRARIES_RELEASE
+        "${CMAKE_BINARY_DIR}/depend/glfw/src/Release/glfw3.lib"
+        PARENT_SCOPE
+    )
+ELSE()
+    SET(GLFW_LIBRARIES "${CMAKE_BINARY_DIR}/depend/glfw/src/glfw3" PARENT_SCOPE)
+ENDIF()
+
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/depend/glfw)
+EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/glfw ${ZLIB_OPTIONS}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/glfw
+)
+
+ADD_CUSTOM_TARGET(glfw)
+ADD_CUSTOM_COMMAND(
+    TARGET glfw PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} --build . --target glfw
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/glfw
+)
+ADD_DEPENDENCIES(depend glfw)
+
+SET_TARGET_PROPERTIES(
+    depend glm lua glfw
+    PROPERTIES FOLDER "Depend"
+)
