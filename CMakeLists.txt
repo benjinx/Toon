@@ -50,6 +50,7 @@ SET(COMMON_SRC
 	src/Mesh.cpp
 	src/Model.cpp
 	src/Shader.cpp
+	src/State.cpp
 	src/UI.cpp
 	src/Utils.cpp
 	src/Window.cpp
@@ -64,6 +65,7 @@ SET(COMMON_H
 	src/Mesh.h
 	src/Model.h
 	src/Shader.h
+	src/State.h
 	src/UI.h
 	src/Utils.h
 	src/Window.h
