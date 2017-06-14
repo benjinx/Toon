@@ -1,0 +1,39 @@
+# Specify version format
+version: "{build}"
+
+os:
+  - Visual Studio 2017
+
+platform:
+  - Win32
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+clone_depth: 1
+
+init:
+  - cmd: cmake --version
+  - cmd: msbuild /version
+
+clone_folder: C:\projects\Temporality
+
+install:
+  - cmd: git submodule update --init --recursive
+
+before_build:
+  - cmd: cd C:\projects\Dusk
+  - cmd: md build
+  - cmd: cd build
+  - cmd: if "%PLATFORM%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 15 2017
+  - cmd: if "%PLATFORM%"=="x64"   set CMAKE_GENERATOR_NAME=Visual Studio 15 2017 Win64
+  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" ..
+
+build:
+  project: C:\projects\Temporality\build\Temporality.sln # path to Visual Studio solution or project
+#  parallel: true                           # enable MSBuild parallel builds
+  verbosity: quiet                         # MSBuild verbosity level (quiet|minimal|normal|detailed)
+
+test: off

@@ -15,7 +15,6 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
     set(CMAKE_CXX_FLAGS " -std=c++11 -Wall -D_XOPEN_SOURCE=700")
 elseif(MSVC)
-    set(CMAKE_CXX_FLAGS "/NODEFAULTLIB:MSVCRT")
 endif()
 
 find_package(OpenGL REQUIRED)
@@ -124,20 +123,27 @@ target_link_libraries(
 )
 
 # Debug-only libraries
-foreach(debug_lib IN ITEMS ${COMMON_LIBS_DEBUG})
-    target_link_libraries(
+FOREACH(debug_lib IN ITEMS ${COMMON_LIBS_DEBUG})
+    TARGET_LINK_LIBRARIES(
         ${PROJECT_NAME}
         debug ${debug_lib}
     )
-endforeach()
+ENDFOREACH()
 
 # Release-only libraries
-foreach(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
-    target_link_libraries(
+FOREACH(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
+    TARGET_LINK_LIBRARIES(
         ${PROJECT_NAME}
         optimized ${release_lib}
     )
-endforeach()
+ENDFOREACH()
+
+# Set IDE folders
+#FOREACH(file IN ITEMS ${Dusk_ASSETS} ${Dusk_INCLUDES} ${Dusk_SOURCES})
+#    GET_FILENAME_COMPONENT(file_path ${file} DIRECTORY)
+#    FILE(TO_NATIVE_PATH ${file_path} file_path)
+#    SOURCE_GROUP(${file_path} FILES ${file})
+#ENDFOREACH()
 
 add_custom_target(
     run
