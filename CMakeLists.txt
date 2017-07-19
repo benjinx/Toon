@@ -99,6 +99,15 @@ SET(STB_SRC
     src/stb/stb_image.h
 )
 
+FILE(GLOB_RECURSE RESOURCES "resources/*")
+FOREACH(res IN ITEMS ${RESOURCES})
+    STRING(LENGTH "${CMAKE_SOURCE_DIR}" len)
+    GET_FILENAME_COMPONENT(path "${res}" DIRECTORY)
+    STRING(SUBSTRING "${path}" ${len} -1 path)
+    STRING(REPLACE "/" "\\" path ${path})
+    SOURCE_GROUP("${path}" FILES ${res})
+ENDFOREACH()
+
 SOURCE_GROUP("Source" FILES ${PROJECT_NAME} ${COMMON_SRC})
 SOURCE_GROUP("Headers" FILES ${PROJECT_NAME} ${COMMON_H})
 SOURCE_GROUP("3rdParty\\STB" FILES ${PROJECT_NAME} ${STB_SRC})
@@ -115,6 +124,7 @@ add_executable(
 	${GLAD_SRC}
 	${IMGUI_SRC}
 	${TINY_OBJ_SRC}
+  ${RESOURCES}
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
