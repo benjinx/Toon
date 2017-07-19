@@ -99,12 +99,10 @@ SET(STB_SRC
     src/stb/stb_image.h
 )
 
-FILE(GLOB_RECURSE RESOURCES "resources/*")
+FILE(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*")
 FOREACH(res IN ITEMS ${RESOURCES})
-    STRING(LENGTH "${CMAKE_SOURCE_DIR}" len)
     GET_FILENAME_COMPONENT(path "${res}" DIRECTORY)
-    STRING(SUBSTRING "${path}" ${len} -1 path)
-    STRING(REPLACE "/" "\\" path ${path})
+    FILE(TO_NATIVE_PATH ${path} path)
     SOURCE_GROUP("${path}" FILES ${res})
 ENDFOREACH()
 
