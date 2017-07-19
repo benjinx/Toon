@@ -10,3 +10,7 @@
 	path = depend/glfw
 	url = https://github.com/glfw/glfw
 	branch = tags/3.2.1
+[submodule "depend/openal"]
+	path = depend/openal
+	url = https://github.com/kcat/openal-soft
+	branch = tags/openal-soft-1.18.0
