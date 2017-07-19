@@ -174,3 +174,8 @@ ELSE()
     ADD_CUSTOM_TARGET(openal DEPENDS ${OPENAL_LIBRARIES})
 ENDIF()
 ADD_DEPENDENCIES(depend openal)
+
+SET_TARGET_PROPERTIES(
+    depend glm lua glfw openal
+    PROPERTIES FOLDER "Depend"
+)
