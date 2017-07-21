@@ -10,14 +10,15 @@ void mouse_pos_callback(GLFWwindow* window, double x, double y);
 void Application::Run()
 {
     Start();
-	float prevTime = glfwGetTime();
+	float prevTime = 0.0f;
     while (!glfwWindowShouldClose(_mWindow.GetWindow()))
     {
 		float currTime = glfwGetTime();
 		float dt = currTime - prevTime;
+		HandleInput(dt);
         Update(dt);
         Render();
-		prevTime = glfwGetTime();
+		prevTime = currTime;
     }
     Destroy();
 }
@@ -26,11 +27,14 @@ void Application::Start()
 {
     _mWindow.Start();
     _mShader.Start(&_mWindow);
-    ImGui_ImplGlfwGL3_Init(_mWindow.GetWindow(), true);
+	UI::StartUI(&_mWindow);
     glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
     glfwSetMouseButtonCallback(_mWindow.GetWindow(), &mouse_button_callback);
     glfwSetScrollCallback(_mWindow.GetWindow(), &scroll_callback);
     glfwSetCursorPosCallback(_mWindow.GetWindow(), &mouse_pos_callback);
+
+	glfwSetInputMode(_mWindow.GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	firstMouse = true;
 
     keysDown.emplace(GLFW_KEY_W, false);
     keysDown.emplace(GLFW_KEY_A, false);
@@ -70,7 +74,7 @@ void Application::Start()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Load Obj
-	_mModels = Utils::LoadObj("resources/models/pcube.obj");
+	_mModels = Utils::LoadObj("resources/models/sphere.obj");
 
 	// Set default to lighting
     _mProg = 1;
@@ -81,15 +85,15 @@ void Application::Start()
 
 void Application::Update(float dt)
 {
-	ImGui_ImplGlfwGL3_NewFrame();
-    // DeltaTime
+	_mDeltaTime = dt;
+
     glfwPollEvents();
 
-	_mDeltaTime = dt;
+	UI::UpdateUI(&_mWindow);
+
+
 	
 	// Update cam
-		
-
 		// forward, direction X velocity
 		// back, -forward
 		// right, direction X velocity
@@ -100,104 +104,6 @@ void Application::Update(float dt)
 
 	//printf("%f\n", dt);
 	Camera::instance().Update(dt);
-
-    // 1. Show a simple window
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-    {
-        if (UI::showMainMenuBar)
-        {
-            if (ImGui::BeginMainMenuBar())
-            {
-                if (ImGui::BeginMenu("Tools"))
-                {
-					ImGui::MenuItem("Settings", "ESC", &UI::settingsSelected, true);
-                    ImGui::MenuItem("Console", "F1", &UI::consoleSelected, true);
-                    ImGui::MenuItem("Options", "F2", &UI::optionsSelected, true);
-                    ImGui::MenuItem("Test Window", "F11", &UI::showTestWindow, true);
-                    ImGui::EndMenu();
-                }
-
-                ImGui::SameLine(_mWindow.GetWidth() - 150, 0.0f);
-                ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
-                ImGui::EndMainMenuBar();
-            }
-
-            if (UI::consoleSelected)
-            {
-                ImGui::SetNextWindowSize(ImVec2(400, 200));
-                ImGui::Begin("Console", &UI::consoleSelected);
-				ImGui::BeginChild(1, ImVec2(390, 135));
-                ImGui::TextColored(Red, "> Error: Test\n");
-                ImGui::TextColored(Yellow, "> Warning: Test\n");
-                ImGui::TextColored(Green, "> Loaded: Test\n");
-                ImGui::TextColored(White, "> Normal Text: Test\n");
-				ImGui::EndChild();
-                ImGui::Text(">");
-                ImGui::SameLine();
-                ImGui::InputText("", buffer, 255);
-                ImGui::End();
-            }
-
-            if (UI::optionsSelected)
-            {
-                ImGui::Begin("Options", &UI::optionsSelected);
-				for (int i = 0; i < _mModels.size(); i++)
-					ImGui::SliderFloat("Rotation Speed", _mModels[i]->GetMesh(0)->GetRotSpeed(), 0.0f, 5.0f);
-				if (_mProg == 0)
-				{
-					if (ImGui::Button("NormalMapping"))
-						_mProg = 1;
-					ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-					for (unsigned int i = 0; i < _mModels.size(); i++)
-					{
-						for (unsigned int j = 0; j < _mModels[i]->GetNumMeshes(); j++)
-						{
-							if (ImGui::Button("Ambient"))
-								_mModels[i]->GetMesh(j)->SetSel(0.0f);
-							if (ImGui::Button("Diffuse"))
-								_mModels[i]->GetMesh(j)->SetSel(1.0f);
-							if (ImGui::Button("Specular"))
-								_mModels[i]->GetMesh(j)->SetSel(2.0f);
-							if (ImGui::Button("Bump"))
-								_mModels[i]->GetMesh(j)->SetSel(3.0f);
-							if (ImGui::Button("Color"))
-								_mModels[i]->GetMesh(j)->SetSel(4.0f);
-						}
-					}
-				}
-				else
-				{
-					if (ImGui::Button("PassThru"))
-						_mProg = 0;
-				}
-
-                ImGui::End();
-            }
-
-            if (UI::showTestWindow)
-            {
-                ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-                ImGui::ShowTestWindow(&UI::showTestWindow);
-            }
-
-			if (UI::settingsSelected)
-			{
-				ImGui::SetNextWindowSize(ImVec2(200, 400));
-				ImGui::SetNextWindowPosCenter();
-				ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoCollapse + ImGuiWindowFlags_AlwaysAutoResize);
-				
-				ImGui::TextColored(Green, "Created by BC/DC Games:\n");
-				ImGui::TextColored(White, "- Benji Campbell\n");
-				ImGui::TextColored(White, "- Daniel Covert\n");
-				ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
-				ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-
-				if (ImGui::Button("Quit"))
-					glfwSetWindowShouldClose(_mWindow.GetWindow(), GL_TRUE);
-				ImGui::End();
-			}
-        }
-    }
 }
 
 void Application::Render()
@@ -209,15 +115,30 @@ void Application::Render()
         model->Render(_mProg, &_mShader);
     }
 
-    ImGui::Render();
+	UI::RenderUI();
 
     _mShader.Present();
 }
 
+void Application::HandleInput(float dt)
+{
+	if (keysDown[GLFW_KEY_W])
+		Camera::instance().HandleMovement(Direction::FORWARD, dt);
+	if (keysDown[GLFW_KEY_S])
+		Camera::instance().HandleMovement(Direction::BACKWARD, dt);
+	if (keysDown[GLFW_KEY_A])
+		Camera::instance().HandleMovement(Direction::LEFT, dt);
+	if (keysDown[GLFW_KEY_D])
+		Camera::instance().HandleMovement(Direction::RIGHT, dt);
+	if (keysDown[GLFW_KEY_Q])
+		Camera::instance().HandleMovement(Direction::UP, dt);
+	if (keysDown[GLFW_KEY_E])
+		Camera::instance().HandleMovement(Direction::DOWN, dt);
+
+}
+
 void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-
-
     if (action == GLFW_RELEASE)
     {
         if (keysDown.find(key) != keysDown.end())
@@ -265,30 +186,35 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
         }
     }
 
-	if (keysDown[GLFW_KEY_W])
-		Camera::instance().Translate(glm::vec3(0, 0, -0.1));
-    if (keysDown[GLFW_KEY_S])
-        Camera::instance().Translate(glm::vec3(0, 0, 0.1));
-    if (keysDown[GLFW_KEY_A])
-        Camera::instance().Translate(glm::vec3(-0.1, 0, 0));
-    if (keysDown[GLFW_KEY_D])
-        Camera::instance().Translate(glm::vec3(0.1, 0, 0));
-    if (keysDown[GLFW_KEY_Q])
-        Camera::instance().Translate(glm::vec3(0, -0.1, 0));
-    if (keysDown[GLFW_KEY_E])
-        Camera::instance().Translate(glm::vec3(0, 0.1, 0));
+	//if (keysDown[GLFW_KEY_W])
+	//	Camera::instance().HandleMovement(Direction::FORWARD);
+ //   if (keysDown[GLFW_KEY_S])
+	//	Camera::instance().HandleMovement(Direction::BACKWARD);
+ //   if (keysDown[GLFW_KEY_A])
+	//	Camera::instance().HandleMovement(Direction::LEFT);
+ //   if (keysDown[GLFW_KEY_D])
+	//	Camera::instance().HandleMovement(Direction::RIGHT);
+ //   if (keysDown[GLFW_KEY_Q])
+	//	Camera::instance().HandleMovement(Direction::UP);
+ //   if (keysDown[GLFW_KEY_E])
+	//	Camera::instance().HandleMovement(Direction::DOWN);
 
-
-	float camSpeed = 100000.0f * 0.1;
-	glm::vec3 camFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	if (keysDown[GLFW_KEY_H])
-		Camera::instance().SetCameraPos(Camera::instance().GetCameraPos() + camSpeed * camFront);
+	//if (keysDown[GLFW_KEY_H])
+	//{
+	//	Camera::instance().HandleRotation();
+	//}
 
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
 }
 
 void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int action, int mode)
 {
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+		rightButtonDown = true;
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+		rightButtonDown = false;
+		// tell camera that it can do handleRotation
+
     // Handle mouse button
     ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mode);
 }
@@ -301,7 +227,22 @@ void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yo
 
 void Application::HandleGLFWMousePos(GLFWwindow* window, double x, double y)
 {
+	if (firstMouse)
+	{
+		lastX = x;
+		lastY = y;
+		firstMouse = false;
+	}
+
+	float xoffset = x - lastX;
+	float yoffset = lastY - y;
+
+	lastX = x;
+	lastY = y;
+
     // handle mouse pos
+	if (rightButtonDown)
+		Camera::instance().HandleRotation(xoffset, yoffset);
 }
 
 void Application::Destroy()

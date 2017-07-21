@@ -24,19 +24,20 @@ out mat4 passVM;
 
 void main()
 {
-	vec4 screenCoord = mvp * position;
-	gl_Position = screenCoord;
-	screenCoord /= screenCoord.w; // perspective divide
+	// Attempt at creating 3D models with a stationary texture stretched across viewport.
+	// (how they did the textures on the characters in chowder)
+	//vec4 screenCoord = mvp * position;
+	//gl_Position = screenCoord;
+	//screenCoord /= screenCoord.w; // perspective divide
 
-	
+	//vec2 uv;
+	//uv.x = screenCoord.x / normalize(resolution.x);
+	//uv.y = screenCoord.y / normalize(resolution.y);
 
-	vec2 uv;
-	uv.x = screenCoord.x / normalize(resolution.x);
-	uv.y = screenCoord.y / normalize(resolution.y);
+	//uv.y *= resolution.y / resolution.x;
+	//passTexCoord = uv.xy;
+	//passVM = viewMat;
 
-	uv.y *= resolution.y / resolution.x;
-	passTexCoord = uv.xy;
-	passVM = viewMat;
-
-	//gl_Position = mvp * position;
+	gl_Position = mvp * position;
+	passTexCoord = texCoord;
 }

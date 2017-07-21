@@ -8,8 +8,9 @@ struct ImDrawData;
 
 namespace UI
 {
+
 void StartUI(Window* aWindow);
-void UpdateUI();
+void UpdateUI(Window* aWindow);
 void RenderUI();
 void DrawUI(ImDrawData* draw_data);
 

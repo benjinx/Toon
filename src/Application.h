@@ -36,12 +36,13 @@ private:
     void                Update(float dt);
     void                Render();
     void                Destroy();
+	void				HandleInput(float dt);
 
     Shader _mShader;
     Window _mWindow;
     std::unordered_map<int, bool> keysDown;
     std::vector<Model*> _mModels;
-
+	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     int                _mProg;
     std::vector<Mesh*> _mMeshes;
@@ -51,6 +52,8 @@ private:
     ImVec4             White       = ImVec4(255.0f, 255.0f, 255.0f, 255.0f);
     char               buffer[255] = {};
 	bool			   ShowCredits;
+	bool firstMouse;
+	float lastX = 640, lastY = 360;
 };
 
 #endif // APPLICATION_H
