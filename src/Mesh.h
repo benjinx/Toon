@@ -61,6 +61,7 @@ private:
     GLuint       _mVAO;
     glm::mat4    _mModelMat;
     unsigned int _mVertCount;
+	std::vector<glm::vec3> tangents, bitangents;
 
     // TEMP
     float _mRotSpeed;

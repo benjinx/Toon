@@ -81,6 +81,9 @@ void Application::Start()
 
 	//
 	ShowCredits = false;
+
+	// Load lua script
+	_mScriptHost.Load();
 }
 
 void Application::Update(float dt)
@@ -90,17 +93,6 @@ void Application::Update(float dt)
     glfwPollEvents();
 
 	UI::UpdateUI(&_mWindow);
-
-
-	
-	// Update cam
-		// forward, direction X velocity
-		// back, -forward
-		// right, direction X velocity
-		// left, -right
-		// up, direction X velocity
-		// down, -up
-	//
 
 	//printf("%f\n", dt);
 	Camera::instance().Update(dt);

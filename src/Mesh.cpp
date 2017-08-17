@@ -10,15 +10,13 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
     glGenVertexArrays(1, &_mVAO);
     glBindVertexArray(_mVAO);
 
-    GLuint vbos[3];
-    glGenBuffers(3, vbos);
+    GLuint vbos[5];
+    glGenBuffers(5, vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(ATTRIB_POSITION);
-
-    // CalcTBN(vertices, texCoords);
 
     if (!normal.empty())
     {
@@ -36,6 +34,24 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
         glEnableVertexAttribArray(ATTRIB_TEXCOORD);
     }
 
+	//CalcTBN(vertices, texCoords);
+	//
+	//if (!tangents.empty())
+	//{
+	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[3]);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tangents.size() * 3, tangents.data(), GL_STATIC_DRAW);
+	//	glVertexAttribPointer(ATTRIB_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	//	glEnableVertexAttribArray(ATTRIB_TANGENT);
+	//}
+
+	//if (!bitangents.empty())
+	//{
+	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[4]);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bitangents.size() * 3, bitangents.data(), GL_STATIC_DRAW);
+	//	glVertexAttribPointer(ATTRIB_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	//	glEnableVertexAttribArray(ATTRIB_BITANGENT);
+	//}
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -46,32 +62,62 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
 
 glm::mat4 Mesh::CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords)
 {
-    glm::vec3 E2m1  = vertices[1] - vertices[0];
-    glm::vec2 uv2m1 = texCoords[1] - texCoords[0];
+	for (int i = 0; i < vertices.size(); i += 3)
+	{
+		glm::vec3 &v0 = vertices[i + 0];
+		glm::vec3 &v1 = vertices[i + 1];
+		glm::vec3 &v2 = vertices[i + 2];
+	
+		glm::vec2 &uv0 = texCoords[i + 0];
+		glm::vec2 &uv1 = texCoords[i + 1];
+		glm::vec2 &uv2 = texCoords[i + 2];
 
-    glm::vec3 E3m1  = vertices[3] - vertices[0];
-    glm::vec2 uv3m1 = texCoords[3] - texCoords[0];
+		glm::vec3 deltaPos1 = v1 - v0;
+		glm::vec3 deltaPos2 = v2 - v0;
 
-    // T
-    glm::vec3 T;
-    if (uv2m1.x != 0)
-        T = E2m1 / uv2m1.x;
-    else // use Edge 3-1 instead.. think use the same uvs
-        T = E3m1 / uv3m1.x;
+		glm::vec2 deltaUV1 = uv1 - uv0;
+		glm::vec2 deltaUV2 = uv2 - uv0;
 
-    T = glm::normalize(T);
+		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+		glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
-    // N
-    glm::vec3 N = glm::cross(E2m1, E3m1);
-    N           = glm::normalize(N);
+		tangents.push_back(tangent);
+		tangents.push_back(tangent);
+		tangents.push_back(tangent);
 
-    // B
-    glm::vec3 B = glm::cross(T, N);
+		bitangents.push_back(bitangent);
+		bitangents.push_back(bitangent);
+		bitangents.push_back(bitangent);
+	}
 
-    // Matrix creation
-    glm::mat4 TBN = glm::mat3(T, B, N);
+    //glm::vec3 E2m1  = vertices[1] - vertices[0];
+    //glm::vec2 uv2m1 = texCoords[1] - texCoords[0];
 
-    return TBN;
+    //glm::vec3 E3m1  = vertices[3] - vertices[0];
+    //glm::vec2 uv3m1 = texCoords[3] - texCoords[0];
+
+    //// T
+    //glm::vec3 T;
+    //if (uv2m1.x != 0)
+    //    T = E2m1 / uv2m1.x;
+    //else // use Edge 3-1 instead.. think use the same uvs
+    //    T = E3m1 / uv3m1.x;
+
+    //T = glm::normalize(T);
+
+    //// N
+    //glm::vec3 N = glm::cross(E2m1, E3m1);
+    //N           = glm::normalize(N);
+
+    //// B
+    //glm::vec3 B = glm::cross(T, N);
+
+    //// Matrix creation
+    //glm::mat4 TBN = glm::mat3(T, B, N);
+
+    //return TBN;
+	return glm::mat4();
 }
 
 void Mesh::Render(GLuint programNum, Shader * shader)

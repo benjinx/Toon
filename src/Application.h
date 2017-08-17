@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "UI.h"
 #include "Utils.h"
+#include "ScriptHost.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
@@ -40,6 +41,7 @@ private:
 
     Shader _mShader;
     Window _mWindow;
+	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
     std::vector<Model*> _mModels;
 	bool rightButtonDown = false;

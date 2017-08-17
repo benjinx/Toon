@@ -46,32 +46,70 @@ SET(COMMON_LIBS_RELEASE
 
 # Source files
 SET(COMMON_SRC
-	src/Application.cpp
-	src/Camera.cpp
-	src/Main.cpp
-	src/Material.cpp
-	src/Mesh.cpp
-	src/Model.cpp
-	src/Shader.cpp
-	src/State.cpp
-	src/UI.cpp
-	src/Utils.cpp
-	src/Window.cpp
 )
 
 # Header files
 SET(COMMON_H
+)
+
+# Core src
+SET(CORE_SRC
+	src/Application.cpp
 	src/Application.h
+	src/Camera.cpp
 	src/Camera.h
-    src/Common.h
-	src/Material.h
-	src/Mesh.h
-	src/Model.h
-	src/Shader.h
-	src/State.h
-	src/UI.h
-	src/Utils.h
+	src/Common.h
+	src/Main.cpp
+	src/Window.cpp
 	src/Window.h
+)
+
+# Debug src
+SET(DEBUG_SRC
+	src/Utils.cpp
+	src/Utils.h
+)
+
+# Graphics src
+SET(GRAPHICS_SRC
+	src/Material.cpp
+	src/Material.h
+	src/Mesh.cpp
+	src/Mesh.h
+	src/Model.cpp
+	src/Model.h
+	src/Shader.cpp
+	src/Shader.h
+)
+
+# Physics src
+SET(PHYSICS_SRC
+)
+
+# Scripting src
+SET(SCRIPTING_SRC
+	src/ScriptHost.cpp
+	src/ScriptHost.h
+)
+
+# Audio src
+SET(AUDIO_SRC
+)
+
+# Animation src
+SET(ANIMATION_SRC
+)
+
+# UI src
+SET(UI_SRC
+	src/UI.cpp
+	src/UI.h
+)
+
+# Navigation/AI src
+SET(AI_SRC
+	src/State.cpp
+	src/State.h
 )
 
 # Third-party source files
@@ -99,7 +137,7 @@ SET(STB_SRC
     src/stb/stb_image.h
 )
 
-FILE(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*")
+FILE(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_SOURCE_DIR} "Resources/*")
 FOREACH(res IN ITEMS ${RESOURCES})
     GET_FILENAME_COMPONENT(path "${res}" DIRECTORY)
     FILE(TO_NATIVE_PATH ${path} path)
@@ -110,6 +148,15 @@ SET_SOURCE_FILES_PROPERTIES(${RESOURCES} PROPERTIES HEADER_FILE_ONLY true)
 
 SOURCE_GROUP("Source" FILES ${PROJECT_NAME} ${COMMON_SRC})
 SOURCE_GROUP("Headers" FILES ${PROJECT_NAME} ${COMMON_H})
+SOURCE_GROUP("Core" FILES ${PROJECT_NAME} ${CORE_SRC})
+SOURCE_GROUP("Debug" FILES ${PROJECT_NAME} ${DEBUG_SRC})
+SOURCE_GROUP("Graphics" FILES ${PROJECT_NAME} ${GRAPHICS_SRC})
+SOURCE_GROUP("Physics" FILES ${PROJECT_NAME} ${PHYSICS_SRC})
+SOURCE_GROUP("Scripting" FILES ${PROJECT_NAME} ${SCRIPTING_SRC})
+SOURCE_GROUP("Audio" FILES ${PROJECT_NAME} ${AUDIO_SRC})
+SOURCE_GROUP("Animation" FILES ${PROJECT_NAME} ${ANIMATION_SRC})
+SOURCE_GROUP("UI" FILES ${PROJECT_NAME} ${UI_SRC})
+SOURCE_GROUP("AI/Navigation" FILES ${PROJECT_NAME} ${AI_SRC})
 SOURCE_GROUP("3rdParty\\STB" FILES ${PROJECT_NAME} ${STB_SRC})
 SOURCE_GROUP("3rdParty\\Glad" FILES ${PROJECT_NAME} ${GLAD_SRC})
 SOURCE_GROUP("3rdParty\\ImGui" FILES ${PROJECT_NAME} ${IMGUI_SRC})
@@ -120,6 +167,15 @@ add_executable(
 	${PROJECT_NAME}
 	${COMMON_SRC}
 	${COMMON_H}
+	${CORE_SRC}
+	${DEBUG_SRC}
+	${GRAPHICS_SRC}
+	${PHYSICS_SRC}
+	${SCRIPTING_SRC}
+	${AUDIO_SRC}
+	${ANIMATION_SRC}
+	${UI_SRC}
+	${AI_SRC}
   ${STB_SRC}
 	${GLAD_SRC}
 	${IMGUI_SRC}

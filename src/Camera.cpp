@@ -52,7 +52,7 @@ void Camera::Update(float dt)
 
 	//UpdateFirstOrder(dt);
 
-	std::cout << "Front " << _mCamFront.x << ", " << _mCamFront.y << ", " << _mCamFront.z << std::endl;
+	//std::cout << "Front " << _mCamFront.x << ", " << _mCamFront.y << ", " << _mCamFront.z << std::endl;
 
 	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mCamFront, _mUp);
 }
