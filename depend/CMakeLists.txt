@@ -175,6 +175,17 @@ ELSE()
 ENDIF()
 ADD_DEPENDENCIES(depend openal)
 
+### ASSIMP
+MESSAGE("Adding dependency: assimp")
+
+SET(ASSIMP_OPTIONS
+)
+
+SET(ASSIMP_INCLUDE_DIRS
+    "${CMAKE_SOURCE_DIR}/depend/assimp/include"
+    PARENT_SCOPE
+)
+
 SET_TARGET_PROPERTIES(
     depend glm lua glfw openal
     PROPERTIES FOLDER "Depend"

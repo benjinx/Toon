@@ -44,7 +44,7 @@ public:
 
     /* Functions */
     Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> texCoords);
-    void Render(GLuint programNum, Shader * shader);
+    void Render(GLuint programNum, Shader * shader, glm::mat4 modelMat);
     glm::mat4 CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords);
 
     GLuint GetVAO() { return _mVAO; }
@@ -59,7 +59,6 @@ private:
 
     /* Render Data */
     GLuint       _mVAO;
-    glm::mat4    _mModelMat;
     unsigned int _mVertCount;
 	std::vector<glm::vec3> tangents, bitangents;
 

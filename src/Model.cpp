@@ -15,6 +15,6 @@ void Model::Render(GLuint programNum, Shader * shader)
 {
     for (Mesh* mesh : _mMeshes)
     {
-        mesh->Render(programNum, shader);
+        mesh->Render(programNum, shader, _mModelMat);
     }
 }

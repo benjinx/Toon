@@ -55,13 +55,13 @@ void Application::Start()
     // Shaders
 	int numShaders = 2;
     std::vector<std::string> vertShaders = {
-		"resources/shaders/passThru.vert",
-        "resources/shaders/normalMapping.vert",
+		"resources/shaders/nmLighting.vert",
+        "resources/shaders/passThru.vert",
     };
 
     std::vector<std::string> fragShaders = {
-		"resources/shaders/passThru.frag",
-        "resources/shaders/normalMapping.frag",
+		"resources/shaders/nmLighting.frag",
+        "resources/shaders/passThru.frag",
     };
 
     for (int i = 0; i < numShaders; i++)
@@ -74,7 +74,15 @@ void Application::Start()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Load Obj
-	_mModels = Utils::LoadObj("resources/models/sphere.obj");
+	_mModels.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
+	_mModels.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
+	_mModels.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
+
+	_mModels.find("Plane")->second->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+
+	_mModels.find("Sun")->second->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
+	_mModels.find("Sun")->second->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+
 
 	// Set default to lighting
     _mProg = 1;
@@ -83,7 +91,19 @@ void Application::Start()
 	ShowCredits = false;
 
 	// Load lua script
-	_mScriptHost.Load();
+	//_mScriptHost.Load();
+
+	// Physics
+	//PhysicsStart();
+}
+
+void Application::PhysicsStart()
+{
+	// Testing Physics System Currently
+	glm::vec3 pos(2.0f, 2.0f, 2.0f);
+	Cube cube;
+	cube.SetPosition(pos);
+	cube.Update();
 }
 
 void Application::Update(float dt)
@@ -96,16 +116,32 @@ void Application::Update(float dt)
 
 	//printf("%f\n", dt);
 	Camera::instance().Update(dt);
+
+	_mModels.find("Earth")->second->SetRotation(0.25f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	//PhysicsUpdate(dt);
+}
+
+void Application::PhysicsUpdate(float dt)
+{
+	//
+	glm::vec3 pos(1.0f, 1.0f, 1.0f), rot(0.0f), scale(2.0f, 2.0f, 2.0f);
+	GameObject gobj;
+	gobj.SetTransform(pos, rot, scale);
+	gobj.Update(_mDeltaTime);
 }
 
 void Application::Render()
 {
     _mShader.Clear();
 
-    for (Model* model : _mModels)
-    {
-        model->Render(_mProg, &_mShader);
-    }
+	for (auto& model : _mModels)
+	{ 
+		if (model.first == "Sun")
+			model.second->Render(1, &_mShader);
+		else
+			model.second->Render(0, &_mShader);
+	}
 
 	UI::RenderUI();
 
@@ -177,24 +213,6 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
         }
         }
     }
-
-	//if (keysDown[GLFW_KEY_W])
-	//	Camera::instance().HandleMovement(Direction::FORWARD);
- //   if (keysDown[GLFW_KEY_S])
-	//	Camera::instance().HandleMovement(Direction::BACKWARD);
- //   if (keysDown[GLFW_KEY_A])
-	//	Camera::instance().HandleMovement(Direction::LEFT);
- //   if (keysDown[GLFW_KEY_D])
-	//	Camera::instance().HandleMovement(Direction::RIGHT);
- //   if (keysDown[GLFW_KEY_Q])
-	//	Camera::instance().HandleMovement(Direction::UP);
- //   if (keysDown[GLFW_KEY_E])
-	//	Camera::instance().HandleMovement(Direction::DOWN);
-
-	//if (keysDown[GLFW_KEY_H])
-	//{
-	//	Camera::instance().HandleRotation();
-	//}
 
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
 }

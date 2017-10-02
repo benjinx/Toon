@@ -14,19 +14,20 @@ enum LogLevel
 
 namespace Utils
 {
-unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp);
+	unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp);
 
-void FreePng(unsigned char* img);
+	void FreePng(unsigned char* img);
 
-GLuint LoadTexture(std::string filename);
+	GLuint LoadTexture(std::string filename);
 
-std::string GetBasename(const std::string& path);
+	std::string GetBasename(const std::string& path);
 
-std::string GetDirname(const std::string& path);
+	std::string GetDirname(const std::string& path);
 
-std::vector<Model*> LoadObj(std::string filename);
+	std::vector<Model*> LoadObjs(std::string filename);
+	Model* LoadObj(std::string filename);
 
-void Log(LogLevel flag, std::string infoStr);
+	void Log(LogLevel flag, std::string infoStr);
 }
 
 #endif // UTILITIES_H

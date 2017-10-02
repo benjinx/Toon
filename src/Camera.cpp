@@ -25,9 +25,6 @@ void Camera::Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget, 
     _mViewMat = glm::lookAt(_mPosition, _mTarget, up);
     _mWorldUp = up;
 
-    // Rotate model
-    // glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-
     // View movement
     // glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f);
 	_mVelocity = glm::vec3(0);
@@ -42,18 +39,6 @@ void Camera::Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget, 
 
 void Camera::Update(float dt)
 {
-	//_mMovementSpeed = 2.0f * dt;
-	// Drag
-	//float dragCoeff = 5.0f, surfaceArea = 0.5f, fluidDensity = 1.293f; // 1.293f is airDensity
-
-	//glm::vec3 dragForce = (dragCoeff * fluidDensity * surfaceArea * (_mVelocity * _mVelocity)) / 2.0f;
-	//AddForce(dragForce);
-
-
-	//UpdateFirstOrder(dt);
-
-	//std::cout << "Front " << _mCamFront.x << ", " << _mCamFront.y << ", " << _mCamFront.z << std::endl;
-
 	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mCamFront, _mUp);
 }
 

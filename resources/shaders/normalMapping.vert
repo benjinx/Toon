@@ -7,6 +7,8 @@ layout (location = 8) in vec2 texCoords;
 
 // Uniforms
 uniform mat4 modelMat;
+uniform mat4 viewMat;
+uniform mat4 projMat;
 uniform mat4 mvp;
 uniform vec4 lightPos;
 uniform vec4 eyePos;
@@ -24,12 +26,12 @@ out vertexData
 
 void main()
 {
-	gl_Position = mvp * position;
-
 	pass.fragPos = modelMat * position;
-	pass.normal = modelMat * normal;
-	pass.lightPos = lightPos;
-	pass.eyePos = eyePos;
-	pass.texCoords = texCoords;
+	pass.normal = transpose(inverse(modelMat)) * normal;
+	pass.lightPos = lightPos - pass.fragPos;
+	pass.eyePos = eyePos - pass.fragPos;
+	pass.texCoords = texCoords.xy;
 	pass.modelMat = modelMat;
+
+	gl_Position = projMat * viewMat * pass.fragPos;
 }

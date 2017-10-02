@@ -30,17 +30,19 @@ void main()
 	//fragColor = texture(diffuse, passTexCoord);
 	//fragColor = mix(texture(ambientTex, passTexCoord), texture(diffuseTex, passTexCoord), 0.5);
 
-	vec4 mixedTextureAndColor = texture(diffuseTex, passTexCoord);
+	//vec4 mixedTextureAndColor = texture(diffuseTex, passTexCoord);
 
-	if (sel == 0)
-		fragColor = texture(ambientTex, passTexCoord);
-	else if (sel == 1)
-		fragColor = texture(diffuseTex, passTexCoord);
-	else if (sel == 2)
-		fragColor = texture(specularTex, passTexCoord);
-	else if (sel == 3)
-		fragColor = texture(bumpTex, passTexCoord);
-	else if (sel == 4)
-		fragColor = mix(mixedTextureAndColor, vec4(1.0, 0.0, 1.0, 1.0), 0.5);
+	fragColor = texture(diffuseTex, passTexCoord);
+
+	//if (sel == 0)
+	//	fragColor = texture(ambientTex, passTexCoord);
+	//else if (sel == 1)
+	//	fragColor = texture(diffuseTex, passTexCoord);
+	//else if (sel == 2)
+	//	fragColor = texture(specularTex, passTexCoord);
+	//else if (sel == 3)
+	//	fragColor = texture(bumpTex, passTexCoord);
+	//else if (sel == 4)
+	//	fragColor = mix(mixedTextureAndColor, vec4(1.0, 0.0, 1.0, 1.0), 0.5);
 
 }

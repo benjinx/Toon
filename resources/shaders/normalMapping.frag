@@ -22,22 +22,31 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
-	float specAmount = 32.0f;
-	//vec4 norm = normalize(pass.modelMat * (texture(bumpTex, pass.texCoords) * 2.0 - 1.0));
-	vec4 norm = pass.modelMat * (texture(bumpTex, pass.texCoords) * 2.0 - 1.0);
+	vec3 lightColor = texture(diffuseTex, pass.texCoords).rgb;
+	//vec3 norm = normalize(pass.normal.xyz);
+	vec3 norm = normalize(mat3(transpose(inverse(pass.modelMat))) * (texture(bumpTex, pass.texCoords).rgb * 2.0 - 1.0));
+	vec3 lightDir = normalize(pass.lightPos.xyz);
+	vec3 viewDir = normalize(pass.eyePos.xyz);
 
-	float amb = 0.1;
-	vec4 ambient = texture(ambientTex, pass.texCoords) * amb * lightColor;
+	// Ambient
+	vec3 ambient = 0.1 * lightColor;
+	//vec4 ambient = texture(ambientTex, pass.texCoords) * lightColor;
 
-	vec4 lightDir = normalize(pass.lightPos - pass.fragPos);
-	float diff = max(dot(pass.normal /*norm*/, lightDir), 0.0);
-	vec4 diffuse = texture(diffuseTex, pass.texCoords) * diff * lightColor;
+	// Diffuse
+	float diff = dot(lightDir, norm);
 
-	vec4 viewDir = normalize(pass.eyePos - pass.fragPos);
-	vec4 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(pass.normal /*norm*/, halfwayDir), 0.0), specAmount);
-	vec4 specular = /*texture(specularTex, pass.texCoords) * */ spec * lightColor;
+	// Specular
+	//vec3 R = (diff + diff) * norm - lightDir;
+	vec3 R = reflect(-lightDir, norm);
+	//vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = max(dot(viewDir, R), 0.0);
+	spec *= spec;
+	spec *= spec;
+	spec *= spec;
 
-	fragColor = vec4(ambient.xyz + diffuse.xyz + specular.xyz, 1.0f);
+	diff = max(diff, 0.0);
+	vec3 diffuse = diff * lightColor;
+	vec3 specular = texture(specularTex, pass.texCoords).rgb * spec;
+
+	fragColor = vec4(ambient + diffuse + specular, 1.0);
 }

@@ -10,8 +10,8 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
     glGenVertexArrays(1, &_mVAO);
     glBindVertexArray(_mVAO);
 
-    GLuint vbos[5];
-    glGenBuffers(5, vbos);
+    GLuint vbos[3];
+    glGenBuffers(3, vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_STATIC_DRAW);
@@ -34,23 +34,87 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
         glEnableVertexAttribArray(ATTRIB_TEXCOORD);
     }
 
-	//CalcTBN(vertices, texCoords);
-	//
-	//if (!tangents.empty())
-	//{
+	/// TBN MANUAL CALC
+	///
+
+	//// positions
+	//glm::vec3 pos1(-0.5, 0.5, 0.0);
+	//glm::vec3 pos2(-0.5, -0.5, 0.0);
+	//glm::vec3 pos3(0.5, -0.5, 0.0);
+	//glm::vec3 pos4(0.5, 0.5, 0.0);
+	//// texture coordinates
+	//glm::vec2 uv1(0.0, 1.0);
+	//glm::vec2 uv2(0.0, 0.0);
+	//glm::vec2 uv3(1.0, 0.0);
+	//glm::vec2 uv4(1.0, 1.0);
+	//// normal vector
+	//glm::vec3 nm(0.0, 0.0, 1.0);
+
+	////
+	//glm::vec3 edge1 = pos2 - pos1;
+	//glm::vec3 edge2 = pos3 - pos1;
+	//glm::vec2 deltaUV1 = uv2 - uv1;
+	//glm::vec2 deltaUV2 = uv3 - uv1;
+
+	////
+	//float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+	//glm::vec3 tangent1, tangent2, bitangent1, bitangent2;
+
+	//tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+	//tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+	//tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+	//tangent1 = glm::normalize(tangent1);
+
+	//bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+	//bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+	//bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+	//bitangent1 = glm::normalize(bitangent1);
+
+	////
+	//edge1 = pos3 - pos1;
+	//edge2 = pos4 - pos1;
+	//deltaUV1 = uv3 - uv1;
+	//deltaUV2 = uv4 - uv1;
+
+	////
+	//f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+	//tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+	//tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+	//tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+	//tangent2 = glm::normalize(tangent2);
+
+	//bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+	//bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+	//bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+	//bitangent2 = glm::normalize(bitangent2);
+
+	/////
+
+	//tangents.push_back(tangent1);
+	//tangents.push_back(tangent2);
+
+	//bitangents.push_back(bitangent1);
+	//bitangents.push_back(bitangent2);
+
+	////CalcTBN(vertices, texCoords);
+	////
+	////if (!tangents.empty())
+	////{
 	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[3]);
 	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tangents.size() * 3, tangents.data(), GL_STATIC_DRAW);
 	//	glVertexAttribPointer(ATTRIB_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	//	glEnableVertexAttribArray(ATTRIB_TANGENT);
-	//}
+	////}
 
-	//if (!bitangents.empty())
-	//{
+	////if (!bitangents.empty())
+	////{
 	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[4]);
 	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bitangents.size() * 3, bitangents.data(), GL_STATIC_DRAW);
 	//	glVertexAttribPointer(ATTRIB_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	//	glEnableVertexAttribArray(ATTRIB_BITANGENT);
-	//}
+	////}
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -120,32 +184,24 @@ glm::mat4 Mesh::CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> 
 	return glm::mat4();
 }
 
-void Mesh::Render(GLuint programNum, Shader * shader)
+void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 {
     glUseProgram(shader->GetShaderProgramIDs()[programNum]);
 
-    _mModelMat = glm::rotate(_mModelMat, glm::radians(_mRotSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
-
     glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "modelMat"), 1, false,
-                       (GLfloat*)&_mModelMat);
+                       (GLfloat*)&modelMat);
     //glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&Camera::instance().GetViewMat());
     //glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&Camera::instance().GetProjectionMat());
 
-	glm::vec2 resolution = Camera::instance().GetResolution();
-	glUniform2fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "resolution"), 1, (GLfloat*)&resolution);
-
-    glm::mat4 mvp = Camera::instance().GetProjectionMat() * Camera::instance().GetViewMat() * _mModelMat;
+    glm::mat4 mvp = Camera::instance().GetProjectionMat() * Camera::instance().GetViewMat() * modelMat;
     glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "mvp"), 1, false, (GLfloat*)&mvp);
 
-    glm::vec4 lightPos = glm::vec4(0.0f, 5.0f, 5.0f, 1.0f);
+	glm::vec4 lightPos = glm::vec4(5.0f, 2.0f, 2.0f, 1.0f);
     glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&lightPos);
 
     glm::vec3 camPos = Camera::instance().GetCameraPos();
-    glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
-    glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "eyePos"), 1, (GLfloat*)&eyePos);
-
-	if (programNum == 0)
-		glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "sel"), (GLfloat)_mSel);
+	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
+	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "eyePos"), 1, (GLfloat*)&eyePos);
 
 	_mMaterial->Bind();
 

@@ -14,3 +14,7 @@
 	path = depend/openal
 	url = https://github.com/kcat/openal-soft
 	branch = tags/openal-soft-1.18.0
+[submodule "depend/assimp"]
+	path = depend/assimp
+	url = https://github.com/assimp/assimp
+	branch = tags/v4.0.1

@@ -16,6 +16,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+#include "Cube.h"
+
 class Application
 {
 public:
@@ -39,11 +41,15 @@ private:
     void                Destroy();
 	void				HandleInput(float dt);
 
+	// 
+	void PhysicsStart();
+	void PhysicsUpdate(float dt);
+
     Shader _mShader;
     Window _mWindow;
 	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
-    std::vector<Model*> _mModels;
+	std::unordered_map<std::string, Model*> _mModels;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     int                _mProg;

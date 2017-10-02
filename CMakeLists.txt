@@ -25,6 +25,7 @@ include_directories(BEFORE SYSTEM
     ${GLM_INCLUDE_DIRS}
     ${LUA_INCLUDE_DIRS}
     ${OPENAL_INCLUDE_DIRS}
+	${ASSIMP_INCLUDE_DIRS}
 )
 
 SET(COMMON_LIBS
@@ -32,16 +33,19 @@ SET(COMMON_LIBS
     ${LUA_LIBRARIES}
     ${GLFW_LIBRARIES}
     ${OPENAL_LIBRARIES}
+	${ASSIMP_LIBRARIES}
 )
 SET(COMMON_LIBS_DEBUG
     ${LUA_LIBRARIES_DEBUG}
     ${GLFW_LIBRARIES_DEBUG}
     ${OPENAL_LIBRARIES_DEBUG}
+	${ASSIMP_LIBRARIES_DEBUG}
 )
 SET(COMMON_LIBS_RELEASE
     ${LUA_LIBRARIES_RELEASE}
     ${GLFW_LIBRARIES_RELEASE}
     ${OPENAL_LIBRARIES_RELEASE}
+	${ASSIMP_LIBRARIES_RELEASE}
 )
 
 # Source files
@@ -59,6 +63,10 @@ SET(CORE_SRC
 	src/Camera.cpp
 	src/Camera.h
 	src/Common.h
+	src/Cube.cpp
+	src/Cube.h
+	src/GameObject.cpp
+	src/GameObject.h
 	src/Main.cpp
 	src/Window.cpp
 	src/Window.h
@@ -84,6 +92,10 @@ SET(GRAPHICS_SRC
 
 # Physics src
 SET(PHYSICS_SRC
+	src/Collision.cpp
+	src/Collision.h
+	src/Rigidbody.cpp
+	src/Rigidbody.h
 )
 
 # Scripting src
@@ -176,11 +188,11 @@ add_executable(
 	${ANIMATION_SRC}
 	${UI_SRC}
 	${AI_SRC}
-  ${STB_SRC}
+	${STB_SRC}
 	${GLAD_SRC}
 	${IMGUI_SRC}
 	${TINY_OBJ_SRC}
-  ${RESOURCES}
+	${RESOURCES}
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
