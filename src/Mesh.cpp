@@ -203,6 +203,8 @@ void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
 	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "eyePos"), 1, (GLfloat*)&eyePos);
 
+	// Pass in material values here.
+
 	_mMaterial->Bind();
 
     if (_mMaterial->AmbientTexExists())

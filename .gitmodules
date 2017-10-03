@@ -17,4 +17,3 @@
 [submodule "depend/assimp"]
 	path = depend/assimp
 	url = https://github.com/assimp/assimp
-	branch = tags/v4.0.1

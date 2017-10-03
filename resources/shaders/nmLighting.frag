@@ -13,25 +13,24 @@ in vertexData
 
 // uniforms
 uniform sampler2D diffuseTex;
-uniform sampler2D normalTex;
+uniform sampler2D bumpTex;
 uniform sampler2D specularTex;
-
-uniform float specAmount;
 
 // target
 layout (location = 0) out vec4 fragColor;
 
 void main()
 {
+	float specAmount = 32.0f;
 	vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 norm = pass.modelMat * (texture(normalTex, pass.texCoords) * 2.0 - 1.0);
+	vec4 norm = pass.modelMat * (texture(bumpTex, pass.texCoords) * 2.0 - 1.0);
 
 	float amb = 0.1;
 	vec4 ambient = amb * lightColor;
 
 	vec4 lightDir = normalize(pass.lightPos - pass.fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec4 diffuse = texture(diffuseTex, pass.texCoords) * diff;
+	vec4 diffuse = texture(diffuseTex, pass.texCoords) * diff * lightColor;
 
 	vec4 viewDir = normalize(pass.eyePos - pass.fragPos);
 	vec4 halfwayDir = normalize(lightDir + viewDir);

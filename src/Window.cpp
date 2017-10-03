@@ -9,6 +9,7 @@ void Window::Start()
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
     glfwWindowHint(GLFW_DECORATED, true);
     glfwWindowHint(GLFW_RESIZABLE, false);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 
     _mWidth  = 1280;
     _mHeight = 720;
