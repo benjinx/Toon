@@ -182,11 +182,51 @@ SET(ASSIMP_OPTIONS
 )
 
 SET(ASSIMP_INCLUDE_DIRS
-    "${CMAKE_SOURCE_DIR}/depend/assimp/include"
+	"${CMAKE_BINARY_DIR}/depend/assimp/include"
+    "${CMAKE_SOURCE_DIR}/depend/assimp/code"
     PARENT_SCOPE
 )
 
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp)
+EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+    ${CMAKE_SOURCE_DIR}/depend/assimp ${ASSIMP_OPTIONS}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
+)
+
+IF (MSVC)
+	SET(ASSIMP_LIBRARIES_DEBUG "${CMAKE_BINARY_DIR}/depend/assimp/code/Debug/assimp-vc140-mt.lib")
+    SET(ASSIMP_LIBRARIES_DEBUG "${ASSIMP_LIBRARIES_DEBUG}" PARENT_SCOPE)
+    SET(ASSIMP_LIBRARIES_RELEASE "${CMAKE_BINARY_DIR}/depend/assimp/code/Release/assimp-vc140-mt.lib")
+    SET(ASSIMP_LIBRARIES_RELEASE "${ASSIMP_LIBRARIES_RELEASE}" PARENT_SCOPE)
+	
+	ADD_CUSTOM_COMMAND(
+        OUTPUT ${ASSIMP_LIBRARIES_DEBUG}
+        COMMAND ${CMAKE_COMMAND} --build . --config Debug --target assimp
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
+    )
+    ADD_CUSTOM_COMMAND(
+        OUTPUT ${ASSIMP_LIBRARIES_RELEASE}
+        COMMAND ${CMAKE_COMMAND} --build . --config Release --target assimp
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
+    )
+	
+	ADD_CUSTOM_TARGET(assimp DEPENDS ${ASSIMP_LIBRARIES_DEBUG} ${ASSIMP_LIBRARIES_RELEASE})
+ELSE()
+	#STEVE DOES LINUX STUFF HERE
+	SET(ASSIMP_LIBRARIES "${CMAKE_BINARY_DIR}/depend/assimp/lib/libassimp.so")
+    SET(ASSIMP_LIBRARIES "${ASSIMP_LIBRARIES}" PARENT_SCOPE)
+
+    ADD_CUSTOM_COMMAND(
+        OUTPUT ${ASSIMP_LIBRARIES}
+        COMMAND ${CMAKE_COMMAND} --build . --target assimp
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
+    )
+    ADD_CUSTOM_TARGET(assimp DEPENDS ${ASSIMP_LIBRARIES})
+ENDIF()
+ADD_DEPENDENCIES(depend assimp)
+
 SET_TARGET_PROPERTIES(
-    depend glm lua glfw openal
+    depend glm lua glfw openal assimp
     PROPERTIES FOLDER "Depend"
 )
