@@ -10,60 +10,60 @@ ADD_CUSTOM_TARGET(glm)
 ADD_DEPENDENCIES(depend glm)
 
 ### lua
-MESSAGE("Adding dependency: lua")
-
-SET(LUA_OPTIONS
-)
-
-IF(MSVC)
-    SET(LUA_OPTIONS
-        -DLUA_BUILD_AS_DLL=OFF
-        -DBUILD_SHARED_LIBS=OFF
-    )
-ENDIF()
-
-SET(LUA_INCLUDE_DIRS
-    "${CMAKE_SOURCE_DIR}/depend/lua/src"
-    "${CMAKE_BINARY_DIR}/depend/lua"
-    PARENT_SCOPE
-)
-
-FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua)
-EXECUTE_PROCESS(
-    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
-        ${CMAKE_SOURCE_DIR}/depend/lua ${LUA_OPTIONS}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
-)
-
-IF (MSVC)
-    SET(LUA_LIBRARIES_DEBUG "${CMAKE_BINARY_DIR}/depend/lua/Debug/lua.lib")
-    SET(LUA_LIBRARIES_DEBUG "${LUA_LIBRARIES_DEBUG}" PARENT_SCOPE)
-    SET(LUA_LIBRARIES_RELEASE "${CMAKE_BINARY_DIR}/depend/lua/Release/lua.lib")
-    SET(LUA_LIBRARIES_RELEASE "${LUA_LIBRARIES_RELEASE}" PARENT_SCOPE)
-
-    ADD_CUSTOM_COMMAND(
-        OUTPUT ${LUA_LIBRARIES_DEBUG}
-        COMMAND ${CMAKE_COMMAND} --build . --config Debug --target liblua
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
-    )
-    ADD_CUSTOM_COMMAND(
-        OUTPUT ${LUA_LIBRARIES_RELEASE}
-        COMMAND ${CMAKE_COMMAND} --build . --config Release --target liblua
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
-    )
-    ADD_CUSTOM_TARGET(lua DEPENDS ${LUA_LIBRARIES_DEBUG} ${LUA_LIBRARIES_RELEASE})
-ELSE()
-    SET(LUA_LIBRARIES "${CMAKE_BINARY_DIR}/depend/lua/liblua.so")
-    SET(LUA_LIBRARIES "${LUA_LIBRARIES}" PARENT_SCOPE)
-
-    ADD_CUSTOM_COMMAND(
-        OUTPUT ${LUA_LIBRARIES}
-        COMMAND ${CMAKE_COMMAND} --build . --target liblua
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
-    )
-    ADD_CUSTOM_TARGET(lua DEPENDS ${LUA_LIBRARIES})
-ENDIF()
-ADD_DEPENDENCIES(depend lua)
+#MESSAGE("Adding dependency: lua")
+#
+#SET(LUA_OPTIONS
+#)
+#
+#IF(MSVC)
+#    SET(LUA_OPTIONS
+#        -DLUA_BUILD_AS_DLL=OFF
+#        -DBUILD_SHARED_LIBS=OFF
+#    )
+#ENDIF()
+#
+#SET(LUA_INCLUDE_DIRS
+#    "${CMAKE_SOURCE_DIR}/depend/lua/src"
+#    "${CMAKE_BINARY_DIR}/depend/lua"
+#    PARENT_SCOPE
+#)
+#
+#FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua)
+#EXECUTE_PROCESS(
+#    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+#        ${CMAKE_SOURCE_DIR}/depend/lua ${LUA_OPTIONS}
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+#)
+#
+#IF (MSVC)
+#    SET(LUA_LIBRARIES_DEBUG "${CMAKE_BINARY_DIR}/depend/lua/Debug/lua.lib")
+#    SET(LUA_LIBRARIES_DEBUG "${LUA_LIBRARIES_DEBUG}" PARENT_SCOPE)
+#    SET(LUA_LIBRARIES_RELEASE "${CMAKE_BINARY_DIR}/depend/lua/Release/lua.lib")
+#    SET(LUA_LIBRARIES_RELEASE "${LUA_LIBRARIES_RELEASE}" PARENT_SCOPE)
+#
+#    ADD_CUSTOM_COMMAND(
+#        OUTPUT ${LUA_LIBRARIES_DEBUG}
+#        COMMAND ${CMAKE_COMMAND} --build . --config Debug --target liblua
+#        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+#    )
+#    ADD_CUSTOM_COMMAND(
+#        OUTPUT ${LUA_LIBRARIES_RELEASE}
+#        COMMAND ${CMAKE_COMMAND} --build . --config Release --target liblua
+#        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+#    )
+#    ADD_CUSTOM_TARGET(lua DEPENDS ${LUA_LIBRARIES_DEBUG} ${LUA_LIBRARIES_RELEASE})
+#ELSE()
+#    SET(LUA_LIBRARIES "${CMAKE_BINARY_DIR}/depend/lua/liblua.so")
+#    SET(LUA_LIBRARIES "${LUA_LIBRARIES}" PARENT_SCOPE)
+#
+#    ADD_CUSTOM_COMMAND(
+#        OUTPUT ${LUA_LIBRARIES}
+#        COMMAND ${CMAKE_COMMAND} --build . --target liblua
+#        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/lua
+#    )
+#    ADD_CUSTOM_TARGET(lua DEPENDS ${LUA_LIBRARIES})
+#ENDIF()
+#ADD_DEPENDENCIES(depend lua)
 
 ### GLFW
 MESSAGE("Adding dependency: glfw")
