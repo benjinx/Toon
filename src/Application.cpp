@@ -21,6 +21,7 @@ void Application::Run()
 		prevTime = currTime;
     }
     Destroy();
+	//Comment
 }
 
 void Application::Start()
