@@ -13,3 +13,6 @@
 [submodule "depend/assimp"]
 	path = depend/assimp
 	url = https://github.com/assimp/assimp
+[submodule "depend/sol2"]
+	path = depend/sol2
+	url = https://github.com/ThePhD/sol2
