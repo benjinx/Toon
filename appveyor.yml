@@ -37,3 +37,6 @@ build:
   verbosity: quiet                         # MSBuild verbosity level (quiet|minimal|normal|detailed)
 
 test: off
+
+ notifications:
+    slack: c0demonk3ys:gnjXYwuoMOBnffg9h8YnlLyE
