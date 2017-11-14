@@ -27,6 +27,11 @@ public:
 
     void Bind();
 
+	glm::vec3 GetAmbient() { return _mAmbient; }
+	glm::vec3 GetDiffuse() { return _mDiffuse; }
+	glm::vec3 GetSpecular() { return _mSpecular; }
+	float GetShininess() { return _mShininess; }
+
     bool AmbientTexExists()
     {
         if (_mAmbientTex != 0)

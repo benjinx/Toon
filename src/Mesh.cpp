@@ -203,7 +203,11 @@ void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
 	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "eyePos"), 1, (GLfloat*)&eyePos);
 
-	// Pass in material values here.
+	// Material values
+	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "ambient"), 1, (GLfloat*)&_mMaterial->GetAmbient());
+	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "diffuse"), 1, (GLfloat*)&_mMaterial->GetDiffuse());
+	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "specular"), 1, (GLfloat*)&_mMaterial->GetSpecular());
+	glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "shininess"), _mMaterial->GetShininess());
 
 	_mMaterial->Bind();
 
