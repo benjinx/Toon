@@ -88,7 +88,7 @@ namespace Utils
 		if (!ret)
 		{
 			fprintf(stderr, "Failed to load %s: %s\n", filename.c_str(), err.c_str());
-			std::vector<Model*> errModel;
+			std::vector<Model*> errModel = {};
 			return errModel;
 		}
 
@@ -189,7 +189,7 @@ namespace Utils
 		if (!ret)
 		{
 			fprintf(stderr, "Failed to load %s: %s\n", filename.c_str(), err.c_str());
-			Model* errModel;
+			Model* errModel = {};
 			return errModel;
 		}
 
