@@ -20,6 +20,7 @@ class GameObject
 public:
 	GameObject() {};
 	GameObject(glm::vec3 position);
+	~GameObject();
 
 	void Update(const float dt);
 	void Render(GLuint programNum, Shader* shader);
@@ -39,15 +40,27 @@ public:
 	}
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetPosition(glm::vec3 position) { _mTransform.position = position; }
+	void SetPosition(glm::vec3 position) { 
+		_mTransform.position = position;
+		_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
+	}
+
 	glm::vec3 GetPosition() { return _mTransform.position; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetRotation(glm::vec3 rotation) { _mTransform.rotation = rotation; }
+	void SetRotation(glm::vec3 rotation) { 
+		_mTransform.rotation = rotation;
+		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	}
 	glm::vec3 GetRotation() { return _mTransform.rotation; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetScale(glm::vec3 scale) { _mTransform.scale = scale; }
+	void SetScale(glm::vec3 scale) { 
+		_mTransform.scale = scale;
+		_mModelMatrix = glm::scale(_mModelMatrix, _mTransform.scale);
+	}
 	glm::vec3 GetScale() { return _mTransform.scale; }
 
 	GameObject* GetChild(std::string name) { 

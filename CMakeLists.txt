@@ -69,6 +69,8 @@ SET(CORE_SRC
 	src/GameObject.cpp
 	src/GameObject.h
 	src/Main.cpp
+	src/Scene.cpp
+	src/Scene.h
 	src/Window.cpp
 	src/Window.h
 )
