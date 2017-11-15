@@ -273,8 +273,8 @@ namespace Utils
 		return newModel;
 	}
 	
-	Model* LoadObjN(std::string filename)
-	{
+	//Model* LoadObjN(std::string filename)
+	//{
 
-	}
+	//}
 }

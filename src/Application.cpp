@@ -78,10 +78,10 @@ void Application::Start()
 	_mModels.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
 	_mModels.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
 
-	_mModels.find("Plane")->second->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	_mModels["Plane"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 
-	_mModels.find("Sun")->second->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
-	_mModels.find("Sun")->second->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+	_mModels["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
+	_mModels["Sun"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 
 
 	// Set default to lighting

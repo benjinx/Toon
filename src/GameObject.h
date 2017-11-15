@@ -1,6 +1,7 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#include "Common.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -30,12 +31,22 @@ public:
 	void SetPosition(glm::vec3 position) { _mTransform.position = position; }
 	glm::vec3 GetPosition() { return _mTransform.position; }
 
+	GameObject* GetChild(std::string name) { 
+		if (_mChildren.find(name) != _mChildren.end())
+			return _mChildren[name];
+
+		return nullptr;
+	}
+
 protected:
 	// Transform
 	Transform _mTransform;
 
 	// Model
 	glm::mat4 _mModelMatrix;
+
+	// Children
+	std::unordered_map<std::string, GameObject*> _mChildren;
 };
 
 // GameObject needs to know which components are attached to each gameobject.
