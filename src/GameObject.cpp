@@ -1,8 +1,19 @@
 #include "GameObject.h"
 
+#include "Mesh.h"
+#include "Shader.h"
+
 GameObject::GameObject(glm::vec3 position)
 {
 	_mTransform.position = position;
+}
+
+GameObject::~GameObject()
+{
+	for (Mesh* mesh : _mMeshes)
+	{
+		delete mesh;
+	}
 }
 
 void GameObject::Update(const float dt)
@@ -75,4 +86,12 @@ void GameObject::Update(const float dt)
 	//ZRotationMatrix[1][1] = glm::cos(_mTransform.rotation.z);
 
 	//_mModelMatrix = ZRotationMatrix * _mModelMatrix;
+}
+
+void GameObject::Render(GLuint programNum, Shader* shader)
+{
+	for (Mesh* mesh : _mMeshes)
+	{
+		mesh->Render(programNum, shader, _mModelMatrix);
+	}
 }

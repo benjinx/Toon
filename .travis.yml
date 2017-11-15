@@ -15,21 +15,21 @@ git:
 
 matrix:
   include:
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-6', 'libstdc++-6-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
-      env: CMAKE_BUILD_TYPE=DEBUG
+    #- os: linux
+    #  compiler: gcc
+    #  addons:
+    #    apt:
+    #      sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
+    #      packages: [ 'g++-6', 'libstdc++-6-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+    #  env: CMAKE_BUILD_TYPE=DEBUG
 
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-6', 'libstdc++-6-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
-      env: CMAKE_BUILD_TYPE=RELEASE
+    #- os: linux
+    #  compiler: gcc
+    #  addons:
+    #    apt:
+    #      sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
+    #      packages: [ 'g++-6', 'libstdc++-6-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+    #  env: CMAKE_BUILD_TYPE=RELEASE
 
     - os: linux
       compiler: clang
@@ -50,7 +50,7 @@ matrix:
 before_install:
   - env
   - export SRC_DIR="`pwd`"
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
+  #- if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
 
 script:

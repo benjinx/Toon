@@ -43,7 +43,7 @@ public:
 	glm::vec3 GetPosition() { return _mTransform.position; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetRotation(glm::vec3 amount) { _mTransform.rotation; }
+	void SetRotation(glm::vec3 rotation) { _mTransform.rotation = rotation; }
 	glm::vec3 GetRotation() { return _mTransform.rotation; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
