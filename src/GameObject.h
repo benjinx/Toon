@@ -5,6 +5,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+class Mesh;
+class Shader;
+
 // Need to make sure to use transform data for modelMatrix.
 struct Transform
 {
@@ -19,6 +22,12 @@ public:
 	GameObject(glm::vec3 position);
 
 	void Update(const float dt);
+	void Render(GLuint programNum, Shader* shader);
+	
+	void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
+
+	Mesh* GetMesh(int index = 0) { return _mMeshes[index]; }
+	unsigned int GetNumMeshes() { return _mMeshes.size(); }
 
 	Transform GetTransform() { return _mTransform; }
 	void SetTransform(Transform transform) { _mTransform = transform; }
@@ -28,8 +37,18 @@ public:
 		_mTransform.rotation = rotation;
 		_mTransform.scale = scale;
 	}
+
+	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetPosition(glm::vec3 position) { _mTransform.position = position; }
 	glm::vec3 GetPosition() { return _mTransform.position; }
+
+	// Remember matrix order is Translate (Position), Rotate, Scale
+	void SetRotation(glm::vec3 amount) { _mTransform.rotation; }
+	glm::vec3 GetRotation() { return _mTransform.rotation; }
+
+	// Remember matrix order is Translate (Position), Rotate, Scale
+	void SetScale(glm::vec3 scale) { _mTransform.scale = scale; }
+	glm::vec3 GetScale() { return _mTransform.scale; }
 
 	GameObject* GetChild(std::string name) { 
 		if (_mChildren.find(name) != _mChildren.end())
@@ -41,6 +60,9 @@ public:
 protected:
 	// Transform
 	Transform _mTransform;
+
+	// Mesh
+	std::vector<Mesh*> _mMeshes;
 
 	// Model
 	glm::mat4 _mModelMatrix;
