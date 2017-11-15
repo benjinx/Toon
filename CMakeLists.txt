@@ -87,8 +87,6 @@ SET(GRAPHICS_SRC
 	src/Material.h
 	src/Mesh.cpp
 	src/Mesh.h
-	src/Model.cpp
-	src/Model.h
 	src/Shader.cpp
 	src/Shader.h
 )

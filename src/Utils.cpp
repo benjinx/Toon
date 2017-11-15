@@ -1,7 +1,7 @@
 #include "Utils.h"
 
 #include "Mesh.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Material.h"
 #include "tiny_obj_loader/tiny_obj_loader.h"
 #include "assimp/config.h"
@@ -73,7 +73,7 @@ namespace Utils
 		return std::string();
 	}
 
-	std::vector<Model*> LoadObjs(std::string filename)
+	std::vector<GameObject*> LoadObjs(std::string filename)
 	{
 		//
 		bool                             ret;
@@ -89,14 +89,14 @@ namespace Utils
 		if (!ret)
 		{
 			fprintf(stderr, "Failed to load %s: %s\n", filename.c_str(), err.c_str());
-			std::vector<Model*> errModel = {};
+			std::vector<GameObject*> errModel = {};
 			return errModel;
 		}
 
 		bool hasNorms     = !attrib.normals.empty();
 		bool hasTexcoords = !attrib.texcoords.empty();
 
-		std::vector<Model*> models;
+		std::vector<GameObject*> models;
 		std::vector<Mesh*>  meshes;
 
 		for (tinyobj::shape_t& shape : shapes)
@@ -167,14 +167,14 @@ namespace Utils
 				newMesh->SetMaterial(newMat);
 			}
 
-			Model* newModel = new Model();
-			newModel->AddMesh(newMesh);
-			models.push_back(newModel);
+			GameObject* newGameObject = new GameObject();
+			newGameObject->AddMesh(newMesh);
+			models.push_back(newGameObject);
 		}
 		return models;
 	}
 
-	Model* LoadObj(std::string filename)
+	GameObject* LoadObj(std::string filename)
 	{
 		//
 		bool                             ret;
@@ -190,14 +190,14 @@ namespace Utils
 		if (!ret)
 		{
 			fprintf(stderr, "Failed to load %s: %s\n", filename.c_str(), err.c_str());
-			Model* errModel = {};
+			GameObject* errModel = {};
 			return errModel;
 		}
 
 		bool hasNorms = !attrib.normals.empty();
 		bool hasTexcoords = !attrib.texcoords.empty();
 
-		Model* newModel = new Model();
+		GameObject* newModel = new GameObject();
 		std::vector<Mesh*>  meshes;
 
 		for (tinyobj::shape_t& shape : shapes)
@@ -273,7 +273,7 @@ namespace Utils
 		return newModel;
 	}
 	
-	//Model* LoadObjN(std::string filename)
+	//GameObject* LoadObjN(std::string filename)
 	//{
 
 	//}

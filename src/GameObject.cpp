@@ -28,11 +28,11 @@ void GameObject::Update(const float dt)
 
 	// GLM
 
-	_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
-	_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	_mModelMatrix = glm::scale(_mModelMatrix, _mTransform.scale);
+	//_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
+	//_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	//_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	//_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	//_mModelMatrix = glm::scale(_mModelMatrix, _mTransform.scale);
 
 	//// Matrix math from scratch
 	

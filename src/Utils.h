@@ -3,7 +3,7 @@
 
 #include "Common.h"
 
-class Model;
+class GameObject;
 
 enum LogLevel
 {
@@ -24,9 +24,9 @@ namespace Utils
 
 	std::string GetDirname(const std::string& path);
 
-	std::vector<Model*> LoadObjs(std::string filename);
-	Model* LoadObj(std::string filename);
-	Model* LoadObjN(std::string filename);
+	std::vector<GameObject*> LoadObjs(std::string filename);
+	GameObject* LoadObj(std::string filename);
+	//GameObject* LoadObjN(std::string filename);
 
 	void Log(LogLevel flag, std::string infoStr);
 }

@@ -6,7 +6,6 @@
 #include "Camera.h"
 #include "Window.h"
 #include "Mesh.h"
-#include "Model.h"
 #include "Material.h"
 #include "Shader.h"
 #include "UI.h"
@@ -49,7 +48,7 @@ private:
     Window _mWindow;
 	//ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
-	std::unordered_map<std::string, Model*> _mModels;
+	std::unordered_map<std::string, GameObject*> _mGameObjects;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     int                _mProg;

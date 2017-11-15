@@ -74,14 +74,14 @@ void Application::Start()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Load Obj
-	_mModels.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
-	_mModels.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
-	_mModels.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
+	//_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
+	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
+	_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
 
-	_mModels["Plane"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	//_mGameObjects["Plane"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 
-	_mModels["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
-	_mModels["Sun"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
+	_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
 
 
 	// Set default to lighting
@@ -117,7 +117,8 @@ void Application::Update(float dt)
 	//printf("%f\n", dt);
 	Camera::instance().Update(dt);
 
-	_mModels.find("Earth")->second->SetRotation(0.25f, glm::vec3(0.0f, 1.0f, 0.0f));
+	_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.25f, 0.0f));
+	_mGameObjects["Sun"]->SetRotation(glm::vec3(0.0f, 0.1f, 0.0f));
 
 	//PhysicsUpdate(dt);
 }
@@ -135,12 +136,12 @@ void Application::Render()
 {
     _mShader.Clear();
 
-	for (auto& model : _mModels)
+	for (auto& gameObject : _mGameObjects)
 	{ 
-		if (model.first == "Sun")
-			model.second->Render(1, &_mShader);
+		if (gameObject.first == "Sun")
+			gameObject.second->Render(1, &_mShader);
 		else
-			model.second->Render(0, &_mShader);
+			gameObject.second->Render(0, &_mShader);
 	}
 
 	UI::RenderUI();

@@ -50,9 +50,9 @@ public:
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetRotation(glm::vec3 rotation) { 
 		_mTransform.rotation = rotation;
-		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		_mModelMatrix = glm::rotate(_mModelMatrix, _mTransform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	glm::vec3 GetRotation() { return _mTransform.rotation; }
 
