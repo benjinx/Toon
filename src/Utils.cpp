@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Material.h"
 #include "tiny_obj_loader/tiny_obj_loader.h"
+#include "assimp/config.h"
 
 namespace Utils
 {
@@ -270,5 +271,10 @@ namespace Utils
 			newModel->AddMesh(newMesh);
 		}
 		return newModel;
+	}
+	
+	Model* LoadObjN(std::string filename)
+	{
+
 	}
 }

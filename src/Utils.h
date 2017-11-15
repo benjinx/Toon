@@ -26,6 +26,7 @@ namespace Utils
 
 	std::vector<Model*> LoadObjs(std::string filename);
 	Model* LoadObj(std::string filename);
+	Model* LoadObjN(std::string filename);
 
 	void Log(LogLevel flag, std::string infoStr);
 }
