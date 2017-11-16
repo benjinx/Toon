@@ -91,7 +91,7 @@ void Application::Start()
 	ShowCredits = false;
 
 	// Load lua script
-	//_mScriptHost.Load();
+	_mScriptHost.Load();
 
 	// Physics
 	//PhysicsStart();

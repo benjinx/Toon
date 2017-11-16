@@ -46,7 +46,7 @@ private:
 
     Shader _mShader;
     Window _mWindow;
-	//ScriptHost _mScriptHost;
+	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
 	std::unordered_map<std::string, GameObject*> _mGameObjects;
 	bool rightButtonDown = false;
