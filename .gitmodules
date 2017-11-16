@@ -16,3 +16,7 @@
 [submodule "depend/sol2"]
 	path = depend/sol2
 	url = https://github.com/ThePhD/sol2
+[submodule "depend/lua"]
+	path = depend/lua
+	url = https://github.com/LuaDist/lua
+	branch = lua-5.3
