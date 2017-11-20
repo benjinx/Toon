@@ -26,7 +26,7 @@ namespace Utils
 
 	std::vector<GameObject*> LoadObjs(std::string filename);
 	GameObject* LoadObj(std::string filename);
-	//GameObject* LoadObjN(std::string filename);
+	GameObject* LoadObjN(std::string filename);
 
 	void Log(LogLevel flag, std::string infoStr);
 }
