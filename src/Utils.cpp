@@ -275,31 +275,31 @@ namespace Utils
 		return newModel;
 	}
 	
-	GameObject* LoadObjN(std::string filename)
-	{
-		//Assimp::Importer importer;
-		//const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+	//GameObject* LoadObjN(std::string filename)
+	//{
+	//	//Assimp::Importer importer;
+	//	//const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-		//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-		//{
-		//	std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
-		//	return nullptr;
-		//}
-		//filename.substr(0, filename.find_last_of('/'));
+	//	//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	//	//{
+	//	//	std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
+	//	//	return nullptr;
+	//	//}
+	//	//filename.substr(0, filename.find_last_of('/'));
 
-		////processNode(scene->mRootNode, scene);
-		//// process all the node's meshes (if any)
-		//for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; i++)
-		//{
-		//	aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[i]];
-		//	//meshes.push_back(processMesh(mesh, scene));
-		//}
-		//// then do the same for each of its children
-		//for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
-		//{
-		//	processNode(scene->mRootNode->mChildren[i], scene);
-		//}
+	//	////processNode(scene->mRootNode, scene);
+	//	//// process all the node's meshes (if any)
+	//	//for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; i++)
+	//	//{
+	//	//	aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[i]];
+	//	//	//meshes.push_back(processMesh(mesh, scene));
+	//	//}
+	//	//// then do the same for each of its children
+	//	//for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
+	//	//{
+	//	//	processNode(scene->mRootNode->mChildren[i], scene);
+	//	//}
 
-		return nullptr;
-	}
+	//	return nullptr;
+	//}
 }

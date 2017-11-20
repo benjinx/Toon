@@ -78,6 +78,12 @@ void Application::Start()
 	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
 	_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
 
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	_mGameObjects.emplace("Earth" + std::to_string(i), Utils::LoadObj("resources/models/earth.obj"));
+	//	_mGameObjects["Earth" + std::to_string(i)]->SetPosition(glm::vec3(i*2.0f, 0.0f, 0.0f));
+	//}
+
 	//_mGameObjects["Plane"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 
 	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
