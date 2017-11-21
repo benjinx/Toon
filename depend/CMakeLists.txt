@@ -184,6 +184,7 @@ SET(ASSIMP_OPTIONS
 SET(ASSIMP_INCLUDE_DIRS
     "${CMAKE_SOURCE_DIR}/depend/assimp/code"
 	"${CMAKE_SOURCE_DIR}/depend/assimp/include"
+	"${CMAKE_BINARY_DIR}/depend/assimp/include"
     PARENT_SCOPE
 )
 
