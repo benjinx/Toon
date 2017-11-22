@@ -32,7 +32,7 @@ public:
     }
     ~Camera(){};
 
-    void Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget, glm::vec3 up);
+    void Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget);
 
     void Update(float dt);
 
@@ -40,13 +40,14 @@ public:
     glm::mat4 GetProjectionMat() { return _mProjectionMat; }
     glm::vec3 GetCameraPos() { return _mPosition; }
     void SetCameraPos(glm::vec3 position) { _mPosition = position; }
-    glm::vec3                   GetCameraVelocity() { return _mVelocity; }
+    glm::vec3 GetCameraVelocity() { return _mVelocity; }
     void SetCameraVelocity(glm::vec3 velocity) { _mVelocity = velocity; }
 	glm::vec2 GetResolution();
 	glm::vec3 GetCameraForward() { return _mForward; }
 
 	void HandleRotation(float x, float y);
 	void HandleMovement(Direction dir, float dt);
+	void HandleFoV(float xoffset, float yoffset);
 	void AddForce(glm::vec3 force);
 	void UpdateAcceleration();
 	void UpdateFirstOrder(float dt);
@@ -64,6 +65,7 @@ private:
 			  _mUp,
 			  _mTarget,
 			  _mWorldUp;
+	float _mFoV;
 	float _mYaw = -90.0f, _mPitch = 0.0f, _mRoll = 0.0f;
 	float _mMovementSpeed;
 	float _mMouseSensitivity;

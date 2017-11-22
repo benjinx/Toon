@@ -48,9 +48,8 @@ void Application::Start()
     // Camera
     glm::vec3 cameraPos    = glm::vec3(0.0f, 0.0f, 2.0f);
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 up           = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    Camera::instance().Init(&_mWindow, cameraPos, cameraTarget, up);
+    Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
 
     // Shaders
 	int numShaders = 2;
@@ -77,6 +76,7 @@ void Application::Start()
 	//_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
 	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
 	_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
+	_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/cube.obj"));
 
 	//for (int i = 0; i < 10; i++)
 	//{
@@ -88,6 +88,9 @@ void Application::Start()
 
 	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
 	_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
+
+	_mGameObjects["Cube"]->SetPosition(glm::vec3(2.0f, 2.0f, -2.0f));
+	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
 
 
 	// Set default to lighting
@@ -238,6 +241,8 @@ void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int acti
 
 void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
+	Camera::instance().HandleFoV(xoffset, yoffset);
+
     // scroll
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
 }
