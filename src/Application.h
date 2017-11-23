@@ -39,6 +39,8 @@ private:
     void                Render();
     void                Destroy();
 	void				HandleInput(float dt);
+	void SetupShaders();
+	void DeleteShaders();
 
 	// 
 	void PhysicsStart();
@@ -49,6 +51,7 @@ private:
 	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
 	std::unordered_map<std::string, GameObject*> _mGameObjects;
+	int _mNumShaders;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     int                _mProg;

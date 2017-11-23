@@ -4,9 +4,9 @@
 #include "GameObject.h"
 #include "Material.h"
 #include "tiny_obj_loader/tiny_obj_loader.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+//#include "assimp/Importer.hpp"
+//#include "assimp/scene.h"
+//#include "assimp/postprocess.h"
 
 namespace Utils
 {
@@ -278,28 +278,19 @@ namespace Utils
 	//GameObject* LoadObjN(std::string filename)
 	//{
 	//	//Assimp::Importer importer;
-	//	//const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+	//	//const aiScene* scene = importer.ReadFile(filename,
+	//	//	aiProcess_CalcTangentSpace |
+	//	//	aiProcess_Triangulate |
+	//	//	aiProcess_FlipUVs);
 
-	//	//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	//	//if (!scene)
 	//	//{
 	//	//	std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
 	//	//	return nullptr;
 	//	//}
-	//	//filename.substr(0, filename.find_last_of('/'));
 
-	//	////processNode(scene->mRootNode, scene);
-	//	//// process all the node's meshes (if any)
-	//	//for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; i++)
-	//	//{
-	//	//	aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[i]];
-	//	//	//meshes.push_back(processMesh(mesh, scene));
-	//	//}
-	//	//// then do the same for each of its children
-	//	//for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
-	//	//{
-	//	//	processNode(scene->mRootNode->mChildren[i], scene);
-	//	//}
-
+	//	//// Process the scene for the data we want now
+	//	//
 	//	return nullptr;
 	//}
 }

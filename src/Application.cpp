@@ -51,26 +51,8 @@ void Application::Start()
 
     Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
 
-    // Shaders
-	int numShaders = 2;
-    std::vector<std::string> vertShaders = {
-		"resources/shaders/nmLighting.vert",
-        "resources/shaders/passThru.vert",
-    };
-
-    std::vector<std::string> fragShaders = {
-		"resources/shaders/nmLighting.frag",
-        "resources/shaders/passThru.frag",
-    };
-
-    for (int i = 0; i < numShaders; i++)
-        _mShader.SetupShaders(vertShaders[i], fragShaders[i]);
-
-    // Depth
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Shaders
+	SetupShaders();
 
     // Load Obj
 	//_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
@@ -104,6 +86,36 @@ void Application::Start()
 
 	// Physics
 	//PhysicsStart();
+}
+
+void Application::SetupShaders()
+{
+	// Shaders
+	_mNumShaders = 2;
+	std::vector<std::string> vertShaders = {
+		"resources/shaders/nmLighting.vert",
+		"resources/shaders/passThru.vert",
+	};
+
+	std::vector<std::string> fragShaders = {
+		"resources/shaders/nmLighting.frag",
+		"resources/shaders/passThru.frag",
+	};
+
+	for (int i = 0; i < _mNumShaders; i++)
+		_mShader.SetupShaders(vertShaders[i], fragShaders[i]);
+
+	// Depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Application::DeleteShaders()
+{
+	for (int i = 0; i < _mNumShaders; i++)
+		_mShader.Destroy();
 }
 
 void Application::PhysicsStart()
@@ -215,6 +227,17 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
             UI::optionsSelected = !UI::optionsSelected;
             break;
         }
+
+		case GLFW_KEY_F5: // Reloads shaders
+		{
+			// Dans Engine - Calls deleteShaders then setupShaders
+			std::cout << "Reloading shaders!\n";
+
+			DeleteShaders();
+			SetupShaders();
+
+			break;
+		}
 
         case GLFW_KEY_F11:
         {
