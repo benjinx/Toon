@@ -197,6 +197,8 @@ void Shader::Destroy()
 		glUseProgram(program);
 		glDeleteProgram(program);
 	}
+
+	_mShaderProgram.clear();
 }
 
 

@@ -114,7 +114,7 @@ void Application::SetupShaders()
 
 void Application::DeleteShaders()
 {
-	for (int i = 0; i < _mNumShaders; i++)
+	//for (int i = 0; i < _mNumShaders; i++)
 		_mShader.Destroy();
 }
 
