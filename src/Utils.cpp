@@ -277,20 +277,20 @@ namespace Utils
 	
 	GameObject* LoadObjN(std::string filename)
 	{
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filename,
-			aiProcess_CalcTangentSpace |
-			aiProcess_Triangulate |
-			aiProcess_FlipUVs);
+		//Assimp::Importer importer;
+		//const aiScene* scene = importer.ReadFile(filename,
+		//	aiProcess_CalcTangentSpace |
+		//	aiProcess_Triangulate |
+		//	aiProcess_FlipUVs);
 
-		if (!scene)
-		{
-			std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
-			return nullptr;
-		}
+		//if (!scene)
+		//{
+		//	std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
+		//	return nullptr;
+		//}
 
-		// Process the scene for the data we want now
-		
+		//// Process the scene for the data we want now
+		//
 		return nullptr;
 	}
 }

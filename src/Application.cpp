@@ -46,7 +46,7 @@ void Application::Start()
 	keysDown.emplace(GLFW_KEY_H, false);
 
     // Camera
-    glm::vec3 cameraPos    = glm::vec3(0.0f, 0.0f, 2.0f);
+    glm::vec3 cameraPos    = glm::vec3(0.0f, 0.0f, 5.0f);
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
     Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
@@ -55,10 +55,12 @@ void Application::Start()
 	SetupShaders();
 
     // Load Obj
-	//_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
+	_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
+	_mGameObjects.emplace("Sphere", Utils::LoadObj("resources/models/pSphere.obj"));
+
 	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
-	_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
-	_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/cube.obj"));
+	//_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
+	//_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/cube.obj"));
 
 	//for (int i = 0; i < 10; i++)
 	//{
@@ -66,13 +68,18 @@ void Application::Start()
 	//	_mGameObjects["Earth" + std::to_string(i)]->SetPosition(glm::vec3(i*2.0f, 0.0f, 0.0f));
 	//}
 
-	//_mGameObjects["Plane"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
+	_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+	_mGameObjects["Plane"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
 	_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
 
-	_mGameObjects["Cube"]->SetPosition(glm::vec3(2.0f, 2.0f, -2.0f));
-	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
+	//_mGameObjects["Cube"]->SetPosition(glm::vec3(2.0f, 2.0f, -2.0f));
+	//_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
+
+	_mGameObjects["Sphere"]->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+	_mGameObjects["Sphere"]->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 
 	// Set default to lighting
@@ -85,7 +92,7 @@ void Application::Start()
 	_mScriptHost.Load();
 
 	// Physics
-	//PhysicsStart();
+	PhysicsStart();
 }
 
 void Application::SetupShaders()
@@ -121,10 +128,10 @@ void Application::DeleteShaders()
 void Application::PhysicsStart()
 {
 	// Testing Physics System Currently
-	glm::vec3 pos(2.0f, 2.0f, 2.0f);
-	Cube cube;
-	cube.SetPosition(pos);
-	cube.Update();
+	//glm::vec3 pos(2.0f, 2.0f, 2.0f);
+	//Cube cube;
+	//cube.SetPosition(pos);
+	//cube.Update();
 }
 
 void Application::Update(float dt)
@@ -138,19 +145,16 @@ void Application::Update(float dt)
 	//printf("%f\n", dt);
 	Camera::instance().Update(dt);
 
-	_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.25f, 0.0f));
-	_mGameObjects["Sun"]->SetRotation(glm::vec3(0.0f, 0.1f, 0.0f));
+	//_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.25f, 0.0f));
+	//_mGameObjects["Sun"]->SetRotation(glm::vec3(0.0f, 0.1f, 0.0f));
 
-	//PhysicsUpdate(dt);
+	PhysicsUpdate(dt);
 }
 
 void Application::PhysicsUpdate(float dt)
 {
 	//
-	glm::vec3 pos(1.0f, 1.0f, 1.0f), rot(0.0f), scale(2.0f, 2.0f, 2.0f);
-	GameObject gobj;
-	gobj.SetTransform(pos, rot, scale);
-	gobj.Update(_mDeltaTime);
+	_mGameObjects["Sphere"]->Update(dt);
 }
 
 void Application::Render()
@@ -159,10 +163,12 @@ void Application::Render()
 
 	for (auto& gameObject : _mGameObjects)
 	{ 
-		if (gameObject.first == "Sun")
-			gameObject.second->Render(1, &_mShader);
-		else
-			gameObject.second->Render(0, &_mShader);
+		//if (gameObject.first == "Sun")
+		//	gameObject.second->Render(1, &_mShader);
+		//else
+		//	gameObject.second->Render(0, &_mShader);
+
+		gameObject.second->Render(1, &_mShader);
 	}
 
 	UI::RenderUI();

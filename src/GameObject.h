@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Rigidbody.h"
 
 class Mesh;
 class Shader;
@@ -18,7 +19,7 @@ struct Transform
 class GameObject
 {
 public:
-	GameObject() {};
+	GameObject();
 	GameObject(glm::vec3 position);
 	~GameObject();
 
@@ -42,7 +43,7 @@ public:
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetPosition(glm::vec3 position) { 
 		_mTransform.position = position;
-		_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
+		//_mModelMatrix = glm::translate(glm::mat4(), _mTransform.position);
 	}
 
 	glm::vec3 GetPosition() { return _mTransform.position; }
@@ -50,18 +51,31 @@ public:
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetRotation(glm::vec3 rotation) { 
 		_mTransform.rotation = rotation;
-		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	glm::vec3 GetRotation() { return _mTransform.rotation; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetScale(glm::vec3 scale) { 
 		_mTransform.scale = scale;
-		_mModelMatrix = glm::scale(_mModelMatrix, _mTransform.scale);
+		//_mModelMatrix = glm::scale(glm::mat4(), _mTransform.scale);
 	}
 	glm::vec3 GetScale() { return _mTransform.scale; }
+
+
+	// Build Model Matrix
+	glm::mat4 GetModelMatrix()
+	{
+		_mModelMatrix = glm::mat4();
+		_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		_mModelMatrix = glm::scale(_mModelMatrix, _mTransform.scale);
+		return _mModelMatrix;
+	}
 
 	GameObject* GetChild(std::string name) { 
 		if (_mChildren.find(name) != _mChildren.end())
@@ -82,6 +96,9 @@ protected:
 
 	// Children
 	std::unordered_map<std::string, GameObject*> _mChildren;
+
+	// Rigidbody
+	Rigidbody _mRigidbody;
 };
 
 // GameObject needs to know which components are attached to each gameobject.
