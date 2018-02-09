@@ -26,60 +26,34 @@ void Application::Run()
 void Application::Start()
 {
     _mWindow.Start();
-    _mShader.Start(&_mWindow);
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
 	UI::StartUI(&_mWindow);
-    glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
-    glfwSetMouseButtonCallback(_mWindow.GetWindow(), &mouse_button_callback);
-    glfwSetScrollCallback(_mWindow.GetWindow(), &scroll_callback);
-    glfwSetCursorPosCallback(_mWindow.GetWindow(), &mouse_pos_callback);
+	glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
+	glfwSetMouseButtonCallback(_mWindow.GetWindow(), &mouse_button_callback);
+	glfwSetScrollCallback(_mWindow.GetWindow(), &scroll_callback);
+	glfwSetCursorPosCallback(_mWindow.GetWindow(), &mouse_pos_callback);
 
 	glfwSetInputMode(_mWindow.GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	firstMouse = true;
 
-    keysDown.emplace(GLFW_KEY_W, false);
-    keysDown.emplace(GLFW_KEY_A, false);
-    keysDown.emplace(GLFW_KEY_S, false);
-    keysDown.emplace(GLFW_KEY_D, false);
-    keysDown.emplace(GLFW_KEY_Q, false);
-    keysDown.emplace(GLFW_KEY_E, false);
+	keysDown.emplace(GLFW_KEY_W, false);
+	keysDown.emplace(GLFW_KEY_A, false);
+	keysDown.emplace(GLFW_KEY_S, false);
+	keysDown.emplace(GLFW_KEY_D, false);
+	keysDown.emplace(GLFW_KEY_Q, false);
+	keysDown.emplace(GLFW_KEY_E, false);
 
 	keysDown.emplace(GLFW_KEY_H, false);
 
-    // Camera
-    glm::vec3 cameraPos    = glm::vec3(0.0f, 0.0f, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	// Camera
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
+	Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
 
-	// Shaders
-	SetupShaders();
-
-    // Load Obj
-	_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
-	_mGameObjects.emplace("Sphere", Utils::LoadObj("resources/models/pSphere.obj"));
-
-	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
-	//_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
-	//_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/cube.obj"));
-
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	_mGameObjects.emplace("Earth" + std::to_string(i), Utils::LoadObj("resources/models/earth.obj"));
-	//	_mGameObjects["Earth" + std::to_string(i)]->SetPosition(glm::vec3(i*2.0f, 0.0f, 0.0f));
-	//}
-
-	_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
-	_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-	_mGameObjects["Plane"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-
-	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
-	_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
-
-	//_mGameObjects["Cube"]->SetPosition(glm::vec3(2.0f, 2.0f, -2.0f));
-	//_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
-
-	_mGameObjects["Sphere"]->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
-	_mGameObjects["Sphere"]->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	// Setup Scene
+	_mGameScene.Start();
 
 
 	// Set default to lighting
@@ -93,36 +67,6 @@ void Application::Start()
 
 	// Physics
 	PhysicsStart();
-}
-
-void Application::SetupShaders()
-{
-	// Shaders
-	_mNumShaders = 2;
-	std::vector<std::string> vertShaders = {
-		"resources/shaders/nmLighting.vert",
-		"resources/shaders/passThru.vert",
-	};
-
-	std::vector<std::string> fragShaders = {
-		"resources/shaders/nmLighting.frag",
-		"resources/shaders/passThru.frag",
-	};
-
-	for (int i = 0; i < _mNumShaders; i++)
-		_mShader.SetupShaders(vertShaders[i], fragShaders[i]);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-void Application::DeleteShaders()
-{
-	//for (int i = 0; i < _mNumShaders; i++)
-		_mShader.Destroy();
 }
 
 void Application::PhysicsStart()
@@ -148,32 +92,26 @@ void Application::Update(float dt)
 	//_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.25f, 0.0f));
 	//_mGameObjects["Sun"]->SetRotation(glm::vec3(0.0f, 0.1f, 0.0f));
 
+	_mGameScene.Update(dt);
+
 	PhysicsUpdate(dt);
 }
 
 void Application::PhysicsUpdate(float dt)
 {
 	//
-	_mGameObjects["Sphere"]->Update(dt);
+	//_mScene.GetGameObjects()["Sphere"]->Update(dt);
 }
 
 void Application::Render()
 {
-    _mShader.Clear();
+	_mWindow.Clear();
 
-	for (auto& gameObject : _mGameObjects)
-	{ 
-		//if (gameObject.first == "Sun")
-		//	gameObject.second->Render(1, &_mShader);
-		//else
-		//	gameObject.second->Render(0, &_mShader);
-
-		gameObject.second->Render(1, &_mShader);
-	}
+	_mGameScene.Render();
 
 	UI::RenderUI();
 
-    _mShader.Present();
+	_mWindow.Present();
 }
 
 void Application::HandleInput(float dt)
@@ -239,8 +177,9 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
 			// Dans Engine - Calls deleteShaders then setupShaders
 			std::cout << "Reloading shaders!\n";
 
-			DeleteShaders();
-			SetupShaders();
+
+			_mGameScene.DeleteShaders();
+			_mGameScene.SetupShaders();
 
 			break;
 		}
@@ -299,7 +238,6 @@ void Application::HandleGLFWMousePos(GLFWwindow* window, double x, double y)
 void Application::Destroy()
 {
     ImGui_ImplGlfwGL3_Shutdown();
-    _mShader.Destroy();
     _mWindow.Destroy();
 }
 

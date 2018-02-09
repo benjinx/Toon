@@ -11,14 +11,9 @@ public:
     Shader(){};
     ~Shader(){};
 
-    void Start(Window* aWindow);
-
     void CheckAttribs();
 
     void SetupShaders(std::string vertFilename, std::string fragFilename);
-
-    void Clear();
-    void Present();
 
     void Destroy();
 

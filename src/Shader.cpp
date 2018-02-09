@@ -3,11 +3,6 @@
 #include "Window.h"
 #include "Utils.h"
 
-void Shader::Start(Window* aWindow)
-{
-    _mpWindow = aWindow;
-}
-
 void Shader::CheckAttribs()
 {
     // Check for max Attribs
@@ -200,12 +195,3 @@ void Shader::Destroy()
 
 	_mShaderProgram.clear();
 }
-
-
-void Shader::Clear()
-{
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Shader::Present() { glfwSwapBuffers(_mpWindow->GetWindow()); }

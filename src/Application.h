@@ -11,6 +11,8 @@
 #include "UI.h"
 #include "Utils.h"
 #include "ScriptHost.h"
+#include "Scene.h"
+#include "GameScene.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
@@ -39,19 +41,15 @@ private:
     void                Render();
     void                Destroy();
 	void				HandleInput(float dt);
-	void SetupShaders();
-	void DeleteShaders();
 
 	// 
 	void PhysicsStart();
 	void PhysicsUpdate(float dt);
 
-    Shader _mShader;
     Window _mWindow;
 	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
-	std::unordered_map<std::string, GameObject*> _mGameObjects;
-	int _mNumShaders;
+	GameScene _mGameScene;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     int                _mProg;

@@ -12,8 +12,10 @@ public:
     ~Window(){};
 
     void Start();
-    void Update(){};
     void Destroy();
+
+	void Clear();
+	void Present();
 
     GLFWwindow* GetWindow() { return _mpWindow; }
 

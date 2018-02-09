@@ -68,6 +68,8 @@ SET(CORE_SRC
 	src/Cube.h
 	src/GameObject.cpp
 	src/GameObject.h
+	src/GameScene.cpp
+	src/GameScene.h
 	src/Main.cpp
 	src/Scene.cpp
 	src/Scene.h
