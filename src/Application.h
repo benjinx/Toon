@@ -10,7 +10,6 @@
 #include "Shader.h"
 #include "UI.h"
 #include "Utils.h"
-#include "ScriptHost.h"
 #include "Scene.h"
 #include "GameScene.h"
 
@@ -34,6 +33,10 @@ public:
     void HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset);
     void HandleGLFWMousePos(GLFWwindow* window, double x, double y);
 
+	int GetWindowWidth() { return _mWindow.GetWidth(); }
+	int GetWindowHeight() { return _mWindow.GetHeight(); }
+	GLFWwindow* GetWindow() { return _mWindow.GetWindow(); }
+
 private:
     static Application* _sInst;
     void                Start();
@@ -43,19 +46,17 @@ private:
 	void				HandleInput(float dt);
 
     Window _mWindow;
-	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
-	GameScene _mGameScene;
+	//GameScene _mGameScene;
+	Scene* _mpCurrentScene;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
-    int                _mProg;
     std::vector<Mesh*> _mMeshes;
     ImVec4             Red         = ImVec4(255.0f, 0.0f, 0.0f, 255.0f);
     ImVec4             Yellow      = ImVec4(255.0f, 255.0f, 0.0f, 255.0f);
     ImVec4             Green       = ImVec4(0.0f, 255.0f, 0.0f, 255.0f);
     ImVec4             White       = ImVec4(255.0f, 255.0f, 255.0f, 255.0f);
     char               buffer[255] = {};
-	bool			   ShowCredits;
 	bool firstMouse;
 	float lastX = 640, lastY = 360;
 };

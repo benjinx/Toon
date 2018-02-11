@@ -1,6 +1,7 @@
 #include "UI.h"
 
 #include "Window.h"
+#include "Application.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
@@ -10,12 +11,12 @@ bool UI::settingsSelected = false;
 bool UI::showMainMenuBar = true;
 bool UI::showTestWindow  = false;
 
-void UI::StartUI(Window* aWindow)
+void UI::StartUI()
 {
-	ImGui_ImplGlfwGL3_Init(aWindow->GetWindow(), true);
+	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow(), true);
 }
 
-void UI::UpdateUI(Window* aWindow)
+void UI::UpdateUI()
 {
 	ImGui_ImplGlfwGL3_NewFrame();
 
@@ -32,7 +33,7 @@ void UI::UpdateUI(Window* aWindow)
 				ImGui::EndMenu();
 			}
 
-			ImGui::SameLine(aWindow->GetWidth() - 150, 0.0f);
+			ImGui::SameLine(Application::Inst()->GetWindowWidth() - 150, 0.0f);
 			ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
@@ -78,7 +79,7 @@ void UI::UpdateUI(Window* aWindow)
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))
-				glfwSetWindowShouldClose(aWindow->GetWindow(), GL_TRUE);
+				glfwSetWindowShouldClose(Application::Inst()->GetWindow(), GL_TRUE);
 			ImGui::End();
 		}
 	}

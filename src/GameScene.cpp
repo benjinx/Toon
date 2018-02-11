@@ -1,12 +1,20 @@
 #include "GameScene.h"
 
+#include "UI.h"
+
 void GameScene::Start()
 {
 	// Shaders
 	SetupShaders();
 
-	// CAMERA START
+	// UI
+	UI::StartUI();
 
+	// Camera
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	Camera::instance().Init(cameraPos, cameraTarget);
 
 	// Object setup
 	_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
@@ -37,6 +45,12 @@ void GameScene::Start()
 
 	_mGameObjects["Earth"]->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
 	_mGameObjects["Earth"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+
+	// Load lua script
+	_mScriptHost.Load();
+
+	// Set default to lighting
+	_mProg = 1;
 
 	// Physics
 	PhysicsStart();
@@ -93,6 +107,8 @@ void GameScene::DeleteShaders()
 
 void GameScene::Update(float dt)
 {
+	Camera::instance().Update(dt);
+
 	//_mGameObjects["Sun"]->SetRotation(_mGameObjects["Sun"]->GetRotation() + glm::vec3(0.0f, 0.1f, 0.0f));
 	_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
 
@@ -102,6 +118,8 @@ void GameScene::Update(float dt)
 	}
 
 	PhysicsUpdate(dt);
+
+	UI::UpdateUI();
 }
 
 void GameScene::Render()
@@ -116,4 +134,5 @@ void GameScene::Render()
 		gameObject.second->Render(1, &_mShader);
 	}
 
+	UI::RenderUI();
 }

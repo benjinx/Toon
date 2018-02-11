@@ -32,7 +32,7 @@ public:
     }
     ~Camera(){};
 
-    void Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget);
+    void Init(glm::vec3 cameraPos, glm::vec3 cameraTarget);
 
     void Update(float dt);
 
@@ -54,7 +54,6 @@ public:
 
 private:
     Camera(){};
-    Window*   _mpWindow;
     glm::mat4 _mViewMat, _mProjectionMat;
     glm::vec3 _mPosition,
 			  _mVelocity,

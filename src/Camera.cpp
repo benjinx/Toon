@@ -1,17 +1,17 @@
 #include "Camera.h"
 
 #include "Window.h"
+#include "Application.h"
 
-void Camera::Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget)
+void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
 {
-    _mpWindow  = aWindow;
     _mPosition = cameraPos;
     _mTarget   = cameraTarget;
 	_mFoV = 45.0f;
 
     // 1 - FOV, 2 - Aspect Ratio, 3 - Near clipping, 4 - Far clipping
     _mProjectionMat =
-        glm::perspective(glm::radians(_mFoV), (float)_mpWindow->GetWidth() / (float)_mpWindow->GetHeight(), 0.1f, 10000.0f);
+        glm::perspective(glm::radians(_mFoV), (float)Application::Inst()->GetWindowWidth() / (float)Application::Inst()->GetWindowHeight(), 0.1f, 10000.0f);
 
     // Camera Dir
 	_mForward = glm::normalize(_mPosition - _mTarget);
@@ -42,7 +42,7 @@ void Camera::Init(Window* aWindow, glm::vec3 cameraPos, glm::vec3 cameraTarget)
 
 void Camera::Update(float dt)
 {
-	_mProjectionMat = glm::perspective(glm::radians(_mFoV), (float)_mpWindow->GetWidth() / (float)_mpWindow->GetHeight(), 0.1f, 10000.0f);
+	_mProjectionMat = glm::perspective(glm::radians(_mFoV), (float)Application::Inst()->GetWindowWidth() / (float)Application::Inst()->GetWindowHeight(), 0.1f, 10000.0f);
 	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mCamFront, _mUp);
 }
 
@@ -141,5 +141,5 @@ void Camera::HandleFoV(float xoffset, float yoffset)
 
 glm::vec2 Camera::GetResolution()
 {
-	return glm::vec2((float)_mpWindow->GetWidth(), (float)_mpWindow->GetHeight());
+	return glm::vec2((float)Application::Inst()->GetWindowWidth(), (float)Application::Inst()->GetWindowHeight());
 }

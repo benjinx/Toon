@@ -3,14 +3,13 @@
 
 #include "Common.h"
 
-class Window;
 struct ImDrawData;
 
 namespace UI
 {
 
-void StartUI(Window* aWindow);
-void UpdateUI(Window* aWindow);
+void StartUI();
+void UpdateUI();
 void RenderUI();
 void DrawUI(ImDrawData* draw_data);
 

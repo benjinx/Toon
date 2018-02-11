@@ -11,8 +11,11 @@ public:
 	Scene();
 	~Scene() {};
 	
+	virtual void Start() {};
 	virtual void Update(float dt);
 	virtual void Render();
+	virtual void SetupShaders() {};
+	virtual void DeleteShaders() {};
 	void Pause();
 	void Resume();
 

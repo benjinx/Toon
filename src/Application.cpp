@@ -27,9 +27,10 @@ void Application::Start()
 {
 	// Window
     _mWindow.Start();
-	
-	// UI
-	UI::StartUI(&_mWindow);
+
+	// Setup Scene
+	_mpCurrentScene = new GameScene();
+	_mpCurrentScene->Start();
 
 	// Input
 	glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
@@ -50,24 +51,6 @@ void Application::Start()
 
 		// Other Input keys
 	keysDown.emplace(GLFW_KEY_H, false);
-
-	// Setup Scene
-	_mGameScene.Start();
-
-	// Camera
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
-
-	// Set default to lighting
-    _mProg = 1;
-
-	//
-	ShowCredits = false;
-
-	// Load lua script
-	_mScriptHost.Load();
 }
 
 void Application::Update(float dt)
@@ -76,17 +59,14 @@ void Application::Update(float dt)
 
     glfwPollEvents();
 
-	Camera::instance().Update(dt);
-	_mGameScene.Update(dt);
-	UI::UpdateUI(&_mWindow);
+	_mpCurrentScene->Update(dt);
 }
 
 void Application::Render()
 {
 	_mWindow.Clear();
 
-	_mGameScene.Render();
-	UI::RenderUI();
+	_mpCurrentScene->Render();
 
 	_mWindow.Present();
 }
@@ -155,8 +135,8 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
 			std::cout << "Reloading shaders!\n";
 
 
-			_mGameScene.DeleteShaders();
-			_mGameScene.SetupShaders();
+			_mpCurrentScene->DeleteShaders();
+			_mpCurrentScene->SetupShaders();
 
 			break;
 		}
