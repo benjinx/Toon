@@ -2,7 +2,7 @@
 #define GAMESCENE_H
 #include "Scene.h"
 #include "Window.h"
-#include "UI.h"
+#include "Camera.h"
 
 class GameScene : Scene
 {
@@ -15,6 +15,8 @@ public:
 	void Render() override;
 	void SetupShaders();
 	void DeleteShaders();
+	void PhysicsStart();
+	void PhysicsUpdate(float dt);
 
 private:
 	Shader _mShader;

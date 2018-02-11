@@ -25,10 +25,13 @@ void Application::Run()
 
 void Application::Start()
 {
+	// Window
     _mWindow.Start();
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
+	
+	// UI
 	UI::StartUI(&_mWindow);
+
+	// Input
 	glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
 	glfwSetMouseButtonCallback(_mWindow.GetWindow(), &mouse_button_callback);
 	glfwSetScrollCallback(_mWindow.GetWindow(), &scroll_callback);
@@ -37,6 +40,7 @@ void Application::Start()
 	glfwSetInputMode(_mWindow.GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	firstMouse = true;
 
+	// Movement
 	keysDown.emplace(GLFW_KEY_W, false);
 	keysDown.emplace(GLFW_KEY_A, false);
 	keysDown.emplace(GLFW_KEY_S, false);
@@ -44,17 +48,17 @@ void Application::Start()
 	keysDown.emplace(GLFW_KEY_Q, false);
 	keysDown.emplace(GLFW_KEY_E, false);
 
+		// Other Input keys
 	keysDown.emplace(GLFW_KEY_H, false);
+
+	// Setup Scene
+	_mGameScene.Start();
 
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	Camera::instance().Init(&_mWindow, cameraPos, cameraTarget);
-
-	// Setup Scene
-	_mGameScene.Start();
-
 
 	// Set default to lighting
     _mProg = 1;
@@ -64,18 +68,6 @@ void Application::Start()
 
 	// Load lua script
 	_mScriptHost.Load();
-
-	// Physics
-	PhysicsStart();
-}
-
-void Application::PhysicsStart()
-{
-	// Testing Physics System Currently
-	//glm::vec3 pos(2.0f, 2.0f, 2.0f);
-	//Cube cube;
-	//cube.SetPosition(pos);
-	//cube.Update();
 }
 
 void Application::Update(float dt)
@@ -84,23 +76,9 @@ void Application::Update(float dt)
 
     glfwPollEvents();
 
-	UI::UpdateUI(&_mWindow);
-
-	//printf("%f\n", dt);
 	Camera::instance().Update(dt);
-
-	//_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.25f, 0.0f));
-	//_mGameObjects["Sun"]->SetRotation(glm::vec3(0.0f, 0.1f, 0.0f));
-
 	_mGameScene.Update(dt);
-
-	PhysicsUpdate(dt);
-}
-
-void Application::PhysicsUpdate(float dt)
-{
-	//
-	//_mScene.GetGameObjects()["Sphere"]->Update(dt);
+	UI::UpdateUI(&_mWindow);
 }
 
 void Application::Render()
@@ -108,7 +86,6 @@ void Application::Render()
 	_mWindow.Clear();
 
 	_mGameScene.Render();
-
 	UI::RenderUI();
 
 	_mWindow.Present();

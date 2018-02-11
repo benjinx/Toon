@@ -5,6 +5,9 @@ void GameScene::Start()
 	// Shaders
 	SetupShaders();
 
+	// CAMERA START
+
+
 	// Object setup
 	_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/plane.obj"));
 	//_mGameObjects.emplace("Sphere", Utils::LoadObj("resources/models/pSphere.obj"));
@@ -34,6 +37,9 @@ void GameScene::Start()
 
 	_mGameObjects["Earth"]->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
 	_mGameObjects["Earth"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+
+	// Physics
+	PhysicsStart();
 }
 
 void GameScene::SetupShaders()
@@ -53,11 +59,30 @@ void GameScene::SetupShaders()
 	for (int i = 0; i < _mNumShaders; i++)
 		_mShader.SetupShaders(vertShaders[i], fragShaders[i]);
 
+	// Clear Window
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
 	// Depth
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+
+void GameScene::PhysicsStart()
+{
+	// Testing Physics System Currently
+	//glm::vec3 pos(2.0f, 2.0f, 2.0f);
+	//Cube cube;
+	//cube.SetPosition(pos);
+	//cube.Update();
+}
+
+void GameScene::PhysicsUpdate(float dt)
+{
+	//
+	//_mScene.GetGameObjects()["Sphere"]->Update(dt);
 }
 
 void GameScene::DeleteShaders()
@@ -68,13 +93,15 @@ void GameScene::DeleteShaders()
 
 void GameScene::Update(float dt)
 {
-
+	//_mGameObjects["Sun"]->SetRotation(_mGameObjects["Sun"]->GetRotation() + glm::vec3(0.0f, 0.1f, 0.0f));
 	_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
 
 	for (auto& gobj : _mGameObjects)
 	{
 		gobj.second->Update(dt);
 	}
+
+	PhysicsUpdate(dt);
 }
 
 void GameScene::Render()

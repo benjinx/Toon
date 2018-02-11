@@ -42,10 +42,6 @@ private:
     void                Destroy();
 	void				HandleInput(float dt);
 
-	// 
-	void PhysicsStart();
-	void PhysicsUpdate(float dt);
-
     Window _mWindow;
 	ScriptHost _mScriptHost;
     std::unordered_map<int, bool> keysDown;
