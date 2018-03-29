@@ -6,5 +6,5 @@ Ks 0.8 0.8 0.8
 Ke 0.0000 0.0000 0.0000
 d 1
 illum 2
-map_Kd ../images/pattern/diffuseMap.png
-map_bump ../images/pattern/normalMapOS.png
+map_Kd ../../images/pattern/diffuseMap.png
+map_bump ../../images/pattern/normalMapOS.png

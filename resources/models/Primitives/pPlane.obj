@@ -2,7 +2,7 @@
 #
 
 o Plane
-mtllib plane.mtl
+mtllib pPlane.mtl
 
 v -0.500000 0.500000 0.000000
 v -0.500000 -0.500000 0.000000

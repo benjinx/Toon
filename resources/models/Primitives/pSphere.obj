@@ -2,7 +2,7 @@
 #
 
 o sphere
-mtllib psphere.mtl
+mtllib pSphere.mtl
 
 v -0.707107 0.707107 0.000000
 v -0.693520 0.707107 -0.137950

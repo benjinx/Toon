@@ -47,7 +47,6 @@ private:
 
     Window _mWindow;
     std::unordered_map<int, bool> keysDown;
-	//GameScene _mGameScene;
 	Scene* _mpCurrentScene;
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
