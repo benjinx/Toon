@@ -36,7 +36,7 @@ void Application::Start()
     _mWindow.Start();
 
 	// Setup Scene
-	_mpCurrentScene = new GameScene();
+	//_mpCurrentScene = new GameScene();
 	_mpCurrentScene->Start();
 
 	// Input

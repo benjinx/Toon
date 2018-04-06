@@ -11,7 +11,7 @@
 #include "UI.h"
 #include "Utils.h"
 #include "Scene.h"
-#include "GameScene.h"
+//#include "GameScene.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
@@ -36,6 +36,8 @@ public:
 	int GetWindowWidth() { return _mWindow.GetWidth(); }
 	int GetWindowHeight() { return _mWindow.GetHeight(); }
 	GLFWwindow* GetWindow() { return _mWindow.GetWindow(); }
+
+	void SetCurrentScene(Scene* scene) { _mpCurrentScene = scene; }
 
 private:
     static Application* _sInst;
