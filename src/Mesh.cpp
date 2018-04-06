@@ -15,6 +15,7 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_STATIC_DRAW);
+
     glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(ATTRIB_POSITION);
 
@@ -34,94 +35,48 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
         glEnableVertexAttribArray(ATTRIB_TEXCOORD);
     }
 
-	/// TBN MANUAL CALC
-	///
-
-	//// positions
-	//glm::vec3 pos1(-0.5, 0.5, 0.0);
-	//glm::vec3 pos2(-0.5, -0.5, 0.0);
-	//glm::vec3 pos3(0.5, -0.5, 0.0);
-	//glm::vec3 pos4(0.5, 0.5, 0.0);
-	//// texture coordinates
-	//glm::vec2 uv1(0.0, 1.0);
-	//glm::vec2 uv2(0.0, 0.0);
-	//glm::vec2 uv3(1.0, 0.0);
-	//glm::vec2 uv4(1.0, 1.0);
-	//// normal vector
-	//glm::vec3 nm(0.0, 0.0, 1.0);
-
-	////
-	//glm::vec3 edge1 = pos2 - pos1;
-	//glm::vec3 edge2 = pos3 - pos1;
-	//glm::vec2 deltaUV1 = uv2 - uv1;
-	//glm::vec2 deltaUV2 = uv3 - uv1;
-
-	////
-	//float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	//glm::vec3 tangent1, tangent2, bitangent1, bitangent2;
-
-	//tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-	//tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-	//tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-	//tangent1 = glm::normalize(tangent1);
-
-	//bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-	//bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-	//bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-	//bitangent1 = glm::normalize(bitangent1);
-
-	////
-	//edge1 = pos3 - pos1;
-	//edge2 = pos4 - pos1;
-	//deltaUV1 = uv3 - uv1;
-	//deltaUV2 = uv4 - uv1;
-
-	////
-	//f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	//tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-	//tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-	//tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-	//tangent2 = glm::normalize(tangent2);
-
-	//bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-	//bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-	//bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-	//bitangent2 = glm::normalize(bitangent2);
-
-	/////
-
-	//tangents.push_back(tangent1);
-	//tangents.push_back(tangent2);
-
-	//bitangents.push_back(bitangent1);
-	//bitangents.push_back(bitangent2);
-
-	////CalcTBN(vertices, texCoords);
-	////
-	////if (!tangents.empty())
-	////{
-	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[3]);
-	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tangents.size() * 3, tangents.data(), GL_STATIC_DRAW);
-	//	glVertexAttribPointer(ATTRIB_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	//	glEnableVertexAttribArray(ATTRIB_TANGENT);
-	////}
-
-	////if (!bitangents.empty())
-	////{
-	//	glBindBuffer(GL_ARRAY_BUFFER, vbos[4]);
-	//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bitangents.size() * 3, bitangents.data(), GL_STATIC_DRAW);
-	//	glVertexAttribPointer(ATTRIB_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	//	glEnableVertexAttribArray(ATTRIB_BITANGENT);
-	////}
-
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     _mVertCount = vertices.size();
-    _mRotSpeed  = 0.25f;
-    _mSel       = 0.0f;
+}
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
+{
+	_mVertices = vertices;
+	_mIndices = indices;
+	_mTextures = textures;
+
+	SetupMesh();
+}
+
+void Mesh::SetupMesh()
+{
+	glGenVertexArrays(1, &_mVAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	glBindVertexArray(_mVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, _mVertices.size() * sizeof(Vertex), &_mVertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mIndices.size() * sizeof(unsigned int), &_mIndices[0], GL_STATIC_DRAW);
+
+	// vertex positions
+	glEnableVertexAttribArray(ATTRIB_POSITION);
+	glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+	// vertex normals
+	glEnableVertexAttribArray(ATTRIB_NORMAL);
+	glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+	// vertex texture coords
+	glEnableVertexAttribArray(ATTRIB_TEXCOORD);
+	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glBindVertexArray(0);
 }
 
 //glm::mat4 Mesh::CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords)
@@ -184,6 +139,31 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
 //	return glm::mat4();
 //}
 
+//void Mesh::Draw(GLuint programNum, Shader* shader, glm::mat4 modelMat)
+//{
+//	unsigned int diffuseN = 0;
+//	unsigned int specularN = 0;
+//
+//	for (unsigned int i = 0; i < _mTextures.size(); i++)
+//	{
+//		glActiveTexture(GL_TEXTURE0 + i);
+//		std::string num;
+//		std::string name = _mTextures[i].type;
+//		if (name == "texture_diffuse")
+//			num = std::to_string(diffuseN++);
+//		else if (name == "texture_specular")
+//			num = std::to_string(specularN++);
+//
+//		glUniform1i(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], (name + num).c_str()), i);
+//		glBindTexture(GL_TEXTURE_2D, _mTextures[i].id);
+//	}
+//	glActiveTexture(GL_TEXTURE0);
+//
+//	glBindVertexArray(_mVAO);
+//	glDrawElements(GL_TRIANGLES, _mIndices.size(), GL_UNSIGNED_INT, 0);
+//	glBindVertexArray(0);
+//}
+
 void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 {
     glUseProgram(shader->GetShaderProgramIDs()[programNum]);
@@ -236,6 +216,7 @@ void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 
     glBindVertexArray(_mVAO);
     glDrawArrays(GL_TRIANGLES, 0, _mVertCount);
+	//glDrawElements(GL_TRIANGLES, _mIndices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
 }

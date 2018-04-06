@@ -16,30 +16,47 @@ void GameScene::Start()
 
 	Camera::instance().Init(cameraPos, cameraTarget);
 
+	// Init Axis For Scene
+	//InitAxis();
+
 	// Object setup
 	//_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/Primitives/pPlane.obj"));
 	//_mGameObjects.emplace("Sphere", Utils::LoadObj("resources/models/Primitives/pSphere.obj"));
 
-	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
+	//_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
 	//_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
-	_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/Primitives/pCube.obj"));
+	//_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/Primitives/pCube.obj"));
 
-	/*_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
-	_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-	_mGameObjects["Plane"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));*/
 
-	_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
-	_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
+	///
+	_mGameObjects.emplace("Test", Utils::LoadObjN("resources/models/Primitives/pCube.obj"));
+	_mGameObjects["Test"]->SetPosition(glm::vec3(0.5f, 0.5f, 1.5f));
+	_mGameObjects["Test"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
+	_mGameObjects["Test"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	///
 
-	_mGameObjects["Cube"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -1.0f, 0.0f));
+	//_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+	//_mGameObjects["Plane"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	//_mGameObjects["Plane"]->InitAxis();
+
+	//_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
+	//_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
+	//_mGameObjects["Sun"]->InitAxis();
+	
+	/*_mGameObjects["Cube"]->SetPosition(glm::vec3(0.5f, 0.5f, 1.5f));
 	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
 	_mGameObjects["Cube"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	_mGameObjects["Cube"]->InitAxis();*/
 
 	//_mGameObjects["Sphere"]->SetPosition(glm::vec3(0.0f, 0.0f, 1.0f));
 	//_mGameObjects["Sphere"]->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	//_mGameObjects["Sphere"]->InitAxis();
 
 	//_mGameObjects["Earth"]->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
 	//_mGameObjects["Earth"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	//_mGameObjects["Earth"]->InitAxis();
 
 	// Load lua script
 	_mScriptHost.Load();
@@ -49,13 +66,15 @@ void GameScene::Start()
 
 	// Physics
 	PhysicsStart();
+
 }
 
 void GameScene::SetupShaders()
 {
 	// Shaders
-	_mNumShaders = 4;
+	_mNumShaders = 5;
 	std::vector<std::string> vertShaders = {
+		"resources/shaders/axis.vert",
 		"resources/shaders/passThru.vert",
 		"resources/shaders/basicLighting.vert",
 		"resources/shaders/bpLighting.vert",
@@ -63,6 +82,7 @@ void GameScene::SetupShaders()
 	};
 
 	std::vector<std::string> fragShaders = {
+		"resources/shaders/axis.frag",
 		"resources/shaders/passThru.frag",
 		"resources/shaders/basicLighting.frag",
 		"resources/shaders/bpLighting.frag",
@@ -81,7 +101,6 @@ void GameScene::SetupShaders()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
 
 void GameScene::PhysicsStart()
 {
@@ -110,7 +129,8 @@ void GameScene::Update(float dt)
 
 	//_mGameObjects["Sun"]->SetRotation(_mGameObjects["Sun"]->GetRotation() + glm::vec3(0.0f, 0.1f, 0.0f));
 	//_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
-	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
+	//_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
+	_mGameObjects["Test"]->SetRotation(_mGameObjects["Test"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
 
 	for (auto& gobj : _mGameObjects)
 	{
@@ -124,13 +144,27 @@ void GameScene::Update(float dt)
 
 void GameScene::Render()
 {
+
 	for (auto& gameObject : _mGameObjects)
 	{
 		if (gameObject.first == "Sun")
-			gameObject.second->Render(0, &_mShader);
+			gameObject.second->Render(1, &_mShader);
 		else
-			gameObject.second->Render(2, &_mShader);
+			gameObject.second->Render(3, &_mShader);
 	}
+
+	// Axis Rendering for Objects
+	for (auto& gameOject : _mGameObjects)
+	{
+		if (gameOject.second->IsAxisEnabled())
+		{
+			gameOject.second->DrawAxis(0, &_mShader);
+		}
+	}
+
+
+	// Draw Scene Axis
+	//DrawAxis(0, &_mShader);
 
 	UI::RenderUI();
 }

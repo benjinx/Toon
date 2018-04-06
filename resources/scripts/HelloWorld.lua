@@ -1,2 +1,2 @@
 -- Simple Hello World Lua Script
-print('Hello World!');
+print('Printing from lua - Hello World!');

@@ -84,6 +84,11 @@ public:
 		return nullptr;
 	}
 
+	void InitAxis();
+	void DrawAxis(GLuint programNum, Shader * shader);
+
+	bool IsAxisEnabled() { return axisEnabled; }
+
 protected:
 	// Transform
 	Transform _mTransform;
@@ -99,6 +104,11 @@ protected:
 
 	// Rigidbody
 	Rigidbody _mRigidbody;
+
+	// Axis Rendering
+	GLuint _mVAO;
+	GLuint _mVBO[2];
+	bool axisEnabled;
 };
 
 // GameObject needs to know which components are attached to each gameobject.

@@ -37,6 +37,19 @@ enum attributeName
     ATTRIB_BITANGENT_SECONDARY,
 };
 
+/// NEW
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec3 texCoords;
+};
+
+/// NEW
+struct Texture {
+	unsigned int id;
+	std::string type;
+};
+
 class Mesh
 {
 public:
@@ -44,27 +57,30 @@ public:
 
     /* Functions */
     Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> texCoords);
-    void Render(GLuint programNum, Shader * shader, glm::mat4 modelMat);
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+	void Render(GLuint programNum, Shader * shader, glm::mat4 modelMat);
     //glm::mat4 CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords);
 
     GLuint GetVAO() { return _mVAO; }
     void SetMaterial(Material* material) { _mMaterial = material; }
 
-    // TEMP
-    float* GetRotSpeed() { return &_mRotSpeed; }
-    void SetSel(float value) { _mSel = value; }
+	//void Draw();
 
 private:
     Material* _mMaterial;
 
     /* Render Data */
-    GLuint       _mVAO;
+    GLuint       _mVAO, VBO, EBO;
     unsigned int _mVertCount;
-	std::vector<glm::vec3> tangents, bitangents;
+	std::vector<glm::vec3> _mTangents, _mBitangents;
 
-    // TEMP
-    float _mRotSpeed;
-    float _mSel;
+	/* Mesh Data */
+	std::vector<Vertex> _mVertices;
+	std::vector<unsigned int> _mIndices;
+	std::vector<Texture> _mTextures;
+
+	/* Functions */
+	void SetupMesh();
 };
 
 #endif // MESH_H

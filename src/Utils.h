@@ -4,6 +4,13 @@
 #include "Common.h"
 
 class GameObject;
+struct aiNode;
+struct aiMesh;
+struct aiScene;
+struct aiMaterial;
+enum aiTextureType;
+class Mesh;
+//struct Texture;
 
 enum LogLevel
 {
@@ -27,6 +34,9 @@ namespace Utils
 	std::vector<GameObject*> LoadObjs(std::string filename);
 	GameObject* LoadObj(std::string filename);
 	GameObject* LoadObjN(std::string filename);
+	void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname);
+	Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname);
+	std::string GetMaterialTextureName(aiMaterial* material, aiTextureType type, std::string dirname);
 
 	void Log(LogLevel flag, std::string infoStr);
 }

@@ -277,20 +277,165 @@ namespace Utils
 	
 	GameObject* LoadObjN(std::string filename)
 	{
-		//Assimp::Importer importer;
-		//const aiScene* scene = importer.ReadFile(filename,
-		//	aiProcess_CalcTangentSpace |
-		//	aiProcess_Triangulate |
-		//	aiProcess_FlipUVs);
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(filename,
+			aiProcess_CalcTangentSpace |
+			aiProcess_Triangulate |
+			aiProcess_FlipUVs);
 
-		//if (!scene)
-		//{
-		//	std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
-		//	return nullptr;
-		//}
+		if (!scene)
+		{
+			std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
+			return nullptr;
+		}
 
-		//// Process the scene for the data we want now
-		//
-		return nullptr;
+		std::string dirname = GetDirname(filename) + "/";
+
+		std::vector<Mesh*> meshes;
+
+		// ProcessNode
+		ProcessNode(scene->mRootNode, scene, meshes, dirname);
+
+		GameObject* gobj = new GameObject();
+		gobj->AddMesh(meshes[0]);
+
+		return gobj;
 	}
+
+	void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname)
+	{
+		// process all the node's meshes (if any)
+		for (unsigned int i = 0; i < node->mNumMeshes; i++)
+		{
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			meshes.push_back(ProcessMesh(mesh, scene, meshes, dirname));
+		}
+		// then do the same for each of its children
+		for (unsigned int i = 0; i < node->mNumChildren; i++)
+		{
+			ProcessNode(node->mChildren[i], scene, meshes, dirname);
+		}
+	}
+
+	Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname)
+	{
+		std::vector<glm::vec3> vertices;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> texCoords;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
+
+		// Indices
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+			{
+				indices.push_back(face.mIndices[j]);
+			}
+		}
+
+		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+		{
+			// Vertices
+			glm::vec3 vertice(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			vertices.push_back(vertice);
+
+			// Normals
+			if (mesh->HasNormals())
+			{
+				glm::vec3 normal(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+				normals.push_back(normal);
+			}
+
+			// TexCoords
+			if (mesh->mTextureCoords[0])
+			{
+				glm::vec2 texCoord(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+				texCoords.push_back(texCoord);
+			}
+			else
+				texCoords.push_back(glm::vec2(0.0f, 0.0f));
+		}
+
+		//vertices.resize(indices.size());
+
+		//if (mesh->HasNormals())
+		//	normals.resize(indices.size());
+
+		//if (mesh->mTextureCoords[0])
+		//	texCoords.resize(indices.size());
+
+
+		//std::vector<glm::vec3> newVerts;
+		//newVerts.reserve(indices.size());
+		//for (auto&i : indices)
+		//{
+		//	newVerts.push_back(vertices[i]);
+		//}
+		
+		//vertices.size();
+		
+
+		Mesh* newMesh = new Mesh(vertices, normals, texCoords);
+		Material* newMat = nullptr;
+
+		// Materials
+		if (mesh->mMaterialIndex >= 0)
+		{
+			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+			// Ambient
+			std::string ambientTex = GetMaterialTextureName(material, aiTextureType_AMBIENT, dirname);
+
+			// Diffuse
+			std::string diffuseTex = GetMaterialTextureName(material, aiTextureType_DIFFUSE, dirname);
+
+			// Specular
+			std::string specularTex = GetMaterialTextureName(material, aiTextureType_SPECULAR, dirname);
+
+			// Normal
+			std::string normalTex = GetMaterialTextureName(material, aiTextureType_NORMALS, dirname);
+
+			aiColor4D aiAmb;
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &aiAmb);
+			float amb[3] = { aiAmb.r, aiAmb.g, aiAmb.b };
+
+			aiColor4D aiDiff;
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &aiDiff);
+			float diff[3] = { aiDiff.r, aiDiff.g, aiDiff.b };
+
+			aiColor4D aiSpec;
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &aiSpec);
+			float spec[3] = { aiSpec.r, aiSpec.g, aiSpec.b };
+
+			aiColor4D aiShininess;
+			aiGetMaterialColor(material, AI_MATKEY_SHININESS, &aiShininess);
+			glm::vec3 shininess(aiShininess.r, aiShininess.g, aiShininess.b);
+
+			// Notes:
+			// Remove dissolve from material it's pointless
+			// Add all the other materials, Albedo, Metallic, roughness, AO?, etc
+
+		
+			newMat = new Material(amb, diff, spec, 0.0f, 0.0f, ambientTex, diffuseTex, specularTex, normalTex);
+			newMesh->SetMaterial(newMat);
+		}
+		
+		return newMesh;
+	}
+
+	std::string GetMaterialTextureName(aiMaterial* material, aiTextureType type, std::string dirname)
+	{
+		std::string texName;
+		for (int i = 0; i < material->GetTextureCount(type); i++)
+		{
+			aiString str;
+			material->GetTexture(type, i, &str);
+			texName = dirname + str.C_Str();
+			printf("Loading Material: %s\n", texName.c_str());
+		}
+		return texName;
+	}
+
 }
