@@ -2,6 +2,8 @@
 
 Application* Application::_sInst = nullptr;
 
+const float TARGET_FPS = 60.0f;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mode);
@@ -9,15 +11,20 @@ void mouse_pos_callback(GLFWwindow* window, double x, double y);
 
 void Application::Run()
 {
+    const float targetElapsed = 1.0f / TARGET_FPS;
+
     Start();
 	float prevTime = 0.0f;
     while (!glfwWindowShouldClose(_mWindow.GetWindow()))
     {
 		float currTime = glfwGetTime();
-		float dt = currTime - prevTime;
+		float elapsed = currTime - prevTime;
+        float dt = elapsed / targetElapsed;
+
 		HandleInput(dt);
         Update(dt);
         Render();
+
 		prevTime = currTime;
     }
     Destroy();

@@ -44,7 +44,7 @@ void GameScene::Start()
 	//_mGameObjects["Sun"]->SetPosition(glm::vec3(5.0f, 2.0f, 2.0f));
 	//_mGameObjects["Sun"]->SetScale(glm::vec3(2.0f, 2.0f, 2.0f));
 	//_mGameObjects["Sun"]->InitAxis();
-	
+
 	/*_mGameObjects["Cube"]->SetPosition(glm::vec3(0.5f, 0.5f, 1.5f));
 	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
 	_mGameObjects["Cube"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -130,7 +130,7 @@ void GameScene::Update(float dt)
 	//_mGameObjects["Sun"]->SetRotation(_mGameObjects["Sun"]->GetRotation() + glm::vec3(0.0f, 0.1f, 0.0f));
 	//_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
 	//_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
-	_mGameObjects["Test"]->SetRotation(_mGameObjects["Test"]->GetRotation() + glm::vec3(0.0f, 0.25f, 0.0f));
+	_mGameObjects["Test"]->SetRotation(_mGameObjects["Test"]->GetRotation() + glm::vec3(0.0f, 1.0f * dt, 0.0f));
 
 	for (auto& gobj : _mGameObjects)
 	{

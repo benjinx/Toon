@@ -35,7 +35,7 @@ void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
 	_mForce = glm::vec3(0);
 
 	// Movement vals
-	_mMovementSpeed = 2.0f;
+	_mMovementSpeed = 0.3f;
 	_mCamFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	_mFirstMouse = true;
 }
@@ -79,6 +79,7 @@ void Camera::UpdateFirstOrder(float dt)
 void Camera::HandleMovement(Direction dir, float dt)
 {
 	float velocity = _mMovementSpeed * dt;
+    printf("%f\n", _mMovementSpeed);
 
 	switch (dir)
 	{
