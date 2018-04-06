@@ -30,8 +30,9 @@ void GameScene::Start()
 
 	///
 	_mGameObjects.emplace("Test", Utils::LoadObjN("resources/models/earth.obj"));
-	_mGameObjects["Test"]->SetPosition(glm::vec3(0.5f, 0.5f, 1.5f));
+	_mGameObjects["Test"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Test"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	_mGameObjects["Test"]->InitAxis();
 	///
 
 

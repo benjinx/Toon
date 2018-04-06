@@ -324,18 +324,7 @@ namespace Utils
 		std::vector<glm::vec2> texCoords;
 		std::vector<glm::vec3> tangents;
 		std::vector<glm::vec3> bitangents;
-		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
-
-		// Indices
-		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace face = mesh->mFaces[i];
-			for (unsigned int j = 0; j < face.mNumIndices; j++)
-			{
-				indices.push_back(face.mIndices[j]);
-			}
-		}
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
