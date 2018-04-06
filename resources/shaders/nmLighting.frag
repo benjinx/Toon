@@ -6,15 +6,14 @@ in vertexData
 	vec3 normal;
 	vec2 texCoords;
 	mat4 modelMat;
-	vec3 lightPos;
-	vec3 eyePos;
+	vec4 lightDir;
+	vec4 eyeDir;
 } pass;
 
 // Uniforms
-uniform vec4 lightPos;
-uniform vec4 eyePos;
 uniform sampler2D diffuseTex;
 uniform sampler2D bumpTex;
+uniform sampler2D specularTex;
 
 // Targets
 layout (location = 0) out vec4 fragColor;
@@ -23,30 +22,27 @@ void main()
 {
 	vec3 objectColor = texture(diffuseTex, pass.texCoords).rgb;
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
-	vec3 norm = normalize(texture(bumpTex, pass.texCoords).rgb * 2.0 - 1.0);
+	vec3 N = normalize(texture(bumpTex, pass.texCoords).rgb * 2.0 - 1.0);
+	vec3 L = normalize(pass.lightDir.xyz);
+	vec3 V = normalize(pass.eyeDir.xyz);
 
 	// ambient
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * objectColor;
   	
     // diffuse 
-    //vec3 norm = normalize(pass.normal);
-    vec3 lightDir = normalize(lightPos.xyz - pass.fragPos);
-    float diff = dot(lightDir, pass.normal);
+    float diff = dot(L, N);
     
     // specular
-    vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
-	//vec3 halfwayDir = normalize(lightDir + viewDir);
-	vec3 R = reflect(-lightDir, pass.normal);
-    float spec = max(dot(viewDir, R), 0.0);
+	vec3 R = (diff + diff) * N - L;
+    float spec = max(dot(V, R), 0.0);
 	spec *= spec;
 	spec *= spec;
 	spec *= spec;
 
 	diff = max(diff, 0.0);
 	vec3 diffuse = diff * objectColor;
-
-    vec3 specular = spec * lightColor;
+	vec3 specular = texture(specularTex, pass.texCoords).rgb * spec * lightColor;
         
     vec3 result = (ambient + diffuse + specular);
 	fragColor = vec4(result, 1.0);

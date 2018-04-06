@@ -29,9 +29,8 @@ void GameScene::Start()
 
 
 	///
-	_mGameObjects.emplace("Test", Utils::LoadObjN("resources/models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Test", Utils::LoadObjN("resources/models/earth.obj"));
 	_mGameObjects["Test"]->SetPosition(glm::vec3(0.5f, 0.5f, 1.5f));
-	_mGameObjects["Test"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
 	_mGameObjects["Test"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 	///
 
@@ -150,7 +149,7 @@ void GameScene::Render()
 		if (gameObject.first == "Sun")
 			gameObject.second->Render(1, &_mShader);
 		else
-			gameObject.second->Render(3, &_mShader);
+			gameObject.second->Render(4, &_mShader);
 	}
 
 	// Axis Rendering for Objects

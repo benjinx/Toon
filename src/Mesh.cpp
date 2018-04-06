@@ -4,18 +4,17 @@
 #include "Shader.h"
 #include "Material.h"
 
-Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::vector<glm::vec2> texCoords)
+Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::vector<glm::vec2> texCoords, std::vector<glm::vec3> tangents, std::vector<glm::vec3> bitangents)
 {
     // VBO, VAO.
     glGenVertexArrays(1, &_mVAO);
     glBindVertexArray(_mVAO);
 
-    GLuint vbos[3];
-    glGenBuffers(3, vbos);
+    GLuint vbos[5];
+    glGenBuffers(5, vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_STATIC_DRAW);
-
     glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(ATTRIB_POSITION);
 
@@ -35,48 +34,26 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
         glEnableVertexAttribArray(ATTRIB_TEXCOORD);
     }
 
+	if (!tangents.empty())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[3]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tangents.size() * 3, tangents.data(), GL_STATIC_DRAW);
+		glVertexAttribPointer(ATTRIB_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(ATTRIB_TANGENT);
+	}
+
+	if (!bitangents.empty())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[4]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bitangents.size() * 3, bitangents.data(), GL_STATIC_DRAW);
+		glVertexAttribPointer(ATTRIB_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(ATTRIB_BITANGENT);
+	}
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     _mVertCount = vertices.size();
-}
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
-{
-	_mVertices = vertices;
-	_mIndices = indices;
-	_mTextures = textures;
-
-	SetupMesh();
-}
-
-void Mesh::SetupMesh()
-{
-	glGenVertexArrays(1, &_mVAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindVertexArray(_mVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, _mVertices.size() * sizeof(Vertex), &_mVertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mIndices.size() * sizeof(unsigned int), &_mIndices[0], GL_STATIC_DRAW);
-
-	// vertex positions
-	glEnableVertexAttribArray(ATTRIB_POSITION);
-	glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-	// vertex normals
-	glEnableVertexAttribArray(ATTRIB_NORMAL);
-	glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
-	// vertex texture coords
-	glEnableVertexAttribArray(ATTRIB_TEXCOORD);
-	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
-
-	glBindVertexArray(0);
 }
 
 //glm::mat4 Mesh::CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords)

@@ -7,4 +7,4 @@ d 1
 illum 2
 map_Kd ../images/earth/2k/earth_dm_2k.png
 map_Ks ../images/earth/2k/earth_sm_2k.png
-map_bump ../images/earth/2k/earth_nm_2k_os.png
+map_Kn ../images/earth/2k/earth_nm_2k.png

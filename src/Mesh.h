@@ -56,8 +56,7 @@ public:
     /* Mesh Data */
 
     /* Functions */
-    Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> texCoords);
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+    Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> texCoords, std::vector<glm::vec3> tangents, std::vector<glm::vec3> bitangents);
 	void Render(GLuint programNum, Shader * shader, glm::mat4 modelMat);
     //glm::mat4 CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords);
 
@@ -70,17 +69,8 @@ private:
     Material* _mMaterial;
 
     /* Render Data */
-    GLuint       _mVAO, VBO, EBO;
+    GLuint       _mVAO, VBO;
     unsigned int _mVertCount;
-	std::vector<glm::vec3> _mTangents, _mBitangents;
-
-	/* Mesh Data */
-	std::vector<Vertex> _mVertices;
-	std::vector<unsigned int> _mIndices;
-	std::vector<Texture> _mTextures;
-
-	/* Functions */
-	void SetupMesh();
 };
 
 #endif // MESH_H

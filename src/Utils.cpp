@@ -16,7 +16,7 @@ namespace Utils
 		// bpp - bits per pixel
 		// 32 = RGBA = 4 * 8
 		// 24 = RGB = 3 * 8
-		stbi_set_flip_vertically_on_load(true);
+		//stbi_set_flip_vertically_on_load(true);
 
 		unsigned char* image = stbi_load(filename.c_str(), &w, &h, &bpp, STBI_rgb_alpha);
 
@@ -147,7 +147,7 @@ namespace Utils
 				index += fv;
 			}
 
-			Mesh*     newMesh = new Mesh(vertices, normals, texCoords);
+			Mesh*     newMesh = new Mesh(vertices, normals, texCoords, normals, normals);
 			Material* newMat  = nullptr;
 
 			if (!mesh.material_ids.empty() && mesh.material_ids[0] >= 0)
@@ -248,7 +248,7 @@ namespace Utils
 				index += fv;
 			}
 
-			Mesh*     newMesh = new Mesh(vertices, normals, texCoords);
+			Mesh*     newMesh = new Mesh(vertices, normals, texCoords, normals, normals);
 			Material* newMat = nullptr;
 
 			if (!mesh.material_ids.empty() && mesh.material_ids[0] >= 0)
@@ -322,6 +322,8 @@ namespace Utils
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
+		std::vector<glm::vec3> tangents;
+		std::vector<glm::vec3> bitangents;
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
 
@@ -356,28 +358,19 @@ namespace Utils
 			}
 			else
 				texCoords.push_back(glm::vec2(0.0f, 0.0f));
+
+			// Tangents
+			if (mesh->HasTangentsAndBitangents())
+			{
+				glm::vec3 tangent(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+				tangents.push_back(tangent);
+
+				glm::vec3 bitangent(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+				bitangents.push_back(bitangent);
+			}
 		}
 
-		//vertices.resize(indices.size());
-
-		//if (mesh->HasNormals())
-		//	normals.resize(indices.size());
-
-		//if (mesh->mTextureCoords[0])
-		//	texCoords.resize(indices.size());
-
-
-		//std::vector<glm::vec3> newVerts;
-		//newVerts.reserve(indices.size());
-		//for (auto&i : indices)
-		//{
-		//	newVerts.push_back(vertices[i]);
-		//}
-		
-		//vertices.size();
-		
-
-		Mesh* newMesh = new Mesh(vertices, normals, texCoords);
+		Mesh* newMesh = new Mesh(vertices, normals, texCoords, tangents, bitangents);
 		Material* newMat = nullptr;
 
 		// Materials
