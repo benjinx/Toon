@@ -179,6 +179,9 @@ ADD_DEPENDENCIES(depend openal)
 MESSAGE("Adding dependency: assimp")
 
 SET(ASSIMP_OPTIONS
+    -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+    -DASSIMP_BUILD_SAMPLES=OFF
+    -DASSIMP_BUILD_TESTS=OFF
 )
 
 SET(ASSIMP_INCLUDE_DIRS
@@ -196,25 +199,51 @@ EXECUTE_PROCESS(
 )
 
 IF (MSVC)
-	SET(ASSIMP_LIBRARIES_DEBUG "${CMAKE_BINARY_DIR}/depend/assimp/code/Debug/assimp-vc140-mt.lib")
+    SET(ASSIMP_OPTIONS
+        -DASSIMP_BUILD_ZLIB=ON
+        ${ASSIMP_OPTIONS}
+    )
+
+	SET(ASSIMP_LIBRARIES_DEBUG "${CMAKE_BINARY_DIR}/depend/assimp/code/Debug/assimp-vc140-mt.lib"
+                               "${CMAKE_BINARY_DIR}/depend/assimp/contrib/irrXML/Debug/IrrXML.lib"
+                               "${CMAKE_BINARY_DIR}/depend/assimp/contrib/zlib/Debug/zlibd.lib")
     SET(ASSIMP_LIBRARIES_DEBUG "${ASSIMP_LIBRARIES_DEBUG}" PARENT_SCOPE)
-    SET(ASSIMP_LIBRARIES_RELEASE "${CMAKE_BINARY_DIR}/depend/assimp/code/Release/assimp-vc140-mt.lib")
+    SET(ASSIMP_LIBRARIES_RELEASE "${CMAKE_BINARY_DIR}/depend/assimp/code/Release/assimp-vc140-mt.lib"
+                                 "${CMAKE_BINARY_DIR}/depend/assimp/contrib/irrXML/Release/IrrXML.lib"
+                                 "${CMAKE_BINARY_DIR}/depend/assimp/contrib/zlib/Release/zlib.lib")
     SET(ASSIMP_LIBRARIES_RELEASE "${ASSIMP_LIBRARIES_RELEASE}" PARENT_SCOPE)
-	
+
+    SET(ASSIMP_DLL_DEBUG "${CMAKE_BINARY_DIR}/depend/assimp/code/Debug/assimp-vc140-mt.dll")
+    SET(ASSIMP_DLL_RELEASE "${CMAKE_BINARY_DIR}/depend/assimp/code/Release/assimp-vc140-mt.dll")
+
 	ADD_CUSTOM_COMMAND(
         OUTPUT ${ASSIMP_LIBRARIES_DEBUG}
+        COMMAND ${CMAKE_COMMAND} --build . --config Debug --target zlib
         COMMAND ${CMAKE_COMMAND} --build . --config Debug --target assimp
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
     )
     ADD_CUSTOM_COMMAND(
         OUTPUT ${ASSIMP_LIBRARIES_RELEASE}
+        COMMAND ${CMAKE_COMMAND} --build . --config Release --target zlib
         COMMAND ${CMAKE_COMMAND} --build . --config Release --target assimp
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
     )
-	
-	ADD_CUSTOM_TARGET(assimp DEPENDS ${ASSIMP_LIBRARIES_DEBUG} ${ASSIMP_LIBRARIES_RELEASE})
+
+	ADD_CUSTOM_TARGET(assimp DEPENDS assimp-dll ${ASSIMP_LIBRARIES_DEBUG} ${ASSIMP_LIBRARIES_RELEASE})
+
+    FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Debug)
+    FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Release)
+    ADD_CUSTOM_COMMAND(
+        OUTPUT
+        TARGET assimp
+        DEPENDS ${ASSIMP_LIBRARIES_DEBUG} ${ASSIMP_LIBRARIES_RELEASE}
+        COMMAND ${CMAKE_COMMAND} -E copy "${ASSIMP_DLL_DEBUG}" "${CMAKE_BINARY_DIR}/Debug/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${ASSIMP_DLL_RELEASE}" "${CMAKE_BINARY_DIR}/Release/"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/depend/assimp
+    )
 ELSE()
-	SET(ASSIMP_LIBRARIES "${CMAKE_BINARY_DIR}/depend/assimp/code/libassimp.so")
+	SET(ASSIMP_LIBRARIES "${CMAKE_BINARY_DIR}/depend/assimp/code/libassimp.so"
+                         "${CMAKE_BINARY_DIR}/depend/assimp/contrib/irrXML/libIrrXML.a")
     SET(ASSIMP_LIBRARIES "${ASSIMP_LIBRARIES}" PARENT_SCOPE)
 
     ADD_CUSTOM_COMMAND(

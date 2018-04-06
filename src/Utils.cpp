@@ -274,7 +274,7 @@ namespace Utils
 		}
 		return newModel;
 	}
-	
+
 	GameObject* LoadObjN(std::string filename)
 	{
 		Assimp::Importer importer;
@@ -410,11 +410,11 @@ namespace Utils
 			// Remove dissolve from material it's pointless
 			// Add all the other materials, Albedo, Metallic, roughness, AO?, etc
 
-		
+
 			newMat = new Material(amb, diff, spec, 0.0f, 0.0f, ambientTex, diffuseTex, specularTex, normalTex);
 			newMesh->SetMaterial(newMat);
 		}
-		
+
 		return newMesh;
 	}
 

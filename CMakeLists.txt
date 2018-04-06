@@ -158,7 +158,7 @@ FOREACH(res IN ITEMS ${RESOURCES})
     FILE(TO_NATIVE_PATH ${path} path)
     SOURCE_GROUP("${path}" FILES ${res})
 ENDFOREACH()
-# Stop VS from trying to compile .obj files 
+# Stop VS from trying to compile .obj files
 SET_SOURCE_FILES_PROPERTIES(${RESOURCES} PROPERTIES HEADER_FILE_ONLY true)
 
 SOURCE_GROUP("Source" FILES ${PROJECT_NAME} ${COMMON_SRC})
@@ -223,23 +223,31 @@ FOREACH(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
     )
 ENDFOREACH()
 
-# Set IDE folders
-#FOREACH(file IN ITEMS ${Dusk_ASSETS} ${Dusk_INCLUDES} ${Dusk_SOURCES})
-#    GET_FILENAME_COMPONENT(file_path ${file} DIRECTORY)
-#    FILE(TO_NATIVE_PATH ${file_path} file_path)
-#    SOURCE_GROUP(${file_path} FILES ${file})
-#ENDFOREACH()
-
 add_custom_target(
     run
     COMMAND $<TARGET_FILE:${PROJECT_NAME}>
     DEPENDS ${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 set_target_properties(
     run
     PROPERTIES FOLDER "Automation"
 )
 
+# Copy resources to build directory
+ADD_CUSTOM_TARGET(copy-resources ALL)
+ADD_DEPENDENCIES(${PROJECT_NAME} copy-resources)
+ADD_CUSTOM_COMMAND(
+    OUTPUT
+    TARGET copy-resources PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+        copy_directory ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources
+)
+
+SET_TARGET_PROPERTIES(
+    copy-resources
+    PROPERTIES FOLDER "Automation"
+)
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")

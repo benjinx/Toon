@@ -11,10 +11,10 @@ void ScriptHost::Load()
 	L = luaL_newstate();
 
 	// load lua libs
-	luaL_openlibs(L);
+	//luaL_openlibs(L);
 
 	// run the lua script
-	luaL_dofile(L, "resources/scripts/HelloWorld.lua");
+	//luaL_dofile(L, "resources/scripts/HelloWorld.lua");
 
 	// close the lua state
 	lua_close(L);
