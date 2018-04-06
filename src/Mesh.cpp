@@ -63,7 +63,7 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
 //		glm::vec3 &v0 = vertices[i + 0];
 //		glm::vec3 &v1 = vertices[i + 1];
 //		glm::vec3 &v2 = vertices[i + 2];
-//	
+//
 //		glm::vec2 &uv0 = texCoords[i + 0];
 //		glm::vec2 &uv1 = texCoords[i + 1];
 //		glm::vec2 &uv2 = texCoords[i + 2];
@@ -145,10 +145,13 @@ void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
 {
     glUseProgram(shader->GetShaderProgramIDs()[programNum]);
 
+    const auto& view = Camera::instance().GetViewMat();
+    const auto& proj = Camera::instance().GetProjectionMat();
+
     glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "modelMat"), 1, false,
                        (GLfloat*)&modelMat);
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&Camera::instance().GetViewMat());
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&Camera::instance().GetProjectionMat());
+    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&view);
+    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&proj);
 
     glm::mat4 mvp = Camera::instance().GetProjectionMat() * Camera::instance().GetViewMat() * modelMat;
     glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "mvp"), 1, false, (GLfloat*)&mvp);

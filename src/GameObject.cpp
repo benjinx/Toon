@@ -11,7 +11,7 @@ GameObject::GameObject()
 	_mRigidbody.SetFixedAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
 	_mRigidbody.SetVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mRigidbody.SetAcceleration(glm::vec3(0.0f, 0.0f, 0.0f));
-	
+
 	axisEnabled = false;
 }
 
@@ -95,9 +95,12 @@ void GameObject::DrawAxis(GLuint programNum, Shader * shader)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->GetShaderProgramIDs()[programNum]);
 
+    const auto& view = Camera::instance().GetViewMat();
+    const auto& proj = Camera::instance().GetProjectionMat();
+
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "modelMat"), 1, false, (GLfloat*)&_mModelMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&Camera::instance().GetViewMat());
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&Camera::instance().GetProjectionMat());
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&view);
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&proj);
 
 	glBindVertexArray(_mVAO);
 	glDrawArrays(GL_LINES, 0, 18);

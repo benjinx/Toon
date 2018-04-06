@@ -2,13 +2,15 @@
 #define UTILITIES_H
 
 #include "Common.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 class GameObject;
 struct aiNode;
 struct aiMesh;
 struct aiScene;
 struct aiMaterial;
-enum aiTextureType;
 class Mesh;
 //struct Texture;
 

@@ -4,9 +4,6 @@
 #include "GameObject.h"
 #include "Material.h"
 #include "tiny_obj_loader/tiny_obj_loader.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
 
 namespace Utils
 {
