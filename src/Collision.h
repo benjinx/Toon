@@ -57,7 +57,7 @@ struct BoundingVolumeBox
 class Collision
 {
 public:
-	Collision() {};
+	Collision();
 
 private:
 
