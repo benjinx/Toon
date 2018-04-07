@@ -9,7 +9,7 @@
 [submodule "depend/openal"]
 	path = depend/openal
 	url = https://github.com/kcat/openal-soft
-	branch = tags/openal-soft-1.18.0
+	branch = master
 [submodule "depend/assimp"]
 	path = depend/assimp
 	url = https://github.com/assimp/assimp
