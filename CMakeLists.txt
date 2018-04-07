@@ -149,10 +149,6 @@ SET(IMGUI_SRC
 	src/imgui/imgui_impl_glfw_gl3.cpp
 )
 
-SET(TINY_OBJ_SRC
-    src/tiny_obj_loader/tiny_obj_loader.h
-)
-
 SET(STB_SRC
     src/stb/stb_image.h
 )
@@ -179,7 +175,6 @@ SOURCE_GROUP("AI/Navigation" FILES ${PROJECT_NAME} ${AI_SRC})
 SOURCE_GROUP("3rdParty\\STB" FILES ${PROJECT_NAME} ${STB_SRC})
 SOURCE_GROUP("3rdParty\\Glad" FILES ${PROJECT_NAME} ${GLAD_SRC})
 SOURCE_GROUP("3rdParty\\ImGui" FILES ${PROJECT_NAME} ${IMGUI_SRC})
-SOURCE_GROUP("3rdParty\\TinyObjLoader" FILES ${PROJECT_NAME} ${TINY_OBJ_SRC})
 
 # Add source to executables
 ADD_LIBRARY(
