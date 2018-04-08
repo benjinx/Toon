@@ -11,15 +11,6 @@ Material::Material(float       ambient[3],
                    std::string specularFile,
                    std::string bumpFile)
 {
-    // if (!mat->ambient_texname.empty())
-    //{
-    //	GLuint ambientTex = LoadTexture(mat->ambient_texname);
-    //}
-    // else
-    //{
-
-    //}
-
     _mAmbient  = {ambient[0], ambient[1], ambient[2]};
     _mDiffuse  = {diffuse[0], diffuse[1], diffuse[2]};
     _mSpecular = {specular[0], specular[1], specular[2]};

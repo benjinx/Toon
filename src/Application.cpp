@@ -138,10 +138,8 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
 
 		case GLFW_KEY_F5: // Reloads shaders
 		{
-			// Dans Engine - Calls deleteShaders then setupShaders
 			std::cout << "Reloading shaders!\n";
-
-
+			
 			_mpCurrentScene->DeleteShaders();
 			_mpCurrentScene->SetupShaders();
 

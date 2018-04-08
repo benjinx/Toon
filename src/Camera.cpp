@@ -53,7 +53,6 @@ void Camera::AddForce(glm::vec3 force)
 
 void Camera::UpdateAcceleration()
 {
-	//_mAcceleration = (_mForce * _mMassInv) + _mAccelerationFixed;
 	_mAcceleration = _mForce; // Assuming mass for camera is 1, meaning massInv is the same, also no gravity applied to camera.
 	_mForce = glm::vec3(0);
 }
@@ -61,17 +60,7 @@ void Camera::UpdateAcceleration()
 void Camera::UpdateFirstOrder(float dt)
 {
 	_mPosition += _mVelocity * dt;
-
-	/*if (_mVelocity.x <= 2.0f && _mVelocity.x >= -2.0f &&
-		_mVelocity.y <= 2.0f && _mVelocity.y >= -2.0f &&
-		_mVelocity.z <= 2.0f && _mVelocity.z >= -2.0f)
-	{*/
-		_mVelocity += _mAcceleration * dt;
-	//}
-	//else
-	//{
-		// add velocity cap here.
-	//}
+	_mVelocity += _mAcceleration * dt;
 
 	UpdateAcceleration();
 }

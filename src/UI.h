@@ -7,17 +7,16 @@ struct ImDrawData;
 
 namespace UI
 {
+	void StartUI();
+	void UpdateUI();
+	void RenderUI();
+	void DrawUI(ImDrawData* draw_data);
 
-void StartUI();
-void UpdateUI();
-void RenderUI();
-void DrawUI(ImDrawData* draw_data);
-
-extern bool consoleSelected;
-extern bool optionsSelected;
-extern bool settingsSelected;
-extern bool showMainMenuBar;
-extern bool showTestWindow;
+	extern bool consoleSelected;
+	extern bool optionsSelected;
+	extern bool settingsSelected;
+	extern bool showMainMenuBar;
+	extern bool showTestWindow;
 }
 
 #endif // UI_H

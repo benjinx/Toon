@@ -58,12 +58,9 @@ public:
     /* Functions */
     Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> texCoords, std::vector<glm::vec3> tangents, std::vector<glm::vec3> bitangents);
 	void Render(GLuint programNum, Shader * shader, glm::mat4 modelMat);
-    //glm::mat4 CalcTBN(std::vector<glm::vec3> vertices, std::vector<glm::vec2> texCoords);
 
     GLuint GetVAO() { return _mVAO; }
     void SetMaterial(Material* material) { _mMaterial = material; }
-
-	//void Draw();
 
 private:
     Material* _mMaterial;

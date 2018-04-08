@@ -43,7 +43,6 @@ public:
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetPosition(glm::vec3 position) { 
 		_mTransform.position = position;
-		//_mModelMatrix = glm::translate(glm::mat4(), _mTransform.position);
 	}
 
 	glm::vec3 GetPosition() { return _mTransform.position; }
@@ -51,16 +50,12 @@ public:
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetRotation(glm::vec3 rotation) { 
 		_mTransform.rotation = rotation;
-		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		//_mModelMatrix = glm::rotate(glm::mat4(), glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	glm::vec3 GetRotation() { return _mTransform.rotation; }
 
 	// Remember matrix order is Translate (Position), Rotate, Scale
 	void SetScale(glm::vec3 scale) { 
 		_mTransform.scale = scale;
-		//_mModelMatrix = glm::scale(glm::mat4(), _mTransform.scale);
 	}
 	glm::vec3 GetScale() { return _mTransform.scale; }
 

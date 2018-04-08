@@ -20,6 +20,11 @@ void UI::UpdateUI()
 {
 	ImGui_ImplGlfwGL3_NewFrame();
 
+	ImVec4             Red = ImVec4(255.0f, 0.0f, 0.0f, 255.0f);
+	ImVec4             Yellow = ImVec4(255.0f, 255.0f, 0.0f, 255.0f);
+	ImVec4             Green = ImVec4(0.0f, 255.0f, 0.0f, 255.0f);
+	ImVec4             White = ImVec4(255.0f, 255.0f, 255.0f, 255.0f);
+
 	if (UI::showMainMenuBar)
 	{
 		if (ImGui::BeginMainMenuBar())
@@ -43,10 +48,10 @@ void UI::UpdateUI()
 			ImGui::SetNextWindowSize(ImVec2(400, 200));
 			ImGui::Begin("Console", &UI::consoleSelected);
 			ImGui::BeginChild(1, ImVec2(390, 135));
-			//ImGui::TextColored(Red, "> Error: Test\n");
-			//ImGui::TextColored(Yellow, "> Warning: Test\n");
-			//ImGui::TextColored(Green, "> Loaded: Test\n");
-			//ImGui::TextColored(White, "> Normal Text: Test\n");
+			ImGui::TextColored(Red, "> Error: Test\n");
+			ImGui::TextColored(Yellow, "> Warning: Test\n");
+			ImGui::TextColored(Green, "> Loaded: Test\n");
+			ImGui::TextColored(White, "> Normal Text: Test\n");
 			ImGui::EndChild();
 			ImGui::Text(">");
 			ImGui::SameLine();
@@ -72,10 +77,10 @@ void UI::UpdateUI()
 			ImGui::SetNextWindowPosCenter();
 			ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoCollapse + ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("Credits\n");
-			//ImGui::TextColored(Green, "Created by BC/DC Games:\n");
-			//ImGui::TextColored(White, "- Benji Campbell\n");
-			//ImGui::TextColored(White, "- Daniel Covert\n");
-			//ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
+			ImGui::TextColored(Green, "Created by BC/DC Games:\n");
+			ImGui::TextColored(White, "- Benji Campbell\n");
+			ImGui::TextColored(White, "- Daniel Covert\n");
+			ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))
