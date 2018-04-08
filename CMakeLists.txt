@@ -219,16 +219,6 @@ FOREACH(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
     )
 ENDFOREACH()
 
-ADD_CUSTOM_TARGET(
-    run
-    COMMAND $<TARGET_FILE:${PROJECT_NAME}>
-    DEPENDS ${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-SET_TARGET_PROPERTIES(
-    run
-    PROPERTIES FOLDER "Automation"
-)
 
 # Copy resources to build directory
 ADD_CUSTOM_TARGET(copy-resources ALL)

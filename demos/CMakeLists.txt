@@ -14,16 +14,18 @@ FOREACH(demo ${DEMO_LIST})
         PROPERTIES FOLDER "Demos"
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     )
-    ADD_CUSTOM_TARGET(
-        run-${demo}
-        COMMAND $<TARGET_FILE:${demo}>
-        DEPENDS ${demo}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-    SET_TARGET_PROPERTIES(
-        run-${demo}
-        PROPERTIES FOLDER "Automation"
-    )
+    IF(NOT DEFINED ENV{CI})
+        ADD_CUSTOM_TARGET(
+            run-${demo}
+            COMMAND $<TARGET_FILE:${demo}>
+            DEPENDS ${demo}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+        SET_TARGET_PROPERTIES(
+            run-${demo}
+            PROPERTIES FOLDER "Automation"
+        )
+    ENDIF()
     LIST(APPEND RUN_DEMO_LIST "run-${demo}")
 ENDFOREACH()
 
@@ -36,13 +38,15 @@ SET_TARGET_PROPERTIES(
     PROPERTIES FOLDER "Demos"
 )
 
-ADD_CUSTOM_TARGET(
-    run-demos
-    DEPENDS ${RUN_DEMO_LIST}
-)
-SET_TARGET_PROPERTIES(
-    run-demos
-    PROPERTIES FOLDER "Automation"
-)
+IF(NOT DEFINED ENV{CI})
+    ADD_CUSTOM_TARGET(
+        run-demos
+        DEPENDS ${RUN_DEMO_LIST}
+    )
+    SET_TARGET_PROPERTIES(
+        run-demos
+        PROPERTIES FOLDER "Automation"
+    )
+ENDIF()
 
 SET(DEMO_LIST "${DEMO_LIST}" PARENT_SCOPE)

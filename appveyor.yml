@@ -33,7 +33,7 @@ before_build:
 
 build:
   project: C:\projects\Temporality\build\Temporality.sln # path to Visual Studio solution or project
-  verbosity: quiet                         # MSBuild verbosity level (quiet|minimal|normal|detailed)
+  verbosity: detailed                         # MSBuild verbosity level (quiet|minimal|normal|detailed)
 
 test: off
 
