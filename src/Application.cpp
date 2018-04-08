@@ -17,7 +17,7 @@ void Application::Run()
 	float prevTime = 0.0f;
     while (!glfwWindowShouldClose(_mWindow.GetWindow()))
     {
-		float currTime = glfwGetTime();
+		float currTime = (float)glfwGetTime();
 		float elapsed = currTime - prevTime;
         float dt = elapsed / targetElapsed;
 
@@ -173,7 +173,7 @@ void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int acti
 
 void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
-	Camera::instance().HandleFoV(xoffset, yoffset);
+	Camera::instance().HandleFoV((float)xoffset, (float)yoffset);
 
     // scroll
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
@@ -183,16 +183,16 @@ void Application::HandleGLFWMousePos(GLFWwindow* window, double x, double y)
 {
 	if (firstMouse)
 	{
-		lastX = x;
-		lastY = y;
+		lastX = (float)x;
+		lastY = (float)y;
 		firstMouse = false;
 	}
 
-	float xoffset = x - lastX;
-	float yoffset = lastY - y;
+	float xoffset = (float)x - lastX;
+	float yoffset = lastY - (float)y;
 
-	lastX = x;
-	lastY = y;
+	lastX = (float)x;
+	lastY = (float)y;
 
     // handle mouse pos
 	if (rightButtonDown)

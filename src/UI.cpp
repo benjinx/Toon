@@ -33,7 +33,7 @@ void UI::UpdateUI()
 				ImGui::EndMenu();
 			}
 
-			ImGui::SameLine(Application::Inst()->GetWindowWidth() - 150, 0.0f);
+			ImGui::SameLine((float)Application::Inst()->GetWindowWidth() - 150, 0.0f);
 			ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}

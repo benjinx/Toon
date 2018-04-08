@@ -206,7 +206,7 @@ namespace Utils
 	std::string GetMaterialTextureName(aiMaterial* material, aiTextureType type, std::string dirname)
 	{
 		std::string texName;
-		for (int i = 0; i < material->GetTextureCount(type); i++)
+		for (unsigned int i = 0; i < material->GetTextureCount(type); i++)
 		{
 			aiString str;
 			material->GetTexture(type, i, &str);

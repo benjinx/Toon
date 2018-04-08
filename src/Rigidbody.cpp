@@ -50,7 +50,7 @@ void Rigidbody::ClampToGround(GameObject* gameObject, const float groundHeight, 
 {
 	if (gameObject->GetPosition().y < groundHeight)
 	{
-		if (!gameObject->GetPosition().y > 0.001f)
+		if (!(gameObject->GetPosition().y > 0.001f))
 		{
 			glm::vec3 newPos = gameObject->GetPosition();
 			newPos.y = groundHeight + (groundHeight - gameObject->GetPosition().y);
