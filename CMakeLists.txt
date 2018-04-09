@@ -65,6 +65,16 @@ SET(COMMON_LIBS_RELEASE
     ${ASSIMP_LIBRARIES_RELEASE}
 )
 
+# AI
+SET(AI_SRC
+	src/State.cpp
+	src/State.hpp
+)
+
+# Audio src
+SET(AUDIO_SRC
+)
+
 # Core src
 SET(CORE_SRC
 	src/Application.cpp
@@ -72,6 +82,12 @@ SET(CORE_SRC
 	src/Camera.cpp
 	src/Camera.hpp
 	src/Common.hpp
+	src/Window.cpp
+	src/Window.hpp
+)
+
+# Game src
+SET(GAME_SRC
 	src/Cube.cpp
 	src/Cube.hpp
 	src/GameObject.cpp
@@ -80,14 +96,6 @@ SET(CORE_SRC
 	src/Light.hpp
 	src/Scene.cpp
 	src/Scene.hpp
-	src/Window.cpp
-	src/Window.hpp
-)
-
-# Debug src
-SET(DEBUG_SRC
-	src/Utils.cpp
-	src/Utils.hpp
 )
 
 # Graphics src
@@ -98,6 +106,20 @@ SET(GRAPHICS_SRC
 	src/Mesh.hpp
 	src/Shader.cpp
 	src/Shader.hpp
+)
+
+# Input src
+SET(INPUT_SRC
+)
+
+# Interface src
+SET(INTERFACE_SRC
+	src/UI.cpp
+	src/UI.hpp
+)
+
+# Network src
+SET(NETWORK_SRC
 )
 
 # Physics src
@@ -114,24 +136,10 @@ SET(SCRIPTING_SRC
 	src/ScriptHost.hpp
 )
 
-# Audio src
-SET(AUDIO_SRC
-)
-
-# Animation src
-SET(ANIMATION_SRC
-)
-
-# UI src
-SET(UI_SRC
-	src/UI.cpp
-	src/UI.hpp
-)
-
-# Navigation/AI src
-SET(AI_SRC
-	src/State.cpp
-	src/State.hpp
+# Utilities src
+SET(UTILITIES_SRC
+	src/Utils.cpp
+	src/Utils.hpp
 )
 
 # Third-party source files
@@ -165,15 +173,18 @@ ENDFOREACH()
 # Stop VS from trying to compile .obj files
 SET_SOURCE_FILES_PROPERTIES(${RESOURCES} PROPERTIES HEADER_FILE_ONLY true)
 
+SOURCE_GROUP("AI" FILES ${PROJECT_NAME} ${AI_SRC})
+SOURCE_GROUP("Audio" FILES ${PROJECT_NAME} ${AUDIO_SRC})
 SOURCE_GROUP("Core" FILES ${PROJECT_NAME} ${CORE_SRC})
-SOURCE_GROUP("Debug" FILES ${PROJECT_NAME} ${DEBUG_SRC})
+SOURCE_GROUP("Game" FILES ${PROJECT_NAME} ${GAME_SRC})
 SOURCE_GROUP("Graphics" FILES ${PROJECT_NAME} ${GRAPHICS_SRC})
+SOURCE_GROUP("Input" FILES ${PROJECT_NAME} ${INPUT_SRC})
+SOURCE_GROUP("Interface" FILES ${PROJECT_NAME} ${INTERFACE_SRC})
+SOURCE_GROUP("Network" FILES ${PROJECT_NAME} ${NETWORK_SRC})
 SOURCE_GROUP("Physics" FILES ${PROJECT_NAME} ${PHYSICS_SRC})
 SOURCE_GROUP("Scripting" FILES ${PROJECT_NAME} ${SCRIPTING_SRC})
-SOURCE_GROUP("Audio" FILES ${PROJECT_NAME} ${AUDIO_SRC})
-SOURCE_GROUP("Animation" FILES ${PROJECT_NAME} ${ANIMATION_SRC})
-SOURCE_GROUP("UI" FILES ${PROJECT_NAME} ${UI_SRC})
-SOURCE_GROUP("AI/Navigation" FILES ${PROJECT_NAME} ${AI_SRC})
+SOURCE_GROUP("Utilities" FILES ${PROJECT_NAME} ${UTILITIES_SRC})
+
 SOURCE_GROUP("3rdParty\\STB" FILES ${PROJECT_NAME} ${STB_SRC})
 SOURCE_GROUP("3rdParty\\Glad" FILES ${PROJECT_NAME} ${GLAD_SRC})
 SOURCE_GROUP("3rdParty\\ImGui" FILES ${PROJECT_NAME} ${IMGUI_SRC})
@@ -181,15 +192,17 @@ SOURCE_GROUP("3rdParty\\ImGui" FILES ${PROJECT_NAME} ${IMGUI_SRC})
 # Add source to executables
 ADD_LIBRARY(
 	${PROJECT_NAME}
+	${AI_SRC}
+	${AUDIO_SRC}
 	${CORE_SRC}
-	${DEBUG_SRC}
+	${GAME_SRC}
 	${GRAPHICS_SRC}
+	${INPUT_SRC}
+	${INTERFACE_SRC}
+	${NETWORK_SRC}
 	${PHYSICS_SRC}
 	${SCRIPTING_SRC}
-	${AUDIO_SRC}
-	${ANIMATION_SRC}
-	${UI_SRC}
-	${AI_SRC}
+	${UTILITIES_SRC}
 	${STB_SRC}
 	${GLAD_SRC}
 	${IMGUI_SRC}
