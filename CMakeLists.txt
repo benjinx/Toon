@@ -163,7 +163,10 @@ SET(STB_SRC
     src/stb/stb_image.h
 )
 
-FILE(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_SOURCE_DIR} "Resources/*")
+FILE(RELATIVE_PATH RESOURCES_DIR "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/resources")
+ADD_DEFINITIONS(-DRESOURCES_DIR="${RESOURCES_DIR}/")
+
+FILE(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*")
 FOREACH(res IN ITEMS ${RESOURCES})
     GET_FILENAME_COMPONENT(path "${res}" DIRECTORY)
     FILE(TO_NATIVE_PATH ${path} path)
@@ -241,21 +244,6 @@ ADD_CUSTOM_TARGET(
 )
 SET_TARGET_PROPERTIES(
     run
-    PROPERTIES FOLDER "Automation"
-)
-
-# Copy resources to build directory
-ADD_CUSTOM_TARGET(copy-resources ALL)
-ADD_DEPENDENCIES(${PROJECT_NAME} copy-resources)
-ADD_CUSTOM_COMMAND(
-    OUTPUT
-    TARGET copy-resources PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E
-        copy_directory ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources
-)
-
-SET_TARGET_PROPERTIES(
-    copy-resources
     PROPERTIES FOLDER "Automation"
 )
 

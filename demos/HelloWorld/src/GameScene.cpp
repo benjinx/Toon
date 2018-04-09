@@ -21,16 +21,16 @@ void GameScene::Start()
 
 	// Object setup
 	// Primitive Objs
-	_mGameObjects.emplace("Plane", Utils::LoadObj("resources/models/Primitives/pPlane.obj"));
-	_mGameObjects.emplace("Sphere", Utils::LoadObj("resources/models/Primitives/pSphere.obj"));
+	_mGameObjects.emplace("Plane", Utils::LoadObj("models/Primitives/pPlane.obj"));
+	_mGameObjects.emplace("Sphere", Utils::LoadObj("models/Primitives/pSphere.obj"));
 	//_mGameObjects.emplace("Torus", Utils::LoadObj("resources/models/Primitives/pTorus.obj"));
 
 	// Scene Objs
-	_mGameObjects.emplace("Sun", Utils::LoadObj("resources/models/sun.obj"));
-	_mGameObjects.emplace("Earth", Utils::LoadObj("resources/models/earth.obj"));
-	_mGameObjects.emplace("Cube", Utils::LoadObj("resources/models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Sun", Utils::LoadObj("models/sun.obj"));
+	_mGameObjects.emplace("Earth", Utils::LoadObj("models/earth.obj"));
+	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
 
-	
+
 	// Initialize Objs
 	//_mGameObjects["Torus"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	//_mGameObjects["Torus"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -75,19 +75,19 @@ void GameScene::SetupShaders()
 	// Shaders
 	_mNumShaders = 5;
 	std::vector<std::string> vertShaders = {
-		"resources/shaders/axis.vert",
-		"resources/shaders/passThru.vert",
-		"resources/shaders/basicLighting.vert",
-		"resources/shaders/bpLighting.vert",
-		"resources/shaders/nmLighting.vert",
+		"shaders/axis.vert",
+		"shaders/passThru.vert",
+		"shaders/basicLighting.vert",
+		"shaders/bpLighting.vert",
+		"shaders/nmLighting.vert",
 	};
 
 	std::vector<std::string> fragShaders = {
-		"resources/shaders/axis.frag",
-		"resources/shaders/passThru.frag",
-		"resources/shaders/basicLighting.frag",
-		"resources/shaders/bpLighting.frag",
-		"resources/shaders/nmLighting.frag",
+		"shaders/axis.frag",
+		"shaders/passThru.frag",
+		"shaders/basicLighting.frag",
+		"shaders/bpLighting.frag",
+		"shaders/nmLighting.frag",
 	};
 
 	for (int i = 0; i < _mNumShaders; i++)

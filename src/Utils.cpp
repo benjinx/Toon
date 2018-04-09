@@ -8,6 +8,8 @@ namespace Utils
 {
 	unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp)
 	{
+		filename = std::string(RESOURCES_DIR) + filename;
+
 		// Remember to call stbi_image_free(image) after using the image and before another.
 		// bpp - bits per pixel
 		// 32 = RGBA = 4 * 8
@@ -23,6 +25,8 @@ namespace Utils
 
 	GLuint LoadTexture(std::string filename)
 	{
+		filename = std::string(RESOURCES_DIR) + filename;
+
 		GLuint texture;
 
 		glGenTextures(1, &texture);
@@ -73,6 +77,8 @@ namespace Utils
 
 	GameObject* LoadObj(std::string filename)
 	{
+		filename = std::string(RESOURCES_DIR) + filename;
+		
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filename,
 			aiProcess_CalcTangentSpace |

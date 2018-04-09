@@ -13,6 +13,9 @@ void Shader::CheckAttribs()
 
 void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 {
+	vertFilename = std::string(RESOURCES_DIR) + vertFilename;
+	fragFilename = std::string(RESOURCES_DIR) + fragFilename;
+
     // Load Shaders
     // Retrieve the vertex/fragment source code from filePath
     std::string   vertexCode, fragmentCode;
