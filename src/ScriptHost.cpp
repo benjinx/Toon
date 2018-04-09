@@ -1,4 +1,4 @@
-#include "ScriptHost.h"
+#include "ScriptHost.hpp"
 
 ScriptHost::ScriptHost()
 {

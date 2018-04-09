@@ -1,8 +1,8 @@
-#include "GameObject.h"
+#include "GameObject.hpp"
 
-#include "Mesh.h"
-#include "Shader.h"
-#include "Camera.h"
+#include "Mesh.hpp"
+#include "Shader.hpp"
+#include "Camera.hpp"
 
 GameObject::GameObject()
 {

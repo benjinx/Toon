@@ -68,48 +68,50 @@ SET(COMMON_LIBS_RELEASE
 # Core src
 SET(CORE_SRC
 	src/Application.cpp
-	src/Application.h
+	src/Application.hpp
 	src/Camera.cpp
-	src/Camera.h
-	src/Common.h
+	src/Camera.hpp
+	src/Common.hpp
 	src/Cube.cpp
-	src/Cube.h
+	src/Cube.hpp
 	src/GameObject.cpp
-	src/GameObject.h
+	src/GameObject.hpp
+	src/Light.cpp
+	src/Light.hpp
 	src/Scene.cpp
-	src/Scene.h
+	src/Scene.hpp
 	src/Window.cpp
-	src/Window.h
+	src/Window.hpp
 )
 
 # Debug src
 SET(DEBUG_SRC
 	src/Utils.cpp
-	src/Utils.h
+	src/Utils.hpp
 )
 
 # Graphics src
 SET(GRAPHICS_SRC
 	src/Material.cpp
-	src/Material.h
+	src/Material.hpp
 	src/Mesh.cpp
-	src/Mesh.h
+	src/Mesh.hpp
 	src/Shader.cpp
-	src/Shader.h
+	src/Shader.hpp
 )
 
 # Physics src
 SET(PHYSICS_SRC
 	src/Collision.cpp
-	src/Collision.h
+	src/Collision.hpp
 	src/Rigidbody.cpp
-	src/Rigidbody.h
+	src/Rigidbody.hpp
 )
 
 # Scripting src
 SET(SCRIPTING_SRC
 	src/ScriptHost.cpp
-	src/ScriptHost.h
+	src/ScriptHost.hpp
 )
 
 # Audio src
@@ -123,13 +125,13 @@ SET(ANIMATION_SRC
 # UI src
 SET(UI_SRC
 	src/UI.cpp
-	src/UI.h
+	src/UI.hpp
 )
 
 # Navigation/AI src
 SET(AI_SRC
 	src/State.cpp
-	src/State.h
+	src/State.hpp
 )
 
 # Third-party source files
@@ -191,7 +193,6 @@ ADD_LIBRARY(
 	${STB_SRC}
 	${GLAD_SRC}
 	${IMGUI_SRC}
-	${TINY_OBJ_SRC}
 	${RESOURCES}
 )
 
@@ -219,6 +220,16 @@ FOREACH(release_lib IN ITEMS ${COMMON_LIBS_RELEASE})
     )
 ENDFOREACH()
 
+ADD_CUSTOM_TARGET(
+    run
+    COMMAND $<TARGET_FILE:${PROJECT_NAME}>
+    DEPENDS ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+SET_TARGET_PROPERTIES(
+    run
+    PROPERTIES FOLDER "Automation"
+)
 
 # Copy resources to build directory
 ADD_CUSTOM_TARGET(copy-resources ALL)

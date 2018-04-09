@@ -1,8 +1,8 @@
-#include "Mesh.h"
+#include "Mesh.hpp"
 
-#include "Camera.h"
-#include "Shader.h"
-#include "Material.h"
+#include "Camera.hpp"
+#include "Shader.hpp"
+#include "Material.hpp"
 
 Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::vector<glm::vec2> texCoords, std::vector<glm::vec3> tangents, std::vector<glm::vec3> bitangents)
 {

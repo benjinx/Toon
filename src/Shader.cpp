@@ -1,7 +1,7 @@
-#include "Shader.h"
+#include "Shader.hpp"
 
-#include "Window.h"
-#include "Utils.h"
+#include "Window.hpp"
+#include "Utils.hpp"
 
 void Shader::CheckAttribs()
 {

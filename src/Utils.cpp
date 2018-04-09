@@ -1,8 +1,8 @@
-#include "Utils.h"
+#include "Utils.hpp"
 
-#include "Mesh.h"
-#include "GameObject.h"
-#include "Material.h"
+#include "Mesh.hpp"
+#include "GameObject.hpp"
+#include "Material.hpp"
 
 namespace Utils
 {

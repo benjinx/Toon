@@ -1,9 +1,9 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
-#include "Scene.h"
-#include "Window.h"
-#include "Camera.h"
-#include "ScriptHost.h"
+#include "Scene.hpp"
+#include "Window.hpp"
+#include "Camera.hpp"
+#include "ScriptHost.hpp"
 
 class GameScene : public Scene
 {

@@ -1,5 +1,5 @@
-#include "Rigidbody.h"
-#include "GameObject.h"
+#include "Rigidbody.hpp"
+#include "GameObject.hpp"
 #include <iostream>
 
 void Rigidbody::AddForce(const glm::vec3 force)

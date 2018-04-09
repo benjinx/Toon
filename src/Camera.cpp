@@ -1,7 +1,7 @@
-#include "Camera.h"
+#include "Camera.hpp"
 
-#include "Window.h"
-#include "Application.h"
+#include "Window.hpp"
+#include "Application.hpp"
 
 void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
 {

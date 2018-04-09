@@ -1,5 +1,5 @@
-#include "Material.h"
-#include "Utils.h"
+#include "Material.hpp"
+#include "Utils.hpp"
 
 Material::Material(float       ambient[3],
                    float       diffuse[3],

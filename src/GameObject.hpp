@@ -1,10 +1,10 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include "Common.h"
+#include "Common.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "Rigidbody.h"
+#include "Rigidbody.hpp"
 
 class Mesh;
 class Shader;

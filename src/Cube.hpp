@@ -1,7 +1,7 @@
 #ifndef CUBE_H
 #define CUBE_H
-#include "GameObject.h"
-#include "Rigidbody.h"
+#include "GameObject.hpp"
+#include "Rigidbody.hpp"
 
 class Cube : public GameObject
 {

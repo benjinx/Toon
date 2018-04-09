@@ -1,9 +1,9 @@
-#include "Application.h"
+#include "Application.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include "GameScene.h"
+#include "GameScene.hpp"
 
 int main()
 {

@@ -1,6 +1,6 @@
-#include "GameScene.h"
+#include "GameScene.hpp"
 
-#include "UI.h"
+#include "UI.hpp"
 
 void GameScene::Start()
 {

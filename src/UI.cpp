@@ -1,7 +1,7 @@
-#include "UI.h"
+#include "UI.hpp"
 
-#include "Window.h"
-#include "Application.h"
+#include "Window.hpp"
+#include "Application.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 

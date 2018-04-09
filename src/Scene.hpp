@@ -1,9 +1,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "GameObject.h"
-#include "Shader.h"
-#include "Utils.h"
+#include "GameObject.hpp"
+#include "Shader.hpp"
+#include "Utils.hpp"
 
 class Scene : public GameObject
 {

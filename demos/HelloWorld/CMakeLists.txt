@@ -3,7 +3,7 @@ GET_FILENAME_COMPONENT(EXAMPLE "${CMAKE_CURRENT_LIST_DIR}" NAME)
 
 ADD_EXECUTABLE(${EXAMPLE}
     src/Main.cpp
-    src/GameScene.h
+    src/GameScene.hpp
     src/GameScene.cpp
 )
 
