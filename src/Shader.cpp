@@ -27,6 +27,9 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 
     try
     {
+		printf("Loading: %s\n", vertFilename.c_str());
+		printf("Loading: %s\n", fragFilename.c_str());
+
         // Open files
         vShaderFile.open(vertFilename);
         fShaderFile.open(fragFilename);

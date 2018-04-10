@@ -217,7 +217,7 @@ namespace Utils
 			aiString str;
 			material->GetTexture(type, i, &str);
 			texName = dirname + str.C_Str();
-			printf("Loading Material: %s\n", texName.c_str());
+			printf("Loading: %s\n", str.C_Str());
 		}
 		return texName;
 	}

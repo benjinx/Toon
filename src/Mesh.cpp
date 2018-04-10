@@ -71,8 +71,47 @@ void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
     glm::mat4 mvp = Camera::instance().GetProjectionMat() * Camera::instance().GetViewMat() * modelMat;
     glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "mvp"), 1, false, (GLfloat*)&mvp);
 
+	///
+	/// LIGHT TESTS/EXAMPLES
+	///
+
+	/// Directional Light
+	DirectionalLight* directionalLight = new DirectionalLight();
+	directionalLight->SetDirection(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f)); // we define direction FROM the light source so it's pointing down
+	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightVec"), 1, (GLfloat*)&directionalLight->GetDirection());
+	
+	
+	/// Point Lights
+	//Light* PointLight = new Light();
+	//PointLight->SetPosition(glm::vec4(5.0f, 2.0f, 2.0f, 1.0f));
+	//PointLight->SetConstant(1.0f);
+	//PointLight->SetLinear(0.09f);
+	//PointLight->SetQuadratic(0.032f);
+	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightVec"), 1, (GLfloat*)&PointLight->GetPos());
+	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightCon"), PointLight->GetConst());
+	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightLin"), PointLight->GetLinear());
+	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightQuad"), PointLight->GetQuad());
+
+	/// Spot Light
+	//Light* SpotLight = new Light();
+	//glm::vec3 camPo = Camera::instance().GetCameraPos();
+	//SpotLight->SetPosition(glm::vec4(camPo.x, camPo.y, camPo.z, 1.0f));
+
+	//glm::vec3 camFront = Camera::instance().GetCameraForward();
+	//SpotLight->SetDir(glm::vec4(camFront.x, camFront.y, camFront.z, 1.0f));
+
+	//SpotLight->SetCutOff(glm::cos(glm::radians(12.5f)));
+
+	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&SpotLight->GetPos());
+	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightD"), 1, (GLfloat*)&SpotLight->GetDir());
+	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightCutoff"), SpotLight->GetCutOff());
+	///
+	///
+	///
+
+	// OG Light
 	glm::vec4 lightPos = glm::vec4(5.0f, 2.0f, 2.0f, 1.0f);
-    glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&lightPos);
+	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&lightPos);
 
     glm::vec3 camPos = Camera::instance().GetCameraPos();
 	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);

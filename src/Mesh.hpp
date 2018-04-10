@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "Common.hpp"
+#include "Light.hpp"
 
 class Shader;
 class Material;

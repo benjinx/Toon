@@ -20,6 +20,7 @@ void GameScene::Start()
 	//InitAxis();
 
 	// Object setup
+	printf("\nLoading Materials\n");
 	// Primitive Objs
 	_mGameObjects.emplace("Plane", Utils::LoadObj("models/Primitives/pPlane.obj"));
 	_mGameObjects.emplace("Sphere", Utils::LoadObj("models/Primitives/pSphere.obj"));
@@ -89,6 +90,8 @@ void GameScene::SetupShaders()
 		"shaders/bpLighting.frag",
 		"shaders/nmLighting.frag",
 	};
+
+	printf("Loading Shaders\n");
 
 	for (int i = 0; i < _mNumShaders; i++)
 		_mShader.SetupShaders(vertShaders[i], fragShaders[i]);

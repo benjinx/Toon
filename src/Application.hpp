@@ -45,6 +45,7 @@ private:
     void                Render();
     void                Destroy();
 	void				HandleInput(float dt);
+	void				OpenGLInfo();
 
     Window _mWindow;
     std::unordered_map<int, bool> keysDown;
@@ -59,6 +60,8 @@ private:
     char               buffer[255] = {};
 	bool firstMouse;
 	float lastX = 640, lastY = 360;
+
+	std::string _mVersionNum = "0.01";
 };
 
 #endif // APPLICATION_H
