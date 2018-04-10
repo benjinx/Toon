@@ -12,6 +12,7 @@ Building
 
 ```
 git clone https://github.com/benjinx/Temporality.git
+cd Temporality
 git submodule update --init
 mkdir build
 cd build
