@@ -202,7 +202,7 @@ namespace Utils
 			// Add all the other materials, Albedo, Metallic, roughness, AO?, etc
 
 
-			newMat = new Material(amb, diff, spec, 0.0f, 0.0f, ambientTex, diffuseTex, specularTex, normalTex);
+			newMat = new Material(amb, diff, spec, aiShininess.r, ambientTex, diffuseTex, specularTex, normalTex);
 			newMesh->SetMaterial(newMat);
 		}
 

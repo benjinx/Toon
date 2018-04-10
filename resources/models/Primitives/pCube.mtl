@@ -9,5 +9,6 @@ Ka 0.0000 0.0000 0.0000
 Kd 0.5880 0.5880 0.5880
 Ks 0.0000 0.0000 0.0000
 Ke 0.0000 0.0000 0.0000
+map_Ka ../../images/crate/crate_diffuse.png
 map_Kd ../../images/crate/crate_diffuse.png
 map_Kn ../../images/crate/crate_normal.png

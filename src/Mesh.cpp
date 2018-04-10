@@ -56,100 +56,80 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
     _mVertCount = vertices.size();
 }
 
-void Mesh::Render(GLuint programNum, Shader * shader, glm::mat4 modelMat)
+void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 {
-    glUseProgram(shader->GetShaderProgramIDs()[programNum]);
+	shader->Use();
 
     const auto& view = Camera::instance().GetViewMat();
     const auto& proj = Camera::instance().GetProjectionMat();
 
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "modelMat"), 1, false,
-                       (GLfloat*)&modelMat);
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&view);
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&proj);
+	shader->SetMat4("modelMat", modelMat);
+	shader->SetMat4("viewMat", view);
+	shader->SetMat4("projMat", proj);
 
-    glm::mat4 mvp = Camera::instance().GetProjectionMat() * Camera::instance().GetViewMat() * modelMat;
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "mvp"), 1, false, (GLfloat*)&mvp);
-
-	///
-	/// LIGHT TESTS/EXAMPLES
-	///
-
-	/// Directional Light
-	DirectionalLight* directionalLight = new DirectionalLight();
-	directionalLight->SetDirection(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f)); // we define direction FROM the light source so it's pointing down
-	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightVec"), 1, (GLfloat*)&directionalLight->GetDirection());
-	
-	
-	/// Point Lights
-	//Light* PointLight = new Light();
-	//PointLight->SetPosition(glm::vec4(5.0f, 2.0f, 2.0f, 1.0f));
-	//PointLight->SetConstant(1.0f);
-	//PointLight->SetLinear(0.09f);
-	//PointLight->SetQuadratic(0.032f);
-	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightVec"), 1, (GLfloat*)&PointLight->GetPos());
-	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightCon"), PointLight->GetConst());
-	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightLin"), PointLight->GetLinear());
-	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightQuad"), PointLight->GetQuad());
-
-	/// Spot Light
-	//Light* SpotLight = new Light();
-	//glm::vec3 camPo = Camera::instance().GetCameraPos();
-	//SpotLight->SetPosition(glm::vec4(camPo.x, camPo.y, camPo.z, 1.0f));
-
-	//glm::vec3 camFront = Camera::instance().GetCameraForward();
-	//SpotLight->SetDir(glm::vec4(camFront.x, camFront.y, camFront.z, 1.0f));
-
-	//SpotLight->SetCutOff(glm::cos(glm::radians(12.5f)));
-
-	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&SpotLight->GetPos());
-	//glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightD"), 1, (GLfloat*)&SpotLight->GetDir());
-	//glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightCutoff"), SpotLight->GetCutOff());
-	///
-	///
-	///
-
-	// OG Light
-	glm::vec4 lightPos = glm::vec4(5.0f, 2.0f, 2.0f, 1.0f);
-	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "lightPos"), 1, (GLfloat*)&lightPos);
+	glm::mat4 mvp = proj * view * modelMat;
+	shader->SetMat4("mvp", mvp);
 
     glm::vec3 camPos = Camera::instance().GetCameraPos();
 	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
-	glUniform4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "eyePos"), 1, (GLfloat*)&eyePos);
+	shader->SetVec4("eyePos", eyePos);
 
 	// Material values
 	auto ambient = _mMaterial->GetAmbient();
-	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "ambient"), 1, (GLfloat*)&ambient);
+	shader->SetVec3("ambient", ambient);
+
 	auto diffuse = _mMaterial->GetDiffuse();
-	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "diffuse"), 1, (GLfloat*)&diffuse);
+	shader->SetVec3("diffuse", diffuse);
+
 	auto specular = _mMaterial->GetSpecular();
-	glUniform3fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "specular"), 1, (GLfloat*)&specular);
-	glUniform1f(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "shininess"), _mMaterial->GetShininess());
+	shader->SetVec3("specular", specular);
+
+	auto shininess = _mMaterial->GetShininess();
+	shader->SetFloat("shininess", shininess);
 
 	_mMaterial->Bind();
 
     if (_mMaterial->AmbientTexExists())
     {
-        glUniform1i(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "ambientTex"), TextureID::AMBIENT);
+		shader->SetInt("ambientTex", TextureID::AMBIENT);
+		shader->SetBool("hasAmbient", true);
     }
+	else
+	{
+		shader->SetBool("hasAmbient", false);
+	}
 
     if (_mMaterial->DiffuseTexExists())
     {
-        glUniform1i(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "diffuseTex"), TextureID::DIFFUSE);
+		shader->SetInt("diffuseTex", TextureID::DIFFUSE);
+		shader->SetBool("hasDiffuse", true);
     }
+	else
+	{
+		shader->SetBool("hasDiffuse", false);
+	}
 
     if (_mMaterial->SpecularTexExists())
     {
-        glUniform1i(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "specularTex"), TextureID::SPECULAR);
-    }
+		shader->SetInt("specularTex", TextureID::SPECULAR);
+		shader->SetBool("hasSpecular", true);
+	}
+	else
+	{
+		shader->SetBool("hasSpecular", false);
+	}
 
-    if (_mMaterial->BumpTexExists())
+    if (_mMaterial->NormalTexExists())
     {
-        glUniform1i(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "bumpTex"), TextureID::BUMP);
-    }
+		shader->SetInt("normalTex", TextureID::NORMAL);
+		shader->SetBool("hasNormal", true);
+	}
+	else
+	{
+		shader->SetBool("hasNormal", false);
+	}
 
     glBindVertexArray(_mVAO);
     glDrawArrays(GL_TRIANGLES, 0, _mVertCount);
-
     glBindVertexArray(0);
 }

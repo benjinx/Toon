@@ -4,12 +4,13 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 #include "ScriptHost.hpp"
+#include "Light.hpp"
 
 class GameScene : public Scene
 {
 public:
 	GameScene() {};
-	~GameScene() { _mShader.Destroy(); };
+	~GameScene() { DeleteShaders(); };
 
 	void Start() override;
 	void Update(float dt) override;
@@ -20,12 +21,11 @@ public:
 	void PhysicsUpdate(float dt);
 
 private:
-	Shader _mShader;
 	int _mNumShaders;
 	int _mProg;
 	ScriptHost _mScriptHost;
 
-	std::vector<Shader> _mShaders;
+	std::vector<Shader*> _mShaders;
 };
 
 #endif // GAMESCENE_H

@@ -9,6 +9,7 @@ in vertexData
 // Uniforms
 uniform vec4 lightPos;
 uniform vec4 eyePos;
+uniform vec4 lightVec;
 
 // Targets
 layout (location = 0) out vec4 fragColor;
@@ -24,12 +25,12 @@ void main()
   	
     // diffuse 
     vec3 norm = normalize(pass.normal);
-	vec3 lightDir = normalize(lightPos.xyz - pass.fragPos);
-	//vec3 lightDir;
-    //if (lightVec.w == 1.0)
-        //lightDir = normalize(lightVec.xyz - pass.fragPos); // Spot Light
-    //else
-        //lightDir = normalize(-lightVec.xyz);// for directional light
+	//vec3 lightDir = normalize(lightPos.xyz - pass.fragPos);
+	vec3 lightDir;
+    if (lightVec.w == 1.0)
+        lightDir = normalize(lightVec.xyz - pass.fragPos); // Spot Light
+    else
+        lightDir = normalize(-lightVec.xyz);// for directional light
 		
 
     float diff = max(dot(norm, lightDir), 0.0);

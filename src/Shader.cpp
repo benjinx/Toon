@@ -83,17 +83,16 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    GLuint shaderProgramID = glCreateProgram();
-    _mShaderProgram.push_back(shaderProgramID);
+	_mID = glCreateProgram();
 
-    glAttachShader(shaderProgramID, vertexShader);
-    glAttachShader(shaderProgramID, fragmentShader);
-    glLinkProgram(shaderProgramID);
+    glAttachShader(_mID, vertexShader);
+    glAttachShader(_mID, fragmentShader);
+    glLinkProgram(_mID);
 
-    glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
+    glGetProgramiv(_mID, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(shaderProgramID, 512, NULL, infoLog);
+        glGetShaderInfoLog(_mID, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
@@ -103,11 +102,6 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 
 void Shader::Destroy()
 {
-	for (auto program : _mShaderProgram)
-	{
-		glUseProgram(program);
-		glDeleteProgram(program);
-	}
-
-	_mShaderProgram.clear();
+	glUseProgram(_mID);
+	glDeleteProgram(_mID);
 }

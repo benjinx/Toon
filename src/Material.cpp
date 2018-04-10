@@ -4,39 +4,53 @@
 Material::Material(float       ambient[3],
                    float       diffuse[3],
                    float       specular[3],
-                   float       dissolve,
                    float       shininess,
                    std::string ambientFile,
                    std::string diffuseFile,
                    std::string specularFile,
-                   std::string bumpFile)
+                   std::string normalFile)
 {
     _mAmbient  = {ambient[0], ambient[1], ambient[2]};
     _mDiffuse  = {diffuse[0], diffuse[1], diffuse[2]};
     _mSpecular = {specular[0], specular[1], specular[2]};
 
-    _mDissolve  = dissolve;
     _mShininess = shininess;
 
     if (ambientFile != "")
     {
         _mAmbientTex = Utils::LoadTexture(ambientFile);
     }
+	else
+	{
+		_mAmbientTex = 0;
+	}
 
     if (diffuseFile != "")
     {
         _mDiffuseTex = Utils::LoadTexture(diffuseFile);
     }
+	else
+	{
+		_mDiffuseTex = 0;
+	}
 
     if (specularFile != "")
     {
         _mSpecularTex = Utils::LoadTexture(specularFile);
     }
+	else
+	{
+		_mSpecularTex = 0;
+	}
 
-    if (bumpFile != "")
+    if (normalFile != "")
     {
-        _mBumpTex = Utils::LoadTexture(bumpFile);
+		_mNormalTex = Utils::LoadTexture(normalFile);
     }
+	else
+	{
+		_mNormalTex = 0;
+	}
 }
 
 void Material::Bind()
@@ -59,9 +73,9 @@ void Material::Bind()
         glBindTexture(GL_TEXTURE_2D, _mSpecularTex);
     }
 
-    if (_mBumpTex != 0)
+    if (_mNormalTex != 0)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureID::BUMP);
-        glBindTexture(GL_TEXTURE_2D, _mBumpTex);
+        glActiveTexture(GL_TEXTURE0 + TextureID::NORMAL);
+        glBindTexture(GL_TEXTURE_2D, _mNormalTex);
     }
 }

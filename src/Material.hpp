@@ -8,7 +8,7 @@ enum TextureID
 	AMBIENT = 0,
 	DIFFUSE,
 	SPECULAR,
-	BUMP,
+	NORMAL,
 };
 
 class Material
@@ -17,12 +17,11 @@ public:
     Material(float       ambient[3],
              float       diffuse[3],
              float       specular[3],
-             float       dissolve,
              float       shininess,
              std::string ambientFile,
              std::string diffuseFile,
              std::string specularFile,
-             std::string bumpFile);
+             std::string normalFile);
     ~Material(){};
 
     void Bind();
@@ -56,9 +55,9 @@ public:
             return false;
     }
 
-    bool BumpTexExists()
+    bool NormalTexExists()
     {
-        if (_mBumpTex != 0)
+        if (_mNormalTex != 0)
             return true;
         else
             return false;
@@ -67,14 +66,14 @@ public:
 	GLuint GetAmbientTex() { return _mAmbientTex; }
 	GLuint GetDiffuseTex() { return _mDiffuseTex; }
 	GLuint GetSpecularTex() { return _mSpecularTex; }
-	GLuint GetBumpTex() { return _mBumpTex; }
+	GLuint GetNormalTex() { return _mNormalTex; }
 
 private:
     glm::vec3 _mAmbient, _mDiffuse, _mSpecular;
 
-    float _mDissolve, _mShininess;
+    float _mShininess;
 
-    GLuint _mAmbientTex, _mDiffuseTex, _mSpecularTex, _mBumpTex;
+    GLuint _mAmbientTex, _mDiffuseTex, _mSpecularTex, _mNormalTex;
 };
 
 #endif // MATERIAL_H

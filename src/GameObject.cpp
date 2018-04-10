@@ -45,11 +45,11 @@ void GameObject::Update(const float dt)
 	//_mRigidbody.ClampToGround(this, min, res);
 }
 
-void GameObject::Render(GLuint programNum, Shader* shader)
+void GameObject::Render(Shader* shader)
 {
 	for (Mesh* mesh : _mMeshes)
 	{
-		mesh->Render(programNum, shader, GetModelMatrix());
+		mesh->Render(shader, GetModelMatrix());
 	}
 }
 
@@ -90,17 +90,17 @@ void GameObject::InitAxis()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void GameObject::DrawAxis(GLuint programNum, Shader * shader)
+void GameObject::DrawAxis(Shader * shader)
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glUseProgram(shader->GetShaderProgramIDs()[programNum]);
+	glUseProgram(shader->GetShaderID());
 
     const auto& view = Camera::instance().GetViewMat();
     const auto& proj = Camera::instance().GetProjectionMat();
 
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "modelMat"), 1, false, (GLfloat*)&_mModelMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "viewMat"), 1, false, (GLfloat*)&view);
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderProgramIDs()[programNum], "projMat"), 1, false, (GLfloat*)&proj);
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "modelMat"), 1, false, (GLfloat*)&_mModelMatrix);
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "viewMat"), 1, false, (GLfloat*)&view);
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "projMat"), 1, false, (GLfloat*)&proj);
 
 	glBindVertexArray(_mVAO);
 	glDrawArrays(GL_LINES, 0, 18);

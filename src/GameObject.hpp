@@ -24,7 +24,7 @@ public:
 	~GameObject();
 
 	void Update(const float dt);
-	void Render(GLuint programNum, Shader* shader);
+	void Render(Shader* shader);
 	
 	void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
 
@@ -80,7 +80,7 @@ public:
 	}
 
 	void InitAxis();
-	void DrawAxis(GLuint programNum, Shader * shader);
+	void DrawAxis(Shader * shader);
 
 	bool IsAxisEnabled() { return axisEnabled; }
 

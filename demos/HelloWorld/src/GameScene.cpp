@@ -94,7 +94,11 @@ void GameScene::SetupShaders()
 	printf("Loading Shaders\n");
 
 	for (int i = 0; i < _mNumShaders; i++)
-		_mShader.SetupShaders(vertShaders[i], fragShaders[i]);
+	{
+		Shader* shader = new Shader();
+		shader->SetupShaders(vertShaders[i], fragShaders[i]);
+		_mShaders.push_back(shader);
+	}
 
 	// Clear Window
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -104,6 +108,44 @@ void GameScene::SetupShaders()
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Testing shader value setting
+	_mShaders[4]->Use();
+	glm::vec4 lightPos = glm::vec4(5.0f, 2.0f, 2.0f, 1.0f);
+	_mShaders[4]->SetVec4("lightPos", lightPos);
+
+	// Lights w/ Shader 2
+	_mShaders[2]->Use();
+
+	/// Directional Light
+	DirectionalLight* directionalLight = new DirectionalLight();
+	directionalLight->SetDirection(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f)); // we define direction FROM the light source so it's pointing down
+	_mShaders[2]->SetVec4("lightVec", directionalLight->GetDirection());
+
+	/// Point Light
+	//PointLight* pointLight = new PointLight();
+	//pointLight->SetPosition(glm::vec4(5.0f, 2.0f, 2.0f, 1.0f));
+	//pointLight->SetConstant(1.0f);
+	//pointLight->SetLinear(0.09f);
+	//pointLight->SetQuadratic(0.032f);
+	//_mShaders[2]->SetVec4("lightVec", pointLight->GetPosition());
+	//_mShaders[2]->SetFloat("lightCon", pointLight->GetConstant());
+	//_mShaders[2]->SetFloat("lightLin", pointLight->GetLinear());
+	//_mShaders[2]->SetFloat("lightQuad", pointLight->GetQuadratic());
+
+	/// Spot Light
+	//SpotLight* spotLight = new SpotLight();
+	//glm::vec3 camPo = Camera::instance().GetCameraPos();
+	//spotLight->SetPosition(glm::vec4(camPo.x, camPo.y, camPo.z, 1.0f));
+
+	//glm::vec3 camFront = Camera::instance().GetCameraForward();
+	//spotLight->SetDirection(glm::vec4(camFront.x, camFront.y, camFront.z, 1.0f));
+
+	//spotLight->SetCutOff(glm::cos(glm::radians(12.5f)));
+
+	//_mShaders[2]->SetVec4("lightPos", spotLight->GetPosition());
+	//_mShaders[2]->SetVec4("lightDir", spotLight->GetDirection());
+	//_mShaders[2]->SetFloat("lightCutOff", spotLight->GetCutOff());
 }
 
 void GameScene::PhysicsStart()
@@ -123,8 +165,10 @@ void GameScene::PhysicsUpdate(float dt)
 
 void GameScene::DeleteShaders()
 {
-	//for (int i = 0; i < _mNumShaders; i++)
-	_mShader.Destroy();
+	for (auto& shader : _mShaders)
+		shader->Destroy();
+
+	_mShaders.clear();
 }
 
 void GameScene::Update(float dt)
@@ -148,13 +192,13 @@ void GameScene::Update(float dt)
 
 void GameScene::Render()
 {
-
+	
 	for (auto& gameObject : _mGameObjects)
 	{
 		if (gameObject.first == "Sun")
-			gameObject.second->Render(1, &_mShader);
+			gameObject.second->Render(_mShaders[1]);
 		else
-			gameObject.second->Render(4, &_mShader);
+			gameObject.second->Render(_mShaders[4]);
 	}
 
 	// Axis Rendering for Objects
@@ -162,7 +206,7 @@ void GameScene::Render()
 	{
 		if (gameOject.second->IsAxisEnabled())
 		{
-			gameOject.second->DrawAxis(0, &_mShader);
+			gameOject.second->DrawAxis(_mShaders[0]);
 		}
 	}
 
