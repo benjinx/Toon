@@ -18,4 +18,8 @@
 #include <fstream>
 #include <sstream>
 
+#ifndef RESOURCE_PATH
+#define RESOURCE_PATH "."
+#endif // RESOURCE_PATH
+
 #endif // COMMON_H

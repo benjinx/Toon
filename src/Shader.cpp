@@ -13,8 +13,7 @@ void Shader::CheckAttribs()
 
 void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 {
-	vertFilename = std::string(RESOURCES_DIR) + vertFilename;
-	fragFilename = std::string(RESOURCES_DIR) + fragFilename;
+    const auto& paths = Utils::GetResourcePaths();
 
     // Load Shaders
     // Retrieve the vertex/fragment source code from filePath
@@ -27,12 +26,19 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 
     try
     {
-		printf("Loading: %s\n", vertFilename.c_str());
-		printf("Loading: %s\n", fragFilename.c_str());
+        printf("Loading: %s\n", vertFilename.c_str());
+        printf("Loading: %s\n", fragFilename.c_str());
 
-        // Open files
-        vShaderFile.open(vertFilename);
-        fShaderFile.open(fragFilename);
+        for (const std::string& p : paths) {
+            std::string fullVertFilename = p + "/" + vertFilename;
+            std::string fullFragFilename = p + "/" + fragFilename;
+
+            // Open files
+            vShaderFile.open(fullVertFilename);
+            fShaderFile.open(fullFragFilename);
+
+            if (vShaderFile && fShaderFile) break;
+        }
 
         std::stringstream vShaderStream, fShaderStream;
 

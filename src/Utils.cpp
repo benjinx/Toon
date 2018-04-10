@@ -3,30 +3,39 @@
 #include "Mesh.hpp"
 #include "GameObject.hpp"
 #include "Material.hpp"
+#include <sstream>
 
 namespace Utils
 {
 	unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp)
 	{
-		filename = std::string(RESOURCES_DIR) + filename;
+        const auto& paths = GetResourcePaths();
+        FILE * file = NULL;
 
-		// Remember to call stbi_image_free(image) after using the image and before another.
-		// bpp - bits per pixel
-		// 32 = RGBA = 4 * 8
-		// 24 = RGB = 3 * 8
-		//stbi_set_flip_vertically_on_load(true);
+        for (const std::string& p : paths) {
+            std::string fullFilename = p + "/" + filename;
+            file = fopen(fullFilename.c_str(), "rb");
 
-		unsigned char* image = stbi_load(filename.c_str(), &w, &h, &bpp, STBI_rgb_alpha);
+            if (!file) continue;
 
-		return image;
+            // Remember to call stbi_image_free(image) after using the image and before another.
+    		// bpp - bits per pixel
+    		// 32 = RGBA = 4 * 8
+    		// 24 = RGB = 3 * 8
+    		//stbi_set_flip_vertically_on_load(true);
+
+    		unsigned char* image = stbi_load_from_file(file, &w, &h, &bpp, STBI_rgb_alpha);
+            fclose(file);
+            return image;
+        }
+
+        return nullptr;
 	}
 
 	void FreePng(unsigned char* img) { stbi_image_free(img); }
 
 	GLuint LoadTexture(std::string filename)
 	{
-		filename = std::string(RESOURCES_DIR) + filename;
-
 		GLuint texture;
 
 		glGenTextures(1, &texture);
@@ -77,31 +86,34 @@ namespace Utils
 
 	GameObject* LoadObj(std::string filename)
 	{
-		filename = std::string(RESOURCES_DIR) + filename;
-		
+        const auto& paths = GetResourcePaths();
+
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filename,
-			aiProcess_CalcTangentSpace |
-			aiProcess_Triangulate |
-			aiProcess_FlipUVs);
+        for (const std::string& p : paths) {
+            std::string fullFilename = p + "/" + filename;
 
-		if (!scene)
-		{
-			std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
-			return nullptr;
-		}
+    		const aiScene* scene = importer.ReadFile(fullFilename,
+    			aiProcess_CalcTangentSpace |
+    			aiProcess_Triangulate |
+    			aiProcess_FlipUVs);
 
-		std::string dirname = GetDirname(filename) + "/";
+            if (!scene) continue;
 
-		std::vector<Mesh*> meshes;
+    		std::string dirname = GetDirname(fullFilename) + "/";
 
-		// ProcessNode
-		ProcessNode(scene->mRootNode, scene, meshes, dirname);
+    		std::vector<Mesh*> meshes;
 
-		GameObject* gobj = new GameObject();
-		gobj->AddMesh(meshes[0]);
+    		// ProcessNode
+    		ProcessNode(scene->mRootNode, scene, meshes, dirname);
 
-		return gobj;
+    		GameObject* gobj = new GameObject();
+    		gobj->AddMesh(meshes[0]);
+
+    		return gobj;
+        }
+
+		std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
+		return nullptr;
 	}
 
 	void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname)
