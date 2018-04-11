@@ -17,6 +17,9 @@ namespace UI
 	extern bool settingsSelected;
 	extern bool showMainMenuBar;
 	extern bool showTestWindow;
+	extern bool showAxis;
+
+	extern float objectColor[3];
 }
 
 #endif // UI_H

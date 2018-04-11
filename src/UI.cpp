@@ -6,10 +6,12 @@
 #include "imgui/imgui_impl_glfw_gl3.h"
 
 bool UI::consoleSelected = false;
-bool UI::optionsSelected = false;
+bool UI::optionsSelected = true;
 bool UI::settingsSelected = false;
 bool UI::showMainMenuBar = true;
 bool UI::showTestWindow  = false;
+bool UI::showAxis = true;
+float UI::objectColor[3] = { 1.0f, 1.0f, 1.0f };
 
 void UI::StartUI()
 {
@@ -61,7 +63,10 @@ void UI::UpdateUI()
 
 		if (UI::optionsSelected)
 		{
+			ImGui::SetNextWindowSize(ImVec2(400, 200));
 			ImGui::Begin("Options", &UI::optionsSelected);
+			ImGui::Checkbox("Show Gameobject Axis", &UI::showAxis);
+			ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
 			ImGui::End();
 		}
 

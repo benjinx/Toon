@@ -76,16 +76,16 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
 	// Material values
 	auto ambient = _mMaterial->GetAmbient();
-	shader->SetVec3("ambient", ambient);
+	shader->SetVec3("ambientAmount", ambient);
 
 	auto diffuse = _mMaterial->GetDiffuse();
-	shader->SetVec3("diffuse", diffuse);
+	shader->SetVec3("diffuseAmount", diffuse);
 
 	auto specular = _mMaterial->GetSpecular();
-	shader->SetVec3("specular", specular);
+	shader->SetVec3("specularAmount", specular);
 
 	auto shininess = _mMaterial->GetShininess();
-	shader->SetFloat("shininess", shininess);
+	shader->SetFloat("shininessAmount", shininess);
 
 	_mMaterial->Bind();
 

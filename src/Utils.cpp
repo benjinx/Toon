@@ -121,12 +121,36 @@ namespace Utils
 
 	Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname)
 	{
+		std::vector<unsigned int> indices;
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
 		std::vector<glm::vec3> tangents;
 		std::vector<glm::vec3> bitangents;
 		std::vector<Texture> textures;
+
+		// Indicies
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+			{
+				indices.push_back(face.mIndices[j]);
+			}
+		}
+
+		//vertices.reserve(indices.size());
+		//normals.reserve(indices.size());
+		//texCoords.reserve(indices.size());
+		//tangents.reserve(indices.size());
+		//bitangents.reserve(indices.size());
+
+		//for (auto& i : indices)
+		//{
+		//	auto& temp = vertices[i];
+		//	std::vector<glm::vec3> newVert;
+		//	newVert.push_back(temp);
+		//}
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{

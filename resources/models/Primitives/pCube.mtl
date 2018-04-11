@@ -5,9 +5,9 @@ d 1.0000
 Tr 0.0000
 Tf 1.0000 1.0000 1.0000
 illum 2
-Ka 0.0000 0.0000 0.0000
+Ka 0.5880 0.5880 0.5880
 Kd 0.5880 0.5880 0.5880
-Ks 0.0000 0.0000 0.0000
+Ks 0.5880 0.5880 0.5880
 Ke 0.0000 0.0000 0.0000
 map_Ka ../../images/crate/crate_diffuse.png
 map_Kd ../../images/crate/crate_diffuse.png

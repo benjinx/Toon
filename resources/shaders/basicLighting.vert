@@ -3,7 +3,6 @@
 // Attributes
 layout (location = 0) in vec4 position;
 layout (location = 2) in vec4 normal;
-//layout (location = 8) in vec2 texCoords;
 
 // Uniforms
 uniform mat4 mvp;

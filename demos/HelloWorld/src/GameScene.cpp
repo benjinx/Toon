@@ -24,18 +24,17 @@ void GameScene::Start()
 	// Primitive Objs
 	_mGameObjects.emplace("Plane", Utils::LoadObj("models/Primitives/pPlane.obj"));
 	_mGameObjects.emplace("Sphere", Utils::LoadObj("models/Primitives/pSphere.obj"));
-	//_mGameObjects.emplace("Torus", Utils::LoadObj("resources/models/Primitives/pTorus.obj"));
 
 	// Scene Objs
 	_mGameObjects.emplace("Sun", Utils::LoadObj("models/sun.obj"));
 	_mGameObjects.emplace("Earth", Utils::LoadObj("models/earth.obj"));
 	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
 
+	/*_mGameObjects.emplace("Nanosuit", Utils::LoadObj("models/nanosuit/nanosuit.obj"));
+	_mGameObjects["Nanosuit"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	_mGameObjects["Nanosuit"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));*/
 
 	// Initialize Objs
-	//_mGameObjects["Torus"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	//_mGameObjects["Torus"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	//_mGameObjects["Torus"]->InitAxis();
 
 	_mGameObjects["Cube"]->SetPosition(glm::vec3(-1.5f, -1.0f, 1.0f));
 	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -81,6 +80,7 @@ void GameScene::SetupShaders()
 		"shaders/basicLighting.vert",
 		"shaders/bpLighting.vert",
 		"shaders/nmLighting.vert",
+		//"shaders/multiLights.vert",
 	};
 
 	std::vector<std::string> fragShaders = {
@@ -89,6 +89,7 @@ void GameScene::SetupShaders()
 		"shaders/basicLighting.frag",
 		"shaders/bpLighting.frag",
 		"shaders/nmLighting.frag",
+		//"shaders/multiLights.frag",
 	};
 
 	printf("Loading Shaders\n");
@@ -175,10 +176,8 @@ void GameScene::Update(float dt)
 {
 	Camera::instance().Update(dt);
 
-	//_mGameObjects["Sun"]->SetRotation(_mGameObjects["Sun"]->GetRotation() + glm::vec3(0.0f, 0.1f, 0.0f));
 	_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
-	//_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
-	//_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
+	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
 
 	for (auto& gobj : _mGameObjects)
 	{

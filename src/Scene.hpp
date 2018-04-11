@@ -5,7 +5,7 @@
 #include "Shader.hpp"
 #include "Utils.hpp"
 
-class Scene : public GameObject
+class Scene //: public GameObject
 {
 public:
 	Scene();

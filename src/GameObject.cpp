@@ -13,6 +13,8 @@ GameObject::GameObject()
 	_mRigidbody.SetAcceleration(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	axisEnabled = false;
+
+	InitAxis();
 }
 
 GameObject::GameObject(glm::vec3 position)
@@ -26,6 +28,8 @@ GameObject::GameObject(glm::vec3 position)
 	_mRigidbody.SetAcceleration(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	axisEnabled = false;
+
+	InitAxis();
 }
 
 GameObject::~GameObject()

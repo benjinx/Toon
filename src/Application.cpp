@@ -121,7 +121,7 @@ void Application::OpenGLInfo()
 	// Max UBO Bindings
 	int maxBindings;
 	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxBindings);
-	printf("Max UBO Bindings: %d\n\n", maxBindings);
+	printf("Max UBO Bindings: %d\n", maxBindings);
 }
 
 void Application::HandleInput(float dt)

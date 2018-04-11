@@ -38,6 +38,8 @@ public:
 
 	void SetCurrentScene(Scene* scene) { _mpCurrentScene = scene; }
 
+	float coll[3] = { 0.0f, 0.0f, 0.0f };
+
 private:
     static Application* _sInst;
     void                Start();

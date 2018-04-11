@@ -7,54 +7,34 @@ in vertexData
 } pass;
 
 // Uniforms
-uniform vec4 lightPos;
 uniform vec4 eyePos;
 uniform vec4 lightVec;
+uniform vec3 objectColor;
+uniform vec3 lightColor;
 
 // Targets
 layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec3 lightColor = vec3(1.0, 1.0, 1.0);
-	vec3 objectColor = vec3(0.0, 1.0, 1.0);
-
 	// ambient
     float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * objectColor;
+    vec3 ambient = ambientStrength * lightColor;
   	
     // diffuse 
     vec3 norm = normalize(pass.normal);
-	//vec3 lightDir = normalize(lightPos.xyz - pass.fragPos);
-	vec3 lightDir;
-    if (lightVec.w == 1.0)
-        lightDir = normalize(lightVec.xyz - pass.fragPos); // Spot Light
-    else
-        lightDir = normalize(-lightVec.xyz);// for directional light
-		
+	vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * objectColor;
+    vec3 diffuse = diff * lightColor;
     
     // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;  
-    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    vec3 specular = specularStrength * spec * lightColor;
 
-	///
-	// Point Light test
-	//float dist    = length(lightVec.xyz - pass.fragPos);
-	//float attenuation = 1.0 / (lightCon + lightLin * dist + lightQuad * (dist * dist));
-
-	//ambient  *= attenuation;
-	//diffuse  *= attenuation;
-	//specular *= attenuation;
-	///
-	///
-
-    vec3 result = (ambient + diffuse + specular);
+    vec3 result = (ambient + diffuse + specular) * objectColor;
 	fragColor = vec4(result, 1.0);
 }
