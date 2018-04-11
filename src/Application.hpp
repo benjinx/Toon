@@ -12,9 +12,6 @@
 #include "Utils.hpp"
 #include "Scene.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
-
 #include "Cube.hpp"
 
 class Application
@@ -55,11 +52,6 @@ private:
 	bool rightButtonDown = false;
 	float			   _mDeltaTime;
     std::vector<Mesh*> _mMeshes;
-    ImVec4             Red         = ImVec4(255.0f, 0.0f, 0.0f, 255.0f);
-    ImVec4             Yellow      = ImVec4(255.0f, 255.0f, 0.0f, 255.0f);
-    ImVec4             Green       = ImVec4(0.0f, 255.0f, 0.0f, 255.0f);
-    ImVec4             White       = ImVec4(255.0f, 255.0f, 255.0f, 255.0f);
-    char               buffer[255] = {};
 	bool firstMouse;
 	float lastX = 640, lastY = 360;
 

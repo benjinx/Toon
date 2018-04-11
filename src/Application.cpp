@@ -1,5 +1,8 @@
 ﻿#include "Application.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 Application* Application::_sInst = nullptr;
 
 const float TARGET_FPS = 60.0f;
@@ -200,7 +203,7 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
         }
     }
 
-    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mode);
 }
 
 void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int action, int mode)
@@ -212,7 +215,7 @@ void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int acti
 		// tell camera that it can do handleRotation
 
     // Handle mouse button
-    ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mode);
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mode);
 }
 
 void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset)
@@ -220,7 +223,7 @@ void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yo
 	Camera::instance().HandleFoV((float)xoffset, (float)yoffset);
 
     // scroll
-    ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 void Application::HandleGLFWMousePos(GLFWwindow* window, double x, double y)

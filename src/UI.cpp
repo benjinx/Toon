@@ -15,6 +15,7 @@ float UI::objectColor[3] = { 1.0f, 1.0f, 1.0f };
 
 void UI::StartUI()
 {
+	ImGui::CreateContext();
 	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow(), true);
 }
 
@@ -67,18 +68,21 @@ void UI::UpdateUI()
 			ImGui::Begin("Options", &UI::optionsSelected);
 			ImGui::Checkbox("Show Gameobject Axis", &UI::showAxis);
 			ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
+			//ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 			ImGui::End();
 		}
 
 		if (UI::showTestWindow)
 		{
 			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-			ImGui::ShowTestWindow(&UI::showTestWindow);
+			//ImGui::ShowTestWindow(&UI::showTestWindow);
+			ImGui::ShowDemoWindow(&UI::showTestWindow);
+			
 		}
 
 		if (UI::settingsSelected)
 		{
-			ImGui::SetNextWindowSize(ImVec2(200, 400));
+			ImGui::SetNextWindowSize(ImVec2(300, 400));
 			ImGui::SetNextWindowPosCenter();
 			ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoCollapse + ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("Credits\n");
@@ -86,6 +90,7 @@ void UI::UpdateUI()
 			ImGui::TextColored(White, "- Benji Campbell\n");
 			ImGui::TextColored(White, "- Daniel Covert\n");
 			ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
+			//ImGui::ShowStyleSelector("UI Style");
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))
@@ -99,6 +104,7 @@ void UI::RenderUI()
 {
     // ImGui functions end here
     ImGui::Render();
+	DrawUI(ImGui::GetDrawData());
 }
 
-void UI::DrawUI(ImDrawData* draw_data) {}
+void UI::DrawUI(ImDrawData* draw_data) { ImGui_ImplGlfwGL3_RenderDrawData(draw_data); }
