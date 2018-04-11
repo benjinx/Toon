@@ -76,32 +76,34 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
 	// Material values
 	auto ambient = _mMaterial->GetAmbient();
-	shader->SetVec3("ambientAmount", ambient);
+	shader->SetVec3("material.ambientVal", ambient);
 
 	auto diffuse = _mMaterial->GetDiffuse();
-	shader->SetVec3("diffuseAmount", diffuse);
+	shader->SetVec3("material.diffuseVal", diffuse);
 
 	auto specular = _mMaterial->GetSpecular();
-	shader->SetVec3("specularAmount", specular);
+	shader->SetVec3("material.specularVal", specular);
 
 	auto shininess = _mMaterial->GetShininess();
-	shader->SetFloat("shininessAmount", shininess);
+	shader->SetFloat("material.shininess", shininess);
 
 	_mMaterial->Bind();
 
-    if (_mMaterial->AmbientTexExists())
-    {
-		shader->SetInt("ambientTex", TextureID::AMBIENT);
-		shader->SetBool("hasAmbient", true);
-    }
-	else
-	{
-		shader->SetBool("hasAmbient", false);
-	}
+	//if (_mMaterial->AmbientTexExists())
+	//{
+	//	//shader->SetInt("ambientTex", TextureID::AMBIENT);
+	//	shader->SetInt("material.ambientTex", TextureID::AMBIENT);
+	//	shader->SetBool("hasAmbient", true);
+	//}
+	//else
+	//{
+	//	shader->SetBool("hasAmbient", false);
+	//}
 
     if (_mMaterial->DiffuseTexExists())
     {
-		shader->SetInt("diffuseTex", TextureID::DIFFUSE);
+		//shader->SetInt("diffuseTex", TextureID::DIFFUSE);
+		shader->SetInt("material.diffuse", TextureID::DIFFUSE);
 		shader->SetBool("hasDiffuse", true);
     }
 	else
@@ -111,7 +113,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
     if (_mMaterial->SpecularTexExists())
     {
-		shader->SetInt("specularTex", TextureID::SPECULAR);
+		//shader->SetInt("specularTex", TextureID::SPECULAR);
+		shader->SetInt("material.specular", TextureID::SPECULAR);
 		shader->SetBool("hasSpecular", true);
 	}
 	else
@@ -121,7 +124,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
     if (_mMaterial->NormalTexExists())
     {
-		shader->SetInt("normalTex", TextureID::NORMAL);
+		//shader->SetInt("normalTex", TextureID::NORMAL);
+		shader->SetInt("material.normal", TextureID::NORMAL);
 		shader->SetBool("hasNormal", true);
 	}
 	else

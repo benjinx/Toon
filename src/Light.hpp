@@ -9,11 +9,11 @@ public:
 	Light();
 	~Light();
 
-	void SetPosition(glm::vec4 pos) { _mPosition = pos; }
-	glm::vec4 GetPosition() { return _mPosition; }
+	void SetPosition(glm::vec3 pos) { _mPosition = pos; }
+	glm::vec3 GetPosition() { return _mPosition; }
 
 private:
-	glm::vec4 _mPosition; // No longer necessery when using directional lights.
+	glm::vec3 _mPosition; // No longer necessery when using directional lights.
 };
 
 
@@ -21,11 +21,11 @@ private:
 struct DirectionalLight : public Light
 {
 public:
-	void SetDirection(glm::vec4 dir) { _mDirection = dir; }
-	glm::vec4 GetDirection() { return _mDirection; }
+	void SetDirection(glm::vec3 dir) { _mDirection = dir; }
+	glm::vec3 GetDirection() { return _mDirection; }
 
 private:
-	glm::vec4 _mDirection;
+	glm::vec3 _mDirection;
 };
 
 

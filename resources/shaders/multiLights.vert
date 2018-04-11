@@ -37,13 +37,16 @@ void main()
 	vec3 lightVec = (lightPos.xyz - pass.fragPos);
 	vec3 eyeVec = (eyePos.xyz - pass.fragPos);
 
-	pass.lightDir.x = dot(T, lightVec);
-	pass.lightDir.y = dot(B, lightVec);
-	pass.lightDir.z = dot(N, lightVec);
+	pass.lightDir = vec4(lightVec, 1.0);
+	pass.eyeDir = vec4(eyeVec, 1.0);
 
-	pass.eyeDir.x = dot(T, eyeVec);
-	pass.eyeDir.y = dot(B, eyeVec);
-	pass.eyeDir.z = dot(N, eyeVec);
+	//pass.lightDir.x = dot(T, lightVec);
+	//pass.lightDir.y = dot(B, lightVec);
+	//pass.lightDir.z = dot(N, lightVec);
+
+	//pass.eyeDir.x = dot(T, eyeVec);
+	//pass.eyeDir.y = dot(B, eyeVec);
+	//pass.eyeDir.z = dot(N, eyeVec);
 
     gl_Position = projMat * viewMat * vec4(pass.fragPos, 1.0);
 }

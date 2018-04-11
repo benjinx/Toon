@@ -90,7 +90,8 @@ void UI::UpdateUI()
 			ImGui::TextColored(White, "- Benji Campbell\n");
 			ImGui::TextColored(White, "- Daniel Covert\n");
 			ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
-			//ImGui::ShowStyleSelector("UI Style");
+			ImGui::ShowStyleSelector("UI Theme");
+
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))

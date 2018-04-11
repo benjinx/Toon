@@ -1,4 +1,22 @@
 #version 330 core
+
+struct Material {
+	vec3 ambientVal;
+	vec3 diffuseVal;
+	vec3 specularVal;
+	float shininess;
+	sampler2D diffuse;
+	sampler2D specular;
+	sampler2D normal;
+};
+
+// Uniforms
+uniform bool hasDiffuse;
+uniform bool hasSpecular;
+uniform bool hasNormal;
+
+uniform Material material;
+
 // Varyings
 in vertexData
 {
@@ -9,31 +27,17 @@ in vertexData
 	vec4 eyeDir;
 } pass;
 
-// Uniforms
-uniform sampler2D diffuseTex;
-uniform sampler2D normalTex;
-uniform sampler2D specularTex;
-uniform float shininessAmount;
-
-uniform bool hasAmbient;
-uniform bool hasDiffuse;
-uniform bool hasSpecular;
-uniform bool hasNormal;
-
-uniform vec3 ambientAmount;
-uniform vec3 diffuseAmount;
-uniform vec3 specularAmount;
 
 // Targets
 layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec3 objectColor = texture(diffuseTex, pass.texCoords).rgb;
+	vec3 objectColor = texture(material.diffuse, pass.texCoords).rgb;
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
 	vec3 N;
 	if (hasNormal)
-		N = normalize(texture(normalTex, pass.texCoords).rgb * 2.0 - 1.0);
+		N = normalize(texture(material.normal, pass.texCoords).rgb * 2.0 - 1.0);
 	else
 		N = normalize(pass.normal);
 
@@ -43,10 +47,10 @@ void main()
 	// ambient
     float ambientStrength = 0.1;
 	vec3 ambient;
-	if (hasAmbient)
+	//if (hasAmbient)
 		ambient = ambientStrength * objectColor;
-	else
-		ambient = ambientStrength * ambientAmount;
+	//else
+		//ambient = ambientStrength * ambientAmount;
   	
     // diffuse 
     float diff = dot(L, N);
@@ -54,7 +58,7 @@ void main()
     // specular
 	vec3 R = (diff + diff) * N - L;
 
-	float shininess = shininessAmount;
+	float shininess = material.shininess;
 	if (shininess <= 1.0)
 		shininess = 32.0;
 
@@ -68,13 +72,13 @@ void main()
 	if (hasDiffuse)
 		diffuse = diff * objectColor;
 	else
-		diffuse = diff * diffuseAmount;
+		diffuse = diff * material.diffuseVal;
 
 	vec3 specular;
 	if (hasSpecular)
-		specular = texture(specularTex, pass.texCoords).rgb * spec * lightColor;
+		specular = texture(material.specular, pass.texCoords).rgb * spec * lightColor;
 	else
-		specular = spec * specularAmount;
+		specular = spec * material.specularVal;
         
     vec3 result = (ambient + diffuse + specular);
 	fragColor = vec4(result, 1.0);
