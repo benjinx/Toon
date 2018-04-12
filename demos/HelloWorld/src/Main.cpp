@@ -12,6 +12,7 @@ int main()
 
     try
     {
+		app.SetDemoName("Sandbox");
 		app.SetCurrentScene(gameScene);
         app.Run();
     }

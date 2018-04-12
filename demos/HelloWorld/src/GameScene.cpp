@@ -48,7 +48,7 @@ void GameScene::SetupShaders()
 		"shaders/axis.vert",
 		"shaders/passThru.vert",
 		"shaders/basicLighting.vert",
-		"shaders/bpLighting.vert",
+		"shaders/advLighting.vert",
 		"shaders/nmLighting.vert",
 		"shaders/multiLights.vert",
 	};
@@ -57,7 +57,7 @@ void GameScene::SetupShaders()
 		"shaders/axis.frag",
 		"shaders/passThru.frag",
 		"shaders/basicLighting.frag",
-		"shaders/bpLighting.frag",
+		"shaders/advLighting.frag",
 		"shaders/nmLighting.frag",
 		"shaders/multiLights.frag",
 	};
@@ -190,7 +190,7 @@ void GameScene::Render()
 		if (gameObject.first == "Sun")
 			gameObject.second->Render(_mShaders[1]);
 		else
-			gameObject.second->Render(_mShaders[5]);
+			gameObject.second->Render(_mShaders[4]);
 	}
 
 	// Axis Rendering for Objects

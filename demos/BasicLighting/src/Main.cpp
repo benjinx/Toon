@@ -12,6 +12,7 @@ int main()
 
     try
     {
+		app.SetDemoName("BasicLighting");
 		app.SetCurrentScene(gameScene);
         app.Run();
     }

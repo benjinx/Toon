@@ -35,7 +35,8 @@ public:
 
 	void SetCurrentScene(Scene* scene) { _mpCurrentScene = scene; }
 
-	float coll[3] = { 0.0f, 0.0f, 0.0f };
+	void SetDemoName(std::string demoName) { _mDemoName = demoName; }
+	std::string GetDemoName() { return _mDemoName; }
 
 private:
     static Application* _sInst;
@@ -56,6 +57,7 @@ private:
 	float lastX = 640, lastY = 360;
 
 	std::string _mVersionNum = "0.01";
+	std::string _mDemoName;
 };
 
 #endif // APPLICATION_H

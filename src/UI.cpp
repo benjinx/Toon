@@ -67,7 +67,8 @@ void UI::UpdateUI()
 			ImGui::SetNextWindowSize(ImVec2(400, 200));
 			ImGui::Begin("Options", &UI::optionsSelected);
 			ImGui::Checkbox("Show Gameobject Axis", &UI::showAxis);
-			ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
+			if (Application::Inst()->GetDemoName() == "BasicLighting")
+				ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
 			//ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 			ImGui::End();
 		}
