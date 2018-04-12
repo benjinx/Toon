@@ -49,7 +49,7 @@ void GameScene::SetupShaders()
 		"shaders/passThru.vert",
 		"shaders/basicLighting.vert",
 		"shaders/advLighting.vert",
-		"shaders/nmLighting.vert",
+		"shaders/normalMapping.vert",
 		"shaders/multiLights.vert",
 	};
 
@@ -58,7 +58,7 @@ void GameScene::SetupShaders()
 		"shaders/passThru.frag",
 		"shaders/basicLighting.frag",
 		"shaders/advLighting.frag",
-		"shaders/nmLighting.frag",
+		"shaders/normalMapping.frag",
 		"shaders/multiLights.frag",
 	};
 
