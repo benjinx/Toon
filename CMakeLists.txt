@@ -1,10 +1,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-INCLUDE("cmake/Macros.cmake")
-
 # Initialize Projects
 PROJECT(Temporality)
+
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+INCLUDE("cmake/Macros.cmake")
+INCLUDE("cmake/Compiler.cmake")
 
 # Allow for custom organization of files in VisualStudio
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -24,9 +25,6 @@ IF(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
 ELSEIF(MSVC)
 
 ENDIF()
-
-# Add Demos Sub
-ADD_SUBDIRECTORY(demos)
 
 # AI
 SET(AI_SRC
@@ -207,7 +205,7 @@ ExternalProject_Add(glm
 )
 
 INCLUDE_DIRECTORIES(
-    "${CMAKE_BINARY_DIR}/depend/glm/include"
+    "${CMAKE_BINARY_DIR}/depend/glm"
 )
 
 ADD_DEPENDENCIES(${PROJECT_NAME} glm)
@@ -232,7 +230,7 @@ ExternalProject_Add(glfw
 
 INCLUDE_DIRECTORIES(
     "${CMAKE_BINARY_DIR}/depend/glfw/include"
-	"${CMAKE_BINARY_DIR}/depend/glfw/build/include"
+	"${CMAKE_BINARY_DIR}/depend/build/glfw/include"
 )
 
 IF(WIN32)
@@ -263,8 +261,9 @@ ExternalProject_Add(assimp
 )
 
 INCLUDE_DIRECTORIES(
+    "${CMAKE_BINARY_DIR}/depend/assimp/code"
     "${CMAKE_BINARY_DIR}/depend/assimp/include"
-    "${CMAKE_BINARY_DIR}/depend/assimp/build/include"
+    "${CMAKE_BINARY_DIR}/depend/build/assimp/include"
 )
 
 IF(WIN32)
@@ -298,5 +297,8 @@ SET_TARGET_PROPERTIES(
     PROPERTIES FOLDER "Automation"
 )
 
+# Add Demos Sub
+ADD_SUBDIRECTORY(demos)
+
 SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
-SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/$(Configuration)")
