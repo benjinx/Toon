@@ -11,7 +11,7 @@
 //	#include "lualib.h"
 //}
 
-#include "lua.hpp"
+//#include "lua.hpp"
 
 class ScriptHost
 {
@@ -22,7 +22,7 @@ public:
 	void Load();
 
 private:
-	lua_State* L;
+	//lua_State* L;
 };
 
 #endif // ! SCRIPT_HOST_H

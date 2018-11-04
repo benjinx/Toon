@@ -3,7 +3,6 @@
 #include "Scene.hpp"
 #include "Window.hpp"
 #include "Camera.hpp"
-#include "ScriptHost.hpp"
 #include "Light.hpp"
 
 class GameScene : public Scene

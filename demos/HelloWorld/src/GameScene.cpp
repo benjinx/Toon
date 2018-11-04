@@ -31,7 +31,7 @@ void GameScene::Start()
 	Camera::instance().Init(cameraPos, cameraTarget);
 
 	// Load lua script
-	_mScriptHost.Load();
+	//_mScriptHost.Load();
 
 	// Set default to lighting
 	_mProg = 1;
