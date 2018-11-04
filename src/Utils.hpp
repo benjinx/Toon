@@ -22,6 +22,21 @@ enum LogLevel
 
 namespace Utils
 {
+    inline std::vector<std::string> GetResourcePaths()
+    {
+        static std::vector<std::string> paths;
+
+        if (paths.empty()) {
+            std::stringstream ss(RESOURCE_PATH);
+            std::string path;
+            while (std::getline(ss, path, ':')) {
+                paths.push_back(path);
+            }
+        }
+
+        return paths;
+    }
+
 	unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp);
 
 	void FreePng(unsigned char* img);
