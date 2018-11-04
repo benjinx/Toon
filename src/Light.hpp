@@ -53,14 +53,14 @@ private:
 struct SpotLight : public Light
 {
 public:
-	void SetDirection(glm::vec4 dir) { _mDirection = dir; }
-	glm::vec4 GetDirection() { return _mDirection; }
+	void SetDirection(glm::vec3 dir) { _mDirection = dir; }
+	glm::vec3 GetDirection() { return _mDirection; }
 	void SetCutOff(float co) { _mCutOff = co; }
 	float GetCutOff() { return _mCutOff; }
 
 private:
 	// Spot Light
-	glm::vec4 _mDirection;
+	glm::vec3 _mDirection;
 	float _mCutOff;
 };
 

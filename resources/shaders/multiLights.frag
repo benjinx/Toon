@@ -55,11 +55,12 @@ in vertexData
 
 // Uniforms
 uniform vec3 viewPos;
-uniform DirLight dirLight;
-#define NR_POINT_LIGHTS 1
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
 uniform Material material;
+
+uniform DirLight dirLight;
+uniform PointLight pointLight;
+uniform SpotLight spotLight;
+
 
 // Targets
 layout (location = 0) out vec4 fragColor;
@@ -80,8 +81,8 @@ void main()
 	vec3 result = CalcDirLight(dirLight, norm, viewDir);
 
 	// phase 2: Point lights
-	for (int i = 0; i < NR_POINT_LIGHTS; i++)
-		result += CalcPointLight(pointLights[i], norm, pass.fragPos, viewDir);
+	result += CalcPointLight(pointLight, norm, pass.fragPos, viewDir);
+
 	// phase 3: Spot light
 	//result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
 
