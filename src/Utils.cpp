@@ -53,6 +53,10 @@ namespace Utils
 		int            width, height, bpp;
 		unsigned char* img = LoadPng(filename, width, height, bpp);
 
+		if (!img) {
+			fprintf(stderr, "Failed to load %s", filename.c_str());
+		}
+
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 		// glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 		glGenerateMipmap(GL_TEXTURE_2D);

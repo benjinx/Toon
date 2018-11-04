@@ -63,7 +63,7 @@ public:
 	// Build Model Matrix
 	glm::mat4 GetModelMatrix()
 	{
-		_mModelMatrix = glm::mat4();
+		_mModelMatrix = glm::mat4(1);
 		_mModelMatrix = glm::translate(_mModelMatrix, _mTransform.position);
 		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 		_mModelMatrix = glm::rotate(_mModelMatrix, glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));

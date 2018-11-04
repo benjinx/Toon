@@ -32,6 +32,7 @@ namespace Utils
             while (std::getline(ss, path, ':')) {
                 paths.push_back(path);
             }
+			paths.push_back(".");
         }
 
         return paths;
