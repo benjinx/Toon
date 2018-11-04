@@ -12,6 +12,7 @@ void GameScene::Start()
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(-2.0f, -0.5f, 1.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
+	_mGameObjects["Light"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Initialize Objs
 	_mGameObjects.emplace("Earth", Utils::LoadObj("models/earth.obj"));
@@ -19,9 +20,11 @@ void GameScene::Start()
 
 	_mGameObjects["Earth"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	_mGameObjects["Earth"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	_mGameObjects["Earth"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	_mGameObjects["Moon"]->SetPosition(glm::vec3(-1.0f, 0.0f, 0.0f));
 	_mGameObjects["Moon"]->SetScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	_mGameObjects["Moon"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Shaders
 	SetupShaders();
