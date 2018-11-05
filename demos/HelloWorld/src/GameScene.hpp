@@ -22,7 +22,6 @@ public:
 private:
 	int _mNumShaders;
 	int _mProg;
-	//ScriptHost _mScriptHost;
 
 	std::vector<Shader*> _mShaders;
 };
