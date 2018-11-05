@@ -107,8 +107,8 @@ void GameScene::Update(float dt)
 	_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
 	_mGameObjects["Moon"]->SetRotation(_mGameObjects["Moon"]->GetRotation() + glm::vec3(0.0f, 0.5f * dt, 0.0f));
 
-	auto& earthPos = _mGameObjects["Earth"]->GetPosition();
-	auto& moonPos = _mGameObjects["Moon"]->GetPosition();
+	const auto& earthPos = _mGameObjects["Earth"]->GetPosition();
+	const auto& moonPos = _mGameObjects["Moon"]->GetPosition();
 
 	_mAngle += 0.5f;
 

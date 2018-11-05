@@ -194,7 +194,7 @@ INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIRS})
 LIST(APPEND _DEPEND_LIBRARIES ${OPENGL_LIBRARIES})
 
 # glm
-ExternalProject_Add(glm
+ExternalProject_Add(depend-glm
     GIT_REPOSITORY		"https://github.com/g-truc/glm.git"
     GIT_TAG				"0.9.9.3"
     GIT_SHALLOW			TRUE
@@ -210,10 +210,10 @@ INCLUDE_DIRECTORIES(
     "${CMAKE_BINARY_DIR}/depend/glm"
 )
 
-ADD_DEPENDENCIES(${PROJECT_NAME} glm)
+ADD_DEPENDENCIES(${PROJECT_NAME} depend-glm)
 
 # glfw
-ExternalProject_Add(glfw
+ExternalProject_Add(depend-glfw
     GIT_REPOSITORY		"https://github.com/glfw/glfw"
     GIT_TAG				"3.2.1"
     GIT_SHALLOW			TRUE
@@ -225,6 +225,7 @@ ExternalProject_Add(glfw
 						-DGLFW_INSTALL=OFF
 						-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
 						-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
+                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
     UPDATE_COMMAND		""
     INSTALL_COMMAND		""
     TEST_COMMAND		""
@@ -239,13 +240,13 @@ IF(WIN32)
     LIST(APPEND _DEPEND_LIBRARIES_DEBUG "glfw3.lib")
     LIST(APPEND _DEPEND_LIBRARIES_RELEASE "glfw3.lib")
 ELSE()
-    LIST(APPEND _DEPEND_LIBRARIES "glfw")
+    LIST(APPEND _DEPEND_LIBRARIES "libglfw.so")
 ENDIF()
 
-ADD_DEPENDENCIES(${PROJECT_NAME} glfw)
+ADD_DEPENDENCIES(${PROJECT_NAME} depend-glfw)
 
 # assimp
-ExternalProject_Add(assimp
+ExternalProject_Add(depend-assimp
     GIT_REPOSITORY  "https://github.com/assimp/assimp"
     GIT_TAG         "master"
     GIT_SHALLOW     TRUE
@@ -254,9 +255,10 @@ ExternalProject_Add(assimp
     CMAKE_ARGS      -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
                     -DASSIMP_BUILD_SAMPLES=OFF
                     -DASSIMP_BUILD_TESTS=OFF
-                    -DASSIMP_BUILD_ZLIB=${WIN32_ON}
+                    -DASSIMP_BUILD_ZLIB=ON
                     -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
                     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
+                    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
     UPDATE_COMMAND  ""
     INSTALL_COMMAND ""
     TEST_COMMAND    ""
@@ -272,20 +274,22 @@ IF(WIN32)
     LIST(APPEND _DEPEND_LIBRARIES_DEBUG "assimp-${MSVC_PREFIX}-mt.lib;IrrXML.lib;zlibstaticd.lib")
     LIST(APPEND _DEPEND_LIBRARIES_RELEASE "assimp-${MSVC_PREFIX}-mt.lib;IrrXML.lib;zlibstatic.lib")
 ELSE()
-    LIST(APPEND _DEPEND_LIBRARIES "zlib;assimp")
+    LIST(APPEND _DEPEND_LIBRARIES "libassimp.so")
 ENDIF()
 
-ADD_DEPENDENCIES(${PROJECT_NAME} assimp)
+ADD_DEPENDENCIES(${PROJECT_NAME} depend-assimp)
 
 # Link all libraries
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${_DEPEND_LIBRARIES})
+FOREACH(lib IN ITEMS ${_DEPEND_LIBRARIES})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} "${CMAKE_BINARY_DIR}/${lib}")
+ENDFOREACH()
 
 FOREACH(debug_lib IN ITEMS ${_DEPEND_LIBRARIES_DEBUG})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug "${CMAKE_BINARY_DIR}/Debug/${debug_lib}")
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug "${CMAKE_BINARY_DIR}/Debug/${debug_lib}")
 ENDFOREACH()
 
 FOREACH(release_lib IN ITEMS ${_DEPEND_LIBRARIES_RELEASE})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} optimized "${CMAKE_BINARY_DIR}/Release/${release_lib}")
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} optimized "${CMAKE_BINARY_DIR}/Release/${release_lib}")
 ENDFOREACH()
 
 ADD_CUSTOM_TARGET(
