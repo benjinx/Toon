@@ -12,7 +12,7 @@ configuration:
   - Debug
   - Release
 
-clone_depth: 1
+clone_depth: 5
 
 init:
   - cmd: cmake --version
