@@ -6,7 +6,7 @@ notifications:
   slack: c0demonk3ys:gnjXYwuoMOBnffg9h8YnlLyE
 
 git:
-  depth: 1
+  depth: 5
 
 # sources  list: https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json,
 # packages list: https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
