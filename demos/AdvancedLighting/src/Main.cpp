@@ -8,6 +8,9 @@
 int main()
 {
 	const auto& paths = Utils::GetResourcePaths();
+	for (auto& p : paths) {
+		printf("%s\n", p.c_str());
+	}
 
     Application app;
 	Scene* gameScene = new GameScene();
