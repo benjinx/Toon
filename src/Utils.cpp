@@ -124,7 +124,7 @@ namespace Utils
     		return gobj;
         }
 
-		std::cout << "ERROR:ASSIMP::" << importer.GetErrorString() << std::endl;
+		fprintf(stderr, "Failed to load [%s]", filename.c_str());
 		return nullptr;
 	}
 
