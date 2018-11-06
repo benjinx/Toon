@@ -5,7 +5,7 @@
 void GameScene::Start()
 {
 	// Object setup
-	printf("\nLoading Materials\n");
+	printf("\nLoading Models/Materials\n");
 
 	// Scene Objs
 

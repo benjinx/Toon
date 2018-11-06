@@ -5,7 +5,7 @@
 void GameScene::Start()
 {
 	// Object setup
-	printf("\nLoading Materials\n");
+	printf("\nLoading Models/Materials\n");
 
 	// Light Source
 	_mGameObjects.emplace("Light", Utils::LoadObj("models/Primitives/pSphere.obj"));
