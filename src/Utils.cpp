@@ -12,11 +12,15 @@ namespace Utils
         const auto& paths = GetResourcePaths();
         FILE * file = NULL;
 
+	    printf("Loading: [%s]\n", filename.c_str());
+
         for (const std::string& p : paths) {
             std::string fullFilename = p + "/" + filename;
             file = fopen(fullFilename.c_str(), "rb");
 
             if (!file) continue;
+
+		    printf("Loaded:  [%s]\n", fullFilename.c_str());
 
             // Remember to call stbi_image_free(image) after using the image and before another.
     		// bpp - bits per pixel
@@ -54,7 +58,7 @@ namespace Utils
 		unsigned char* img = LoadPng(filename, width, height, bpp);
 
 		if (!img) {
-			fprintf(stderr, "Failed to load %s", filename.c_str());
+			fprintf(stderr, "Failed to load [%s]", filename.c_str());
 		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
@@ -92,6 +96,8 @@ namespace Utils
 	{
         const auto& paths = GetResourcePaths();
 
+	    printf("Loading: [%s]\n", filename.c_str());
+
 		Assimp::Importer importer;
         for (const std::string& p : paths) {
             std::string fullFilename = p + "/" + filename;
@@ -102,6 +108,8 @@ namespace Utils
     			aiProcess_FlipUVs);
 
             if (!scene) continue;
+
+		    printf("Loaded:  [%s]\n", fullFilename.c_str());
 
     		std::string dirname = GetDirname(fullFilename) + "/";
 
@@ -257,7 +265,6 @@ namespace Utils
 			aiString str;
 			material->GetTexture(type, i, &str);
 			texName = dirname + str.C_Str();
-			printf("Loading: %s\n", str.C_Str());
 		}
 		return texName;
 	}

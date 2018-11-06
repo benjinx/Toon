@@ -15,13 +15,13 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 {
     const auto& paths = Utils::GetResourcePaths();
 
+    printf("Loading: [%s]\n", vertFilename.c_str());
+    printf("Loading: [%s]\n", fragFilename.c_str());
+
     // Load Shaders
     // Retrieve the vertex/fragment source code from filePath
     std::ifstream vertShaderFile;
     std::ifstream fragShaderFile;
-
-    printf("Loading: [%s]\n", vertFilename.c_str());
-    printf("Loading: [%s]\n", fragFilename.c_str());
 
     bool loaded = false;
     for (const std::string& p : paths) {
@@ -32,6 +32,8 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
         fragShaderFile.open(fullFragFilename);
 
         if (vertShaderFile.is_open() && fragShaderFile.is_open()) {
+            printf("Loaded:  [%s]\n", fullVertFilename.c_str());
+            printf("Loaded:  [%s]\n", fullFragFilename.c_str());
             loaded = true;
             break;
         }
