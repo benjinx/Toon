@@ -17,50 +17,41 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 
     // Load Shaders
     // Retrieve the vertex/fragment source code from filePath
-    std::string   vertexCode, fragmentCode;
-    std::ifstream vShaderFile, fShaderFile;
+    std::ifstream vertShaderFile;
+    std::ifstream fragShaderFile;
 
-    // Ensures ifstream objects can throw exceptions:
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    printf("Loading: [%s]\n", vertFilename.c_str());
+    printf("Loading: [%s]\n", fragFilename.c_str());
 
-    try
-    {
-        printf("Loading: %s\n", vertFilename.c_str());
-        printf("Loading: %s\n", fragFilename.c_str());
+    bool loaded = false;
+    for (const std::string& p : paths) {
+        std::string fullVertFilename = p + "/" + vertFilename;
+        std::string fullFragFilename = p + "/" + fragFilename;
 
-        for (const std::string& p : paths) {
-            std::string fullVertFilename = p + "/" + vertFilename;
-            std::string fullFragFilename = p + "/" + fragFilename;
+        vertShaderFile.open(fullVertFilename);
+        fragShaderFile.open(fullFragFilename);
 
-            // Open files
-            vShaderFile.open(fullVertFilename);
-            fShaderFile.open(fullFragFilename);
-
-            if (vShaderFile && fShaderFile) break;
+        if (vertShaderFile.is_open() && fragShaderFile.is_open()) {
+            loaded = true;
+            break;
         }
-
-        std::stringstream vShaderStream, fShaderStream;
-
-        // Read files buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
-
-        // Close file
-        vShaderFile.close();
-        fShaderFile.close();
-
-        // Convert stream into GLchar array
-        vertexCode   = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-    }
-    catch (std::ifstream::failure e)
-    {
-        std::cout << "ERROR::SHADER::FILE_NOT_READ_SUCCESSFULLY" << std::endl;
     }
 
-    const GLchar* vShaderCode = vertexCode.c_str();
-    const GLchar* fShaderCode = fragmentCode.c_str();
+    if (!loaded) {
+        fprintf(stderr, "Failed to load shaders [%s] [%s]\n", vertFilename.c_str(), fragFilename.c_str());
+        return;
+    }
+
+    std::string vertCode((std::istreambuf_iterator<char>(vertShaderFile)),
+                         std::istreambuf_iterator<char>());
+    std::string fragCode((std::istreambuf_iterator<char>(fragShaderFile)),
+                         std::istreambuf_iterator<char>());
+
+    vertShaderFile.close();
+    fragShaderFile.close();
+
+    const GLchar* vShaderCode = vertCode.c_str();
+    const GLchar* fShaderCode = fragCode.c_str();
 
     // Shader & Program Init
     GLuint vertexShader;
