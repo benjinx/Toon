@@ -38,6 +38,8 @@ public:
 	void SetDemoName(std::string demoName) { _mDemoName = demoName; }
 	std::string GetDemoName() { return _mDemoName; }
 
+	void Screenshot();
+
 private:
     static Application* _sInst;
     void                Start();

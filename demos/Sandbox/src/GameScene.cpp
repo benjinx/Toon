@@ -8,7 +8,7 @@ void GameScene::Start()
 	printf("\nLoading Materials\n");
 
 	// Scene Objs
-	_mGameObjects.emplace("Sun", Utils::LoadObj("models/sun.obj"));
+	_mGameObjects.emplace("Sun", Utils::LoadObj("models/Primitives/pSphere.obj"));
 	_mGameObjects.emplace("Earth", Utils::LoadObj("models/earth.obj"));
 
 	// Initialize Objs

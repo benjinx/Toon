@@ -3,6 +3,12 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
 Application* Application::_sInst = nullptr;
 
 const float TARGET_FPS = 60.0f;
@@ -127,6 +133,17 @@ void Application::OpenGLInfo()
 	printf("Max UBO Bindings: %d\n", maxBindings);
 }
 
+void Application::Screenshot()
+{
+	std::vector<unsigned int> pixels(3 * GetWindowWidth() * GetWindowHeight());
+
+	glReadPixels(0, 0, GetWindowWidth(), GetWindowHeight(), GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+	
+	stbi_flip_vertically_on_write(true);
+
+	stbi_write_png("Screenshot.png", GetWindowWidth(), GetWindowHeight(), 3, pixels.data(), 3 * GetWindowWidth());
+}
+
 void Application::HandleInput(float dt)
 {
 	if (keysDown[GLFW_KEY_W])
@@ -141,7 +158,6 @@ void Application::HandleInput(float dt)
 		Camera::instance().HandleMovement(Direction::UP, dt);
 	if (keysDown[GLFW_KEY_E])
 		Camera::instance().HandleMovement(Direction::DOWN, dt);
-
 }
 
 void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -200,6 +216,12 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
             UI::showTestWindow = !UI::showTestWindow;
             break;
         }
+			
+		case GLFW_KEY_PRINT_SCREEN:
+		{
+			Screenshot();
+			break;
+		}
         }
     }
 
