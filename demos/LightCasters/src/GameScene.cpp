@@ -18,6 +18,8 @@ void GameScene::Start()
 	_mGameObjects.emplace("Sphere", Utils::LoadObj("models/Primitives/pSphere.obj"));
 	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
 	_mGameObjects.emplace("Torus", Utils::LoadObj("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Torus2", Utils::LoadObj("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Torus3", Utils::LoadObj("models/Primitives/pTorus.obj"));
 
 	// Initialize Objs
 
@@ -35,6 +37,14 @@ void GameScene::Start()
 	_mGameObjects["Torus"]->SetPosition(glm::vec3(1.0f, 1.0f, -1.0f));
 	_mGameObjects["Torus"]->SetRotation(glm::vec3(-90.0f, -90.0f, 0.0f));
 	_mGameObjects["Torus"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+
+	_mGameObjects["Torus2"]->SetPosition(glm::vec3(4.0f, 1.0f, -1.0f));
+	_mGameObjects["Torus2"]->SetRotation(glm::vec3(-90.0f, 0.0f, 90.0f));
+	_mGameObjects["Torus2"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+
+	_mGameObjects["Torus3"]->SetPosition(glm::vec3(8.0f, 1.0f, -1.0f));
+	_mGameObjects["Torus3"]->SetRotation(glm::vec3(-90.0f, 0.0f, 90.0f));
+	_mGameObjects["Torus3"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	// Shaders
 	SetupShaders();
@@ -105,14 +115,43 @@ void GameScene::Update(float dt)
 
 	// Set Light Position
 	_mShaders[2]->Use();
-
 	_mShaders[2]->SetVec3("lightColor", lightColor);
-	glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
-	_mShaders[2]->SetVec4("lightVec", lightPos);
 
+	// Directional Lighting
 	// Set Direcitonal Light Position
 	glm::vec4 lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f);
 	_mShaders[2]->SetVec4("light.direction", lightDir);
+
+	// Point Lighting
+	// Set attenuation values
+	float	constant = 1.0f,
+			linear = 0.09f,
+			quadratic = 0.032f;
+
+	_mShaders[2]->SetFloat("light.constant", constant);
+	_mShaders[2]->SetFloat("light.linear", linear);
+	_mShaders[2]->SetFloat("light.quadratic", quadratic);
+
+	glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
+	_mShaders[2]->SetVec4("light.position", lightPos);
+
+	// *** COMMENT OUT THESE TWO LINES TO CORRECTLY SHOW DIRECTIONAL AND POINT OTHERWISE WILL ONLY SHOW POINT ***
+	//lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 1.0f);
+	//_mShaders[2]->SetVec4("light.direction", lightDir);
+
+
+	// Spotlight Lighting
+	_mShaders[2]->SetVec3("light.position", Camera::instance().GetCameraPos());
+
+	// Change 0.0f to 1.0f to just enable spotlight
+	glm::vec4 camFront = glm::vec4(Camera::instance().GetCameraForward(), 1.0f);
+	_mShaders[2]->SetVec4("light.direction", camFront);
+
+	_mShaders[2]->SetFloat("light.cutoff", glm::cos(glm::radians(12.5f)));
+	_mShaders[2]->SetFloat("light.outerCutoff", glm::cos(glm::radians(17.5f)));
+
+
+
 
 	// Update Camera
 	Camera::instance().Update(dt);
