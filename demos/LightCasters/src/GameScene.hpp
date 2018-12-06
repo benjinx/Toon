@@ -21,6 +21,8 @@ private:
 	int _mNumShaders;
 
 	std::vector<Shader*> _mShaders;
+
+	bool _mOptions = true, _mDirLight = true, _mPointLight = true, _mSpotLight = true;
 };
 
 #endif // GAMESCENE_H
