@@ -49,6 +49,12 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
     std::string fragCode((std::istreambuf_iterator<char>(fragShaderFile)),
                          std::istreambuf_iterator<char>());
 
+    if (vertFilename == "shaders/lightCasters.vert") {
+        printf("Shader Code:\n");
+        printf("%s\n", vertCode.c_str());
+        printf("%s\n", fragCode.c_str());
+    }
+
     vertShaderFile.close();
     fragShaderFile.close();
 

@@ -69,7 +69,6 @@ private:
 	float _mMovementSpeed;
 	float _mMouseSensitivity;
 	float _mZoom;
-	glm::vec3 _mCamFront;
 	bool			   _mFirstMouse;
 	float			   _mLastX = 640, _mLastY = 360;
 

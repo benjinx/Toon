@@ -29,7 +29,7 @@ public:
 	void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
 
 	Mesh* GetMesh(int index = 0) { return _mMeshes[index]; }
-	unsigned int GetNumMeshes() { return _mMeshes.size(); }
+	unsigned int GetNumMeshes() { return (unsigned int)_mMeshes.size(); }
 
 	Transform GetTransform() { return _mTransform; }
 	void SetTransform(Transform transform) { _mTransform = transform; }

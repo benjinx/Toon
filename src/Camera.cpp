@@ -14,7 +14,7 @@ void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
         glm::perspective(glm::radians(_mFoV), (float)Application::Inst()->GetWindowWidth() / (float)Application::Inst()->GetWindowHeight(), 0.1f, 10000.0f);
 
     // Camera Dir
-	_mForward = glm::normalize(_mPosition - _mTarget);
+	_mForward = glm::normalize(_mTarget - _mPosition);
 
 	// Set world up
 	_mWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -36,14 +36,13 @@ void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
 
 	// Movement vals
 	_mMovementSpeed = 0.1f;
-	_mCamFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	_mFirstMouse = true;
 }
 
 void Camera::Update(float dt)
 {
 	_mProjectionMat = glm::perspective(glm::radians(_mFoV), (float)Application::Inst()->GetWindowWidth() / (float)Application::Inst()->GetWindowHeight(), 0.1f, 10000.0f);
-	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mCamFront, _mUp);
+	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mForward, _mUp);
 }
 
 void Camera::AddForce(glm::vec3 force)
@@ -72,22 +71,22 @@ void Camera::HandleMovement(Direction dir, float dt)
 	switch (dir)
 	{
 	case FORWARD:
-		_mPosition += _mCamFront * velocity;
+		_mPosition += _mForward * velocity;
 		break;
 	case BACKWARD:
-		_mPosition -= _mCamFront * velocity;
+		_mPosition -= _mForward * velocity;
 		break;
 	case LEFT:
-		_mPosition -= glm::normalize(glm::cross(_mCamFront, _mUp)) * velocity;
+		_mPosition -= glm::normalize(glm::cross(_mForward, _mUp)) * velocity;
 		break;
 	case RIGHT:
-		_mPosition += glm::normalize(glm::cross(_mCamFront, _mUp)) * velocity;
+		_mPosition += glm::normalize(glm::cross(_mForward, _mUp)) * velocity;
 		break;
 	case UP:
-		_mPosition += glm::normalize(glm::cross(_mCamFront, _mRight)) * velocity;
+		_mPosition += glm::normalize(glm::cross(_mForward, _mRight)) * velocity;
 		break;
 	case DOWN:
-		_mPosition -= glm::normalize(glm::cross(_mCamFront, _mRight)) * velocity;
+		_mPosition -= glm::normalize(glm::cross(_mForward, _mRight)) * velocity;
 		break;
 	default:
 		break;
@@ -113,9 +112,9 @@ void Camera::HandleRotation(float xoffset, float yoffset)
 	front.x = cos(glm::radians(_mPitch)) * cos(glm::radians(_mYaw));
 	front.y = sin(glm::radians(_mPitch));
 	front.z = cos(glm::radians(_mPitch)) * sin(glm::radians(_mYaw));
-	_mCamFront = glm::normalize(front);
-	_mRight = glm::normalize(glm::cross(_mCamFront, _mWorldUp));
-	_mUp = glm::normalize(glm::cross(_mRight, _mCamFront));
+	_mForward = glm::normalize(front);
+	_mRight = glm::normalize(glm::cross(_mForward, _mWorldUp));
+	_mUp = glm::normalize(glm::cross(_mRight, _mForward));
 }
 
 void Camera::HandleFoV(float xoffset, float yoffset)
