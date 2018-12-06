@@ -193,15 +193,17 @@ void GameScene::Render()
 			gameObject.second->Render(_mShaders[4]);
 	}
 
-	// Axis Rendering for Objects
-	for (auto& gameOject : _mGameObjects)
+	// Render object axis
+	if (UI::showAxis)
 	{
-		if (gameOject.second->IsAxisEnabled())
+		for (auto& gameOject : _mGameObjects)
 		{
-			gameOject.second->DrawAxis(_mShaders[0]);
+			if (gameOject.second->IsAxisEnabled())
+			{
+				gameOject.second->DrawAxis(_mShaders[0]);
+			}
 		}
 	}
-
 
 	// Draw Scene Axis
 	//DrawAxis(0, &_mShader);
