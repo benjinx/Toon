@@ -1,9 +1,0 @@
-newmtl Moon
-Ns 32
-Ka 0.1 0.1 0.1
-Kd 0.8 0.8 0.8
-Ks 0.8 0.8 0.8
-d 1
-illum 2
-map_Kd ../images/moon/2k/moon_dm_2k.png
-map_Kn ../images/moon/2k/moon_nm_2k.png

@@ -9,5 +9,5 @@ Ka 0.0000 0.0000 0.0000
 Kd 0.5880 0.5880 0.5880
 Ks 0.0000 0.0000 0.0000
 Ke 0.0000 0.0000 0.0000
-map_Kd ../../images/brickwall.jpg
-map_Kn ../../images/brickwall_normal.jpg
+map_Kd ../../images/brickwall/brickwall.jpg
+map_Kn ../../images/brickwall/brickwall_normal.jpg
