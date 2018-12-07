@@ -68,6 +68,8 @@ SET(INPUT_SRC
 SET(INTERFACE_SRC
 	src/UI.cpp
 	src/UI.hpp
+	src/DevUI.cpp
+	src/DevUI.hpp
 )
 
 # Network src

@@ -11,7 +11,7 @@
 #include "UI.hpp"
 #include "Utils.hpp"
 #include "Scene.hpp"
-
+#include "DevUI.hpp"
 #include "Cube.hpp"
 
 class Application

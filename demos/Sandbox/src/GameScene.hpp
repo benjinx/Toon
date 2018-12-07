@@ -25,6 +25,9 @@ private:
 	//ScriptHost _mScriptHost;
 
 	std::vector<Shader*> _mShaders;
+
+
+	bool _mDirLight, _mPointLight, _mSpotLight;
 };
 
 #endif // GAMESCENE_H

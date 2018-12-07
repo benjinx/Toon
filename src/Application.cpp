@@ -179,7 +179,11 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
         {
         case GLFW_KEY_ESCAPE:
         {
-			UI::settingsSelected = !UI::settingsSelected;
+			DevUI::HandleEvent(key);
+			//UI::settingsSelected = !UI::settingsSelected;
+
+			//Test
+			//DevUI::settingsSelected = !DevUI::settingsSelected;
 			break;
         }
 
