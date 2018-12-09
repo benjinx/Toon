@@ -74,39 +74,42 @@ void DevUI::Render()
 
 void DevUI::HandleKeyEvent(int key, int scancode, int action, int mode)
 {
-	switch (key)
+	if (action == GLFW_PRESS)
 	{
-		case GLFW_KEY_ESCAPE:
+		switch (key)
 		{
-			_SettingsShown = !_SettingsShown;
-			break;
+			case GLFW_KEY_ESCAPE:
+			{
+				_SettingsShown = !_SettingsShown;
+				break;
+			}
+				
+			/*
+			case GLFW_KEY_GRAVE_ACCENT:
+			{
+			    UI::showMainMenuBar = !UI::showMainMenuBar;
+			    break;
+			}
+
+			case GLFW_KEY_F1:
+			{
+			    UI::consoleSelected = !UI::consoleSelected;
+			    break;
+			}
+
+			case GLFW_KEY_F2:
+			{
+			    UI::optionsSelected = !UI::optionsSelected;
+			    break;
+			}
+
+			case GLFW_KEY_F11:
+			{
+			    UI::showTestWindow = !UI::showTestWindow;
+			    break;
+			}
+			*/
 		}
-		
-		/*
-        case GLFW_KEY_GRAVE_ACCENT:
-        {
-            UI::showMainMenuBar = !UI::showMainMenuBar;
-            break;
-        }
-
-        case GLFW_KEY_F1:
-        {
-            UI::consoleSelected = !UI::consoleSelected;
-            break;
-        }
-
-        case GLFW_KEY_F2:
-        {
-            UI::optionsSelected = !UI::optionsSelected;
-            break;
-        }
-
-        case GLFW_KEY_F11:
-        {
-            UI::showTestWindow = !UI::showTestWindow;
-            break;
-        }
-		*/
 	}
 }
 
