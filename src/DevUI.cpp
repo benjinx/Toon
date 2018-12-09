@@ -49,8 +49,8 @@ void DevUI::Render()
 		ImGui::Text("Credits\n");
 		ImGui::TextColored(Green, "Created by BC/DC Games:\n");
 		ImGui::TextColored(White, "- Benji Campbell\n");
-		ImGui::TextColored(White, "- Daniel Covert\n");
 		ImGui::TextColored(White, "- Stephen Lane-Walsh\n");
+		ImGui::TextColored(White, "- Daniel Covert\n");
 		ImGui::ShowStyleSelector("UI Theme");
 
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
