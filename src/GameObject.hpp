@@ -80,9 +80,7 @@ public:
 	}
 
 	void InitAxis();
-	void DrawAxis(Shader * shader);
-
-	bool IsAxisEnabled() { return axisEnabled; }
+	void DrawAxis(Shader* shader);
 
 protected:
 	// Transform
@@ -103,7 +101,6 @@ protected:
 	// Axis Rendering
 	GLuint _mVAO;
 	GLuint _mVBO[2];
-	bool axisEnabled;
 };
 
 // GameObject needs to know which components are attached to each gameobject.

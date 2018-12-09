@@ -12,8 +12,6 @@ GameObject::GameObject()
 	_mRigidbody.SetVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mRigidbody.SetAcceleration(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	axisEnabled = false;
-
 	InitAxis();
 }
 
@@ -26,8 +24,6 @@ GameObject::GameObject(glm::vec3 position)
 	_mRigidbody.SetFixedAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
 	_mRigidbody.SetVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mRigidbody.SetAcceleration(glm::vec3(0.0f, 0.0f, 0.0f));
-
-	axisEnabled = false;
 
 	InitAxis();
 }
@@ -55,11 +51,15 @@ void GameObject::Render(Shader* shader)
 	{
 		mesh->Render(shader, GetModelMatrix());
 	}
+
+	//if (_sShowAxis)
+	//{
+	//	DrawAxis(shader);
+	//}
 }
 
 void GameObject::InitAxis()
 {
-	axisEnabled = true;
 	glGenVertexArrays(1, &_mVAO);
 	glBindVertexArray(_mVAO);
 	GLfloat arr[] = { 0, 0, 0,
@@ -94,7 +94,7 @@ void GameObject::InitAxis()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void GameObject::DrawAxis(Shader * shader)
+void GameObject::DrawAxis(Shader* shader)
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->GetShaderID());

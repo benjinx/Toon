@@ -12,14 +12,21 @@ void GameScene::Start()
 	printf("\nLoading Materials\n");
 
 	// Scene Objs
+	_mGameObjects.emplace("Light", Utils::LoadObj("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
 
 	// Initialize Objs
+	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
+
+	_mGameObjects["Cube"]->SetPosition(glm::vec3(-1.5f, -1.0f, 0.0f));
+	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
+	_mGameObjects["Cube"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// Shaders
 	SetupShaders();
 
 	// UI
-	//UI::StartUI();
 	DevUI::Start();
 	DevUI::RegisterOptionsFunc([this]() {
 		ImGui::Checkbox("Enable Directional Light", &_mDirLight);
@@ -46,15 +53,17 @@ void GameScene::Start()
 void GameScene::SetupShaders()
 {
 	// Shaders
-	_mNumShaders = 2;
+	_mNumShaders = 3;
 	std::vector<std::string> vertShaders = {
 		"shaders/axis.vert",
 		"shaders/passThru.vert",
+		"shaders/advLighting.vert",
 	};
 
 	std::vector<std::string> fragShaders = {
 		"shaders/axis.frag",
 		"shaders/passThru.frag",
+		"shaders/advLighting.frag",
 	};
 
 	printf("\nLoading Shaders\n");
@@ -101,10 +110,21 @@ void GameScene::DeleteShaders()
 
 void GameScene::Update(float dt)
 {
-	// Testing shader value setting
-	//_mShaders[4]->Use();
-	//glm::vec4 lightPos = glm::vec4(5.0f, 2.0f, 2.0f, 1.0f);
-	//_mShaders[4]->SetVec4("lightPos", lightPos);
+	// Set Light Color
+	_mShaders[1]->Use();
+	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	_mShaders[1]->SetVec3("passColor", lightColor);
+
+	// Set Light Position
+	_mShaders[2]->Use();
+
+	_mShaders[2]->SetVec3("lightColor", lightColor);
+
+	glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
+	_mShaders[2]->SetVec4("lightVec", lightPos);
+	
+	glm::vec3 objColor = glm::vec3(UI::objectColor[0], UI::objectColor[1], UI::objectColor[2]);
+	_mShaders[2]->SetVec3("objectColor", objColor);
 
 	Camera::instance().Update(dt);
 
@@ -114,37 +134,9 @@ void GameScene::Update(float dt)
 	}
 
 	PhysicsUpdate(dt);
-
-	// Old update UI
-	//UI::UpdateUI();
 }
 
 void GameScene::Render()
 {
-	
-	for (auto& gameObject : _mGameObjects)
-	{
-		if (gameObject.first == "Sun")
-			gameObject.second->Render(_mShaders[1]);
-		else
-			gameObject.second->Render(_mShaders[4]);
-	}
-
-	// Render object axis
-	if (UI::showAxis)
-	{
-		for (auto& gameOject : _mGameObjects)
-		{
-			if (gameOject.second->IsAxisEnabled())
-			{
-				gameOject.second->DrawAxis(_mShaders[0]);
-			}
-		}
-	}
-
-	// Draw Scene Axis
-	//DrawAxis(0, &_mShader);
-
-	//UI::RenderUI();
-	DevUI::Render();
+	Scene::Render();
 }

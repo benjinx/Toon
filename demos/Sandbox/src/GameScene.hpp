@@ -20,13 +20,6 @@ public:
 	void PhysicsUpdate(float dt);
 
 private:
-	int _mNumShaders;
-	int _mProg;
-	//ScriptHost _mScriptHost;
-
-	std::vector<Shader*> _mShaders;
-
-
 	bool _mDirLight, _mPointLight, _mSpotLight;
 };
 

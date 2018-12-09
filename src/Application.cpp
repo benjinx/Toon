@@ -72,6 +72,9 @@ void Application::Start()
 
 		// Other Input keys
 	keysDown.emplace(GLFW_KEY_H, false);
+
+	// Register the options function into the UI
+	DevUI::RegisterOptionsFunc(&Scene::Options);
 }
 
 void Application::Update(float dt)
@@ -88,6 +91,8 @@ void Application::Render()
 	_mWindow.Clear();
 
 	_mpCurrentScene->Render();
+
+	DevUI::Render();
 
 	_mWindow.Present();
 }

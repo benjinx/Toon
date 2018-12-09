@@ -62,7 +62,6 @@ void DevUI::Render()
 
 	ImGui::SetNextWindowSize(ImVec2(400, 200));
 	if (ImGui::Begin("Options", &UI::optionsSelected)) {
-		ImGui::Checkbox("Show Gameobject Axis", &UI::showAxis);
 		for (auto& f : _OptionsFuncs) {
 			f();
 		}
