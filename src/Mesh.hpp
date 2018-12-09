@@ -27,8 +27,8 @@ public:
         NORMAL = 2,
         COLOR = 3,
         TEXCOORD = 8,
-        TANGENT,
-        BITANGENT,
+        TANGENT = 10,
+        BITANGENT = 11,
     };
 
     /* Functions */
