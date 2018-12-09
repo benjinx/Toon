@@ -99,10 +99,17 @@ void GameObject::DrawAxis(Shader* shader)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->GetShaderID());
 
-    const auto& view = Camera::instance().GetViewMat();
-    const auto& proj = Camera::instance().GetProjectionMat();
+    const auto& view = Camera::Inst().GetViewMat();
+    const auto& proj = Camera::Inst().GetProjectionMat();
+	auto model = _mModelMatrix;
 
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "modelMat"), 1, false, (GLfloat*)&_mModelMatrix);
+	model = glm::mat4(1);
+	model = glm::translate(model, _mTransform.position);
+	model = glm::rotate(model, glm::radians(_mTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(_mTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(_mTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "modelMat"), 1, false, (GLfloat*)&model);
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "viewMat"), 1, false, (GLfloat*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetShaderID(), "projMat"), 1, false, (GLfloat*)&proj);
 

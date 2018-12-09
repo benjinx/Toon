@@ -1,7 +1,6 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
-//#include <GL/glew.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -22,4 +21,6 @@
 #define RESOURCE_PATH "."
 #endif // RESOURCE_PATH
 
-#endif // COMMON_H
+#define VERSION "@PROJECT_VERSION@"
+
+#endif // CONFIG_HPP

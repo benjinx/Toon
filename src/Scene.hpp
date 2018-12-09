@@ -8,24 +8,28 @@
 class Scene //: public GameObject
 {
 public:
-	Scene();
-	~Scene() {};
-	
-	virtual void Start() = 0;
-	virtual void Update(float dt) = 0;
-	virtual void Render();
-	virtual void SetupShaders() = 0;
-	virtual void DeleteShaders() = 0;
-	void Pause() {};
-	void Resume() {};
 
-	std::unordered_map<std::string, GameObject*> GetGameObjects() { return _mGameObjects; }
+	typedef std::unordered_map<std::string, GameObject*> GameObjectMap;
+
+	Scene() = default;
+	virtual ~Scene();
+	
+	virtual void Start() { }
+	virtual void Pause() { }
+	virtual void Resume() { }
+
+	virtual void Update(float dt) { }
+	virtual void Render();
+	
+	virtual void SetupShaders() { }
+	virtual void DeleteShaders() { }
+
+	GameObjectMap GetGameObjects() { return _mGameObjects; }
 
 	// Ui Options.
 	static void Options();
 
 protected:
-	std::unordered_map<std::string, GameObject*> _mGameObjects;
 
 	// Shader information
 	int _mNumShaders;
@@ -35,6 +39,8 @@ protected:
 
 	// Show gameobject axis?
 	static bool _sShowAxis;
+
+	GameObjectMap _mGameObjects;
 };
 
 #endif // SCENE_H

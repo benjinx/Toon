@@ -1,6 +1,5 @@
 #include "GameScene.hpp"
 
-#include "UI.hpp"
 #include "imgui/imgui.h"
 
 void GameScene::Start()
@@ -51,13 +50,18 @@ void GameScene::Start()
 	SetupShaders();
 
 	// UI
-	UI::StartUI();
+	DevUI::Start();
+	DevUI::RegisterOptionsFunc([this]() {
+		ImGui::Checkbox("Enable Directional Light", &_mDirLight);
+		ImGui::Checkbox("Enable Point Light", &_mPointLight);
+		ImGui::Checkbox("Enable Spot Light", &_mSpotLight);
+	});
 
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	Camera::instance().Init(cameraPos, cameraTarget);
+	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
 void GameScene::SetupShaders()
@@ -81,7 +85,7 @@ void GameScene::SetupShaders()
 	for (int i = 0; i < _mNumShaders; i++)
 	{
 		Shader* shader = new Shader();
-		shader->SetupShaders(vertShaders[i], fragShaders[i]);
+		shader->Load(vertShaders[i], fragShaders[i]);
 		_mShaders.push_back(shader);
 	}
 
@@ -155,10 +159,10 @@ void GameScene::Update(float dt)
 	if (_mSpotLight)
 	{
 		_mShaders[2]->SetBool("lightCheck.Spot", true);
-		_mShaders[2]->SetVec3("spotlight.position", Camera::instance().GetCameraPos());
+		_mShaders[2]->SetVec3("spotlight.position", Camera::Inst().GetCameraPos());
 
 		// Change 0.0f to 1.0f to just enable spotlight
-		glm::vec4 camFront = glm::vec4(Camera::instance().GetCameraForward(), 1.0f);
+		glm::vec4 camFront = glm::vec4(Camera::Inst().GetCameraForward(), 1.0f);
 		_mShaders[2]->SetVec4("spotlight.direction", camFront);
 
 		_mShaders[2]->SetFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
@@ -168,7 +172,7 @@ void GameScene::Update(float dt)
 		_mShaders[2]->SetBool("lightCheck.Spot", false);
 
 	// Update Camera
-	Camera::instance().Update(dt);
+	Camera::Inst().Update(dt);
 
 	// Rotate objects
 	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
@@ -180,44 +184,4 @@ void GameScene::Update(float dt)
 	{
 		gobj.second->Update(dt);
 	}
-
-	// Update UI
-	UI::UpdateUI();
-}
-
-void GameScene::Render()
-{
-	// Render objects in scene
-	for (auto& gameObject : _mGameObjects)
-	{
-		if (gameObject.first == "Light")
-			gameObject.second->Render(_mShaders[1]);
-		else
-			gameObject.second->Render(_mShaders[2]);
-	}
-
-	// Render object axis
-	if (UI::showAxis)
-	{
-		for (auto& gameOject : _mGameObjects)
-		{
-			if (gameOject.second->IsAxisEnabled())
-			{
-				gameOject.second->DrawAxis(_mShaders[0]);
-			}
-		}
-	}
-
-
-	ImGui::SetNextWindowSize(ImVec2(400, 200));
-	if (ImGui::Begin("Demo Options", &_mOptions))
-	{
-		ImGui::Checkbox("Enable Directional Light", &_mDirLight);
-		ImGui::Checkbox("Enable Point Light", &_mPointLight);
-		ImGui::Checkbox("Enable Spot Light", &_mSpotLight);
-		ImGui::End();
-	}
-
-	// Render UI
-	UI::RenderUI();
 }

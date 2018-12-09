@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 enum Direction
 {
@@ -15,22 +15,26 @@ enum Direction
 
 class Window;
 
-// Default camera values
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
-const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
-
 class Camera
 {
 public:
-    static Camera& instance()
+    
+	static Camera& Inst()
     {
-        static Camera* instance = new Camera();
-        return *instance;
+		if (!_sInst) {
+			_sInst = new Camera();
+		}
+        return *_sInst;
     }
-    ~Camera(){};
+
+	static void Delete() {
+		if (_sInst) {
+			delete _sInst;
+			_sInst = nullptr;
+		}
+	}
+
+    ~Camera() = default;
 
     void Init(glm::vec3 cameraPos, glm::vec3 cameraTarget);
 
@@ -53,8 +57,14 @@ public:
 	void UpdateFirstOrder(float dt);
 
 private:
-    Camera(){};
-    glm::mat4 _mViewMat, _mProjectionMat;
+
+	static Camera * _sInst;
+
+    Camera() = default;
+
+    glm::mat4 _mViewMat, 
+			  _mProjectionMat;
+			  
     glm::vec3 _mPosition,
 			  _mVelocity,
 			  _mAcceleration,
@@ -64,15 +74,13 @@ private:
 			  _mUp,
 			  _mTarget,
 			  _mWorldUp;
-	float _mFoV;
-	float _mYaw = -90.0f, _mPitch = 0.0f, _mRoll = 0.0f;
-	float _mMovementSpeed;
-	float _mMouseSensitivity;
-	float _mZoom;
-	bool			   _mFirstMouse;
-	float			   _mLastX = 640, _mLastY = 360;
 
-    // clip coords created via - V clip = M projection * M view * M model * V local
+	float _mFoV;
+	float _mYaw = -90.0f, 
+	      _mPitch = 0.0f;
+	float _mMovementSpeed = 2.5f;
+	bool  _mFirstMouse;
+
 };
 
 #endif // CAMERA_H

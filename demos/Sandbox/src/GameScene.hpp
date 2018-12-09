@@ -13,7 +13,6 @@ public:
 
 	void Start() override;
 	void Update(float dt) override;
-	void Render() override;
 	void SetupShaders() override;
 	void DeleteShaders() override;
 	void PhysicsStart();

@@ -1,19 +1,19 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "Common.hpp"
-
-enum TextureID
-{
-	AMBIENT = 0,
-	DIFFUSE,
-	SPECULAR,
-	NORMAL,
-};
+#include "Config.hpp"
 
 class Material
 {
 public:
+
+    enum TexID {
+        AMBIENT = 0,
+        DIFFUSE,
+        SPECULAR,
+        NORMAL,
+    };
+
     Material(float       ambient[3],
              float       diffuse[3],
              float       specular[3],
@@ -22,7 +22,7 @@ public:
              std::string diffuseFile,
              std::string specularFile,
              std::string normalFile);
-    ~Material(){};
+    virtual ~Material();
 
     void Bind();
 

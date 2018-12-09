@@ -12,7 +12,7 @@ std::vector<std::function<void()>> _OptionsFuncs;
 void DevUI::Start()
 {
 	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow(), true);
+	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow()->GetGLFWWindow(), true);
 }
 
 void DevUI::Render()
@@ -36,7 +36,7 @@ void DevUI::Render()
 			ImGui::EndMenu();
 		}
 
-		ImGui::SameLine((float)Application::Inst()->GetWindowWidth() - 150, 0.0f);
+		ImGui::SameLine((float)Application::Inst()->GetWindow()->GetWidth() - 150, 0.0f);
 		ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 		ImGui::EndMainMenuBar();
 	}
@@ -56,7 +56,7 @@ void DevUI::Render()
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 		if (ImGui::Button("Quit"))
-			glfwSetWindowShouldClose(Application::Inst()->GetWindow(), GL_TRUE);
+			glfwSetWindowShouldClose(Application::Inst()->GetWindow()->GetGLFWWindow(), GL_TRUE);
 		ImGui::End();
 	}
 
@@ -72,7 +72,7 @@ void DevUI::Render()
 	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void DevUI::HandleEvent(int key)
+void DevUI::HandleKeyEvent(int key, int scancode, int action, int mode)
 {
 	switch (key)
 	{
@@ -81,6 +81,32 @@ void DevUI::HandleEvent(int key)
 			_SettingsShown = !_SettingsShown;
 			break;
 		}
+		
+		/*
+        case GLFW_KEY_GRAVE_ACCENT:
+        {
+            UI::showMainMenuBar = !UI::showMainMenuBar;
+            break;
+        }
+
+        case GLFW_KEY_F1:
+        {
+            UI::consoleSelected = !UI::consoleSelected;
+            break;
+        }
+
+        case GLFW_KEY_F2:
+        {
+            UI::optionsSelected = !UI::optionsSelected;
+            break;
+        }
+
+        case GLFW_KEY_F11:
+        {
+            UI::showTestWindow = !UI::showTestWindow;
+            break;
+        }
+		*/
 	}
 }
 

@@ -30,13 +30,13 @@ void GameScene::Start()
 	SetupShaders();
 
 	// UI
-	UI::StartUI();
+	DevUI::Start();
 
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	Camera::instance().Init(cameraPos, cameraTarget);
+	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
 void GameScene::SetupShaders()
@@ -60,7 +60,7 @@ void GameScene::SetupShaders()
 	for (int i = 0; i < _mNumShaders; i++)
 	{
 		Shader* shader = new Shader();
-		shader->SetupShaders(vertShaders[i], fragShaders[i]);
+		shader->Load(vertShaders[i], fragShaders[i]);
 		_mShaders.push_back(shader);
 	}
 
@@ -101,7 +101,7 @@ void GameScene::Update(float dt)
 	_mShaders[2]->SetVec4("lightPos", lightPos);
 
 	// Update Camera
-	Camera::instance().Update(dt);
+	Camera::Inst().Update(dt);
 
 	// Rotate objects
 	_mGameObjects["Earth"]->SetRotation(_mGameObjects["Earth"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
@@ -110,12 +110,12 @@ void GameScene::Update(float dt)
 	const auto& earthPos = _mGameObjects["Earth"]->GetPosition();
 	const auto& moonPos = _mGameObjects["Moon"]->GetPosition();
 
-	_mAngle += 0.5f;
+	_mAngle += 0.5f * dt;
 
 	if (_mAngle > 360.0f)
 		_mAngle = 0.0f;
 
-	float radian = glm::radians(_mAngle + dt);
+	float radian = glm::radians(_mAngle);
 
 	float radius = glm::distance(moonPos, earthPos);
 
@@ -132,34 +132,4 @@ void GameScene::Update(float dt)
 	{
 		gobj.second->Update(dt);
 	}
-
-	// Update UI
-	UI::UpdateUI();
-}
-
-void GameScene::Render()
-{
-	// Render objects in scene
-	for (auto& gameObject : _mGameObjects)
-	{
-		if (gameObject.first == "Light")
-			gameObject.second->Render(_mShaders[1]);
-		else
-			gameObject.second->Render(_mShaders[2]);
-	}
-
-	// Render object axis
-	if (UI::showAxis)
-	{
-		for (auto& gameOject : _mGameObjects)
-		{
-			if (gameOject.second->IsAxisEnabled())
-			{
-				gameOject.second->DrawAxis(_mShaders[0]);
-			}
-		}
-	}
-
-	// Render UI
-	UI::RenderUI();
 }

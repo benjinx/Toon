@@ -1,7 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 #include "Camera.hpp"
 #include "Window.hpp"
@@ -17,10 +17,13 @@
 class Application
 {
 public:
-    static Application* Inst() { return _sInst; }
+
+    static Application* Inst() { 
+        return _sInst; 
+    }
 
     Application() { _sInst = this; }
-    ~Application() {}
+    ~Application();
 
     void Run();
 
@@ -29,37 +32,30 @@ public:
     void HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset);
     void HandleGLFWMousePos(GLFWwindow* window, double x, double y);
 
-	int GetWindowWidth() { return _mWindow.GetWidth(); }
-	int GetWindowHeight() { return _mWindow.GetHeight(); }
-	GLFWwindow* GetWindow() { return _mWindow.GetWindow(); }
+	Window * GetWindow() { return _mWindow; }
 
-	void SetCurrentScene(Scene* scene) { _mpCurrentScene = scene; }
-
-	void SetDemoName(std::string demoName) { _mDemoName = demoName; }
-	std::string GetDemoName() { return _mDemoName; }
+    Scene * GetCurrentScene() { return _mCurrentScene; }
+	void SetCurrentScene(Scene* scene) { _mCurrentScene = scene; }
 
 	void Screenshot();
 
 private:
+
     static Application* _sInst;
-    void                Start();
-    void                Update(float dt);
-    void                Render();
-    void                Destroy();
-	void				HandleInput(float dt);
-	void				OpenGLInfo();
 
-    Window _mWindow;
-    std::unordered_map<int, bool> keysDown;
-	Scene* _mpCurrentScene;
-	bool rightButtonDown = false;
-	float			   _mDeltaTime;
-    std::vector<Mesh*> _mMeshes;
-	bool firstMouse;
-	float lastX = 640, lastY = 360;
+    void Start();
+    void Update(float dt);
+    void Render();
+	void HandleInput(float dt);
+	void OpenGLInfo();
 
-	std::string _mVersionNum = "0.01";
-	std::string _mDemoName;
+    Window* _mWindow = nullptr;
+	Scene* _mCurrentScene = nullptr;
+    
+    std::unordered_map<int, bool> _mInputMap;
+    
+	float _mLastMX = -1, 
+          _mLastMY = -1;
 };
 
 #endif // APPLICATION_H

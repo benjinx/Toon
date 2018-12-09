@@ -38,7 +38,7 @@ void GameScene::Start()
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	Camera::instance().Init(cameraPos, cameraTarget);
+	Camera::Inst().Init(cameraPos, cameraTarget);
 
 	// Load lua script
 	//_mScriptHost.Load();
@@ -71,7 +71,7 @@ void GameScene::SetupShaders()
 	for (int i = 0; i < _mNumShaders; i++)
 	{
 		Shader* shader = new Shader();
-		shader->SetupShaders(vertShaders[i], fragShaders[i]);
+		shader->Load(vertShaders[i], fragShaders[i]);
 		_mShaders.push_back(shader);
 	}
 
@@ -126,7 +126,7 @@ void GameScene::Update(float dt)
 	glm::vec3 objColor = glm::vec3(UI::objectColor[0], UI::objectColor[1], UI::objectColor[2]);
 	_mShaders[2]->SetVec3("objectColor", objColor);
 
-	Camera::instance().Update(dt);
+	Camera::Inst().Update(dt);
 
 	for (auto& gobj : _mGameObjects)
 	{
@@ -134,9 +134,4 @@ void GameScene::Update(float dt)
 	}
 
 	PhysicsUpdate(dt);
-}
-
-void GameScene::Render()
-{
-	Scene::Render();
 }

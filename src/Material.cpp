@@ -53,29 +53,48 @@ Material::Material(float       ambient[3],
 	}
 }
 
+Material::~Material() {
+    if (_mAmbientTex != 0) {
+        glDeleteTextures(1, &_mAmbientTex);
+        _mAmbientTex = 0;
+    }
+    if (_mDiffuseTex != 0) {
+        glDeleteTextures(1, &_mDiffuseTex);
+        _mDiffuseTex = 0;
+    }
+    if (_mSpecularTex != 0) {
+        glDeleteTextures(1, &_mSpecularTex);
+        _mSpecularTex = 0;
+    }
+    if (_mNormalTex != 0) {
+        glDeleteTextures(1, &_mNormalTex);
+        _mNormalTex = 0;
+    }
+}
+
 void Material::Bind()
 {
     if (_mAmbientTex != 0)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureID::AMBIENT);
+        glActiveTexture(GL_TEXTURE0 + TexID::AMBIENT);
         glBindTexture(GL_TEXTURE_2D, _mAmbientTex);
     }
 
     if (_mDiffuseTex != 0)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureID::DIFFUSE);
+        glActiveTexture(GL_TEXTURE0 + TexID::DIFFUSE);
         glBindTexture(GL_TEXTURE_2D, _mDiffuseTex);
     }
 
     if (_mSpecularTex != 0)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureID::SPECULAR);
+        glActiveTexture(GL_TEXTURE0 + TexID::SPECULAR);
         glBindTexture(GL_TEXTURE_2D, _mSpecularTex);
     }
 
     if (_mNormalTex != 0)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureID::NORMAL);
+        glActiveTexture(GL_TEXTURE0 + TexID::NORMAL);
         glBindTexture(GL_TEXTURE_2D, _mNormalTex);
     }
 }

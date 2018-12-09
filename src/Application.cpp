@@ -1,4 +1,5 @@
 ﻿#include "Application.hpp"
+#include "Config.hpp"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
@@ -18,14 +19,22 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mode);
 void mouse_pos_callback(GLFWwindow* window, double x, double y);
 
+Application::~Application() {
+	delete _mWindow;
+	_mWindow = nullptr;
+
+	Camera::Delete();
+	
+    ImGui_ImplGlfwGL3_Shutdown();
+}
+
 void Application::Run()
 {
     const float targetElapsed = 1.0f / TARGET_FPS;
 
     Start();
 	float prevTime = 0.0f;
-    while (!glfwWindowShouldClose(_mWindow.GetWindow()))
-    {
+    while (!GetWindow()->ShouldClose()) {
 		float currTime = (float)glfwGetTime();
 		float elapsed = currTime - prevTime;
         float dt = elapsed / targetElapsed;
@@ -36,42 +45,43 @@ void Application::Run()
 
 		prevTime = currTime;
     }
-    Destroy();
 }
 
 void Application::Start()
 {
 	// Welcome
-	printf("Temporality Engine v%s\n\n", _mVersionNum.c_str());
+	printf("Temporality Engine v%s\n\n", VERSION);
 
 	// Window
-    _mWindow.Start();
+    _mWindow = new Window(1024, 768);
 
 	// Display OpenGL info
 	OpenGLInfo();
 
 	// Setup Scene
-	_mpCurrentScene->Start();
+	_mCurrentScene->Start();
+
+	GLFWwindow * glfwWin = GetWindow()->GetGLFWWindow();
 
 	// Input
-	glfwSetKeyCallback(_mWindow.GetWindow(), &key_callback);
-	glfwSetMouseButtonCallback(_mWindow.GetWindow(), &mouse_button_callback);
-	glfwSetScrollCallback(_mWindow.GetWindow(), &scroll_callback);
-	glfwSetCursorPosCallback(_mWindow.GetWindow(), &mouse_pos_callback);
+	glfwSetKeyCallback(glfwWin, &key_callback);
+	glfwSetMouseButtonCallback(glfwWin, &mouse_button_callback);
+	glfwSetScrollCallback(glfwWin, &scroll_callback);
+	glfwSetCursorPosCallback(glfwWin, &mouse_pos_callback);
 
-	glfwSetInputMode(_mWindow.GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	firstMouse = true;
+	glfwSetInputMode(glfwWin, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	// Movement
-	keysDown.emplace(GLFW_KEY_W, false);
-	keysDown.emplace(GLFW_KEY_A, false);
-	keysDown.emplace(GLFW_KEY_S, false);
-	keysDown.emplace(GLFW_KEY_D, false);
-	keysDown.emplace(GLFW_KEY_Q, false);
-	keysDown.emplace(GLFW_KEY_E, false);
+	_mInputMap[GLFW_KEY_W] = false;
+	_mInputMap[GLFW_KEY_A] = false;
+	_mInputMap[GLFW_KEY_S] = false;
+	_mInputMap[GLFW_KEY_D] = false;
+	_mInputMap[GLFW_KEY_Q] = false;
+	_mInputMap[GLFW_KEY_E] = false;
+	_mInputMap[GLFW_MOUSE_BUTTON_RIGHT] = false;
 
-		// Other Input keys
-	keysDown.emplace(GLFW_KEY_H, false);
+	// Other Input keys
+	_mInputMap[GLFW_KEY_H] = false;
 
 	// Register the options function into the UI
 	DevUI::RegisterOptionsFunc(&Scene::Options);
@@ -79,22 +89,20 @@ void Application::Start()
 
 void Application::Update(float dt)
 {
-	_mDeltaTime = dt;
-
     glfwPollEvents();
 
-	_mpCurrentScene->Update(dt);
+	_mCurrentScene->Update(dt);
 }
 
 void Application::Render()
 {
-	_mWindow.Clear();
+	_mWindow->Clear();
 
-	_mpCurrentScene->Render();
+	_mCurrentScene->Render();
 
 	DevUI::Render();
 
-	_mWindow.Present();
+	_mWindow->Present();
 }
 
 void Application::OpenGLInfo()
@@ -140,110 +148,80 @@ void Application::OpenGLInfo()
 
 void Application::Screenshot()
 {
-	std::vector<unsigned int> pixels(3 * GetWindowWidth() * GetWindowHeight());
+	std::vector<unsigned int> pixels(3 * GetWindow()->GetWidth() * GetWindow()->GetHeight());
 
-	glReadPixels(0, 0, GetWindowWidth(), GetWindowHeight(), GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+	glReadPixels(0, 0, GetWindow()->GetWidth(), GetWindow()->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 	
 	stbi_flip_vertically_on_write(true);
 
-	stbi_write_png("Screenshot.png", GetWindowWidth(), GetWindowHeight(), 3, pixels.data(), 3 * GetWindowWidth());
+	stbi_write_png("Screenshot.png", GetWindow()->GetWidth(), GetWindow()->GetHeight(), 3, pixels.data(), 3 * GetWindow()->GetWidth());
 }
 
 void Application::HandleInput(float dt)
 {
-	if (keysDown[GLFW_KEY_W])
-		Camera::instance().HandleMovement(Direction::FORWARD, dt);
-	if (keysDown[GLFW_KEY_S])
-		Camera::instance().HandleMovement(Direction::BACKWARD, dt);
-	if (keysDown[GLFW_KEY_A])
-		Camera::instance().HandleMovement(Direction::LEFT, dt);
-	if (keysDown[GLFW_KEY_D])
-		Camera::instance().HandleMovement(Direction::RIGHT, dt);
-	if (keysDown[GLFW_KEY_Q])
-		Camera::instance().HandleMovement(Direction::UP, dt);
-	if (keysDown[GLFW_KEY_E])
-		Camera::instance().HandleMovement(Direction::DOWN, dt);
+	if (_mInputMap[GLFW_KEY_W])
+		Camera::Inst().HandleMovement(Direction::FORWARD, dt);
+	if (_mInputMap[GLFW_KEY_S])
+		Camera::Inst().HandleMovement(Direction::BACKWARD, dt);
+	if (_mInputMap[GLFW_KEY_A])
+		Camera::Inst().HandleMovement(Direction::LEFT, dt);
+	if (_mInputMap[GLFW_KEY_D])
+		Camera::Inst().HandleMovement(Direction::RIGHT, dt);
+	if (_mInputMap[GLFW_KEY_Q])
+		Camera::Inst().HandleMovement(Direction::UP, dt);
+	if (_mInputMap[GLFW_KEY_E])
+		Camera::Inst().HandleMovement(Direction::DOWN, dt);
 }
 
 void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if (action == GLFW_RELEASE)
-    {
-        if (keysDown.find(key) != keysDown.end())
-        {
-            keysDown[key] = false;
+    if (action == GLFW_RELEASE) {
+        if (_mInputMap.find(key) != _mInputMap.end()) {
+            _mInputMap[key] = false;
         }
     }
     if (action == GLFW_PRESS)
     {
-        if (keysDown.find(key) != keysDown.end())
-        {
-            keysDown[key] = true;
-        }
-        switch (key)
-        {
-        case GLFW_KEY_ESCAPE:
-        {
-			DevUI::HandleEvent(key);
-			//UI::settingsSelected = !UI::settingsSelected;
-
-			//Test
-			//DevUI::settingsSelected = !DevUI::settingsSelected;
-			break;
+        if (_mInputMap.find(key) != _mInputMap.end()) {
+            _mInputMap[key] = true;
         }
 
-        case GLFW_KEY_GRAVE_ACCENT:
-        {
-            UI::showMainMenuBar = !UI::showMainMenuBar;
-            break;
-        }
+		switch (key) {
+			case GLFW_KEY_F5: // Reloads shaders
+			{
+				std::cout << "\nReloading shaders!\n";
+				
+				_mCurrentScene->DeleteShaders();
+				_mCurrentScene->SetupShaders();
 
-        case GLFW_KEY_F1:
-        {
-            UI::consoleSelected = !UI::consoleSelected;
-            break;
-        }
-
-        case GLFW_KEY_F2:
-        {
-            UI::optionsSelected = !UI::optionsSelected;
-            break;
-        }
-
-		case GLFW_KEY_F5: // Reloads shaders
-		{
-			std::cout << "\nReloading shaders!\n";
-			
-			_mpCurrentScene->DeleteShaders();
-			_mpCurrentScene->SetupShaders();
-
-			break;
-		}
-
-        case GLFW_KEY_F11:
-        {
-            UI::showTestWindow = !UI::showTestWindow;
-            break;
-        }
-			
-		case GLFW_KEY_PRINT_SCREEN:
-		{
-			Screenshot();
-			break;
-		}
+				break;
+			}
+				
+			case GLFW_KEY_PRINT_SCREEN:
+			{
+				Screenshot();
+				break;
+			}
         }
     }
 
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mode);
+	DevUI::HandleKeyEvent(key, scancode, action, mode);
+	ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mode);
 }
 
 void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int action, int mode)
 {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-		rightButtonDown = true;
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
-		rightButtonDown = false;
-		// tell camera that it can do handleRotation
+    if (action == GLFW_RELEASE) {
+        if (_mInputMap.find(button) != _mInputMap.end()) {
+            _mInputMap[button] = false;
+        }
+    }
+    if (action == GLFW_PRESS)
+    {
+        if (_mInputMap.find(button) != _mInputMap.end()) {
+            _mInputMap[button] = true;
+        }
+	}
 
     // Handle mouse button
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mode);
@@ -251,7 +229,7 @@ void Application::HandleGLFWMouseButton(GLFWwindow* window, int button, int acti
 
 void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
-	Camera::instance().HandleFoV((float)xoffset, (float)yoffset);
+	Camera::Inst().HandleFoV((float)xoffset, (float)yoffset);
 
     // scroll
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
@@ -259,28 +237,21 @@ void Application::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yo
 
 void Application::HandleGLFWMousePos(GLFWwindow* window, double x, double y)
 {
-	if (firstMouse)
-	{
-		lastX = (float)x;
-		lastY = (float)y;
-		firstMouse = false;
+	if (_mLastMX < 0 && _mLastMY < 0) {
+		_mLastMX = (float)x;
+		_mLastMY = (float)y;
 	}
 
-	float xoffset = (float)x - lastX;
-	float yoffset = lastY - (float)y;
+	float xoffset = (float)x - _mLastMX;
+	float yoffset = _mLastMY - (float)y;
 
-	lastX = (float)x;
-	lastY = (float)y;
+	_mLastMX = (float)x;
+	_mLastMY = (float)y;
 
     // handle mouse pos
-	if (rightButtonDown)
-		Camera::instance().HandleRotation(xoffset, yoffset);
-}
-
-void Application::Destroy()
-{
-    ImGui_ImplGlfwGL3_Shutdown();
-    _mWindow.Destroy();
+	if (_mInputMap[GLFW_MOUSE_BUTTON_RIGHT]) {
+		Camera::Inst().HandleRotation(xoffset, yoffset);
+	}
 }
 
 // Not part of the class itself but used for key callback.

@@ -10,44 +10,43 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normal, std::
     glGenVertexArrays(1, &_mVAO);
     glBindVertexArray(_mVAO);
 
-    GLuint vbos[5];
-    glGenBuffers(5, vbos);
+    glGenBuffers(5, _mVBOs);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, _mVBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glEnableVertexAttribArray(ATTRIB_POSITION);
+    glVertexAttribPointer(Attrib::POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(Attrib::POSITION);
 
     if (!normal.empty())
     {
-        glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
+        glBindBuffer(GL_ARRAY_BUFFER, _mVBOs[1]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * normal.size() * 3, normal.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(ATTRIB_NORMAL);
+        glVertexAttribPointer(Attrib::NORMAL, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray(Attrib::NORMAL);
     }
 
     if (!texCoords.empty())
     {
-        glBindBuffer(GL_ARRAY_BUFFER, vbos[2]);
+        glBindBuffer(GL_ARRAY_BUFFER, _mVBOs[2]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * texCoords.size() * 2, texCoords.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(ATTRIB_TEXCOORD);
+        glVertexAttribPointer(Attrib::TEXCOORD, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray(Attrib::TEXCOORD);
     }
 
 	if (!tangents.empty())
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, vbos[3]);
+		glBindBuffer(GL_ARRAY_BUFFER, _mVBOs[3]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tangents.size() * 3, tangents.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(ATTRIB_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glEnableVertexAttribArray(ATTRIB_TANGENT);
+		glVertexAttribPointer(Attrib::TANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(Attrib::TANGENT);
 	}
 
 	if (!bitangents.empty())
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, vbos[4]);
+		glBindBuffer(GL_ARRAY_BUFFER, _mVBOs[4]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bitangents.size() * 3, bitangents.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(ATTRIB_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glEnableVertexAttribArray(ATTRIB_BITANGENT);
+		glVertexAttribPointer(Attrib::BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(Attrib::BITANGENT);
 	}
 
     glBindVertexArray(0);
@@ -60,8 +59,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 {
 	shader->Use();
 
-    const auto& view = Camera::instance().GetViewMat();
-    const auto& proj = Camera::instance().GetProjectionMat();
+    const auto& view = Camera::Inst().GetViewMat();
+    const auto& proj = Camera::Inst().GetProjectionMat();
 
 	shader->SetMat4("modelMat", modelMat);
 	shader->SetMat4("viewMat", view);
@@ -70,7 +69,7 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 	glm::mat4 mvp = proj * view * modelMat;
 	shader->SetMat4("mvp", mvp);
 
-    glm::vec3 camPos = Camera::instance().GetCameraPos();
+    glm::vec3 camPos = Camera::Inst().GetCameraPos();
 	glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
 	shader->SetVec4("eyePos", eyePos);
 
@@ -91,8 +90,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
 	//if (_mMaterial->AmbientTexExists())
 	//{
-	//	//shader->SetInt("ambientTex", TextureID::AMBIENT);
-	//	shader->SetInt("material.ambientTex", TextureID::AMBIENT);
+	//	//shader->SetInt("ambientTex", Material::TexID::AMBIENT);
+	//	shader->SetInt("material.ambientTex", Material::TexID::AMBIENT);
 	//	shader->SetBool("hasAmbient", true);
 	//}
 	//else
@@ -102,8 +101,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
     if (_mMaterial->DiffuseTexExists())
     {
-		//shader->SetInt("diffuseTex", TextureID::DIFFUSE);
-		shader->SetInt("material.diffuse", TextureID::DIFFUSE);
+		//shader->SetInt("diffuseTex", Material::TexID::DIFFUSE);
+		shader->SetInt("material.diffuse", Material::TexID::DIFFUSE);
 		shader->SetBool("hasDiffuse", true);
     }
 	else
@@ -113,8 +112,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
     if (_mMaterial->SpecularTexExists())
     {
-		//shader->SetInt("specularTex", TextureID::SPECULAR);
-		shader->SetInt("material.specular", TextureID::SPECULAR);
+		//shader->SetInt("specularTex", Material::TexID::SPECULAR);
+		shader->SetInt("material.specular", Material::TexID::SPECULAR);
 		shader->SetBool("hasSpecular", true);
 	}
 	else
@@ -124,8 +123,8 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
     if (_mMaterial->NormalTexExists())
     {
-		//shader->SetInt("normalTex", TextureID::NORMAL);
-		shader->SetInt("material.normal", TextureID::NORMAL);
+		//shader->SetInt("normalTex", Material::TexID::NORMAL);
+		shader->SetInt("material.normal", Material::TexID::NORMAL);
 		shader->SetBool("hasNormal", true);
 	}
 	else

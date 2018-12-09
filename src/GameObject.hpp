@@ -1,7 +1,7 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Rigidbody.hpp"
@@ -19,9 +19,10 @@ struct Transform
 class GameObject
 {
 public:
+
 	GameObject();
 	GameObject(glm::vec3 position);
-	~GameObject();
+	virtual ~GameObject();
 
 	void Update(const float dt);
 	void Render(Shader* shader);

@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 struct ImDrawData;
 

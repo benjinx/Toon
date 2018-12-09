@@ -1,19 +1,20 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 class Window;
 
 class Shader
 {
 public:
-    Shader(){};
-    ~Shader(){};
+
+    Shader() = default;
+    ~Shader();
 
     void CheckAttribs();
 
-    void SetupShaders(std::string vertFilename, std::string fragFilename);
+    void Load(std::string vertFilename, std::string fragFilename);
 
     void Destroy();
 
@@ -86,8 +87,9 @@ public:
 	}
 
 private:
-    Window*             _mpWindow;
+
 	GLuint _mID;
+
 };
 
 #endif // SHADER_H

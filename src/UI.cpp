@@ -16,7 +16,7 @@ float UI::objectColor[3] = { 1.0f, 1.0f, 1.0f };
 void UI::StartUI()
 {
 	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow(), true);
+	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow()->GetGLFWWindow(), true);
 }
 
 void UI::UpdateUI()
@@ -41,7 +41,7 @@ void UI::UpdateUI()
 				ImGui::EndMenu();
 			}
 
-			ImGui::SameLine((float)Application::Inst()->GetWindowWidth() - 150, 0.0f);
+			ImGui::SameLine((float)Application::Inst()->GetWindow()->GetWidth() - 150, 0.0f);
 			ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
@@ -67,8 +67,8 @@ void UI::UpdateUI()
 			ImGui::SetNextWindowSize(ImVec2(400, 200));
 			ImGui::Begin("Options", &UI::optionsSelected);
 			ImGui::Checkbox("Show Gameobject Axis", &UI::showAxis);
-			if (Application::Inst()->GetDemoName() == "BasicLighting")
-				ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
+			//if (Application::Inst()->GetDemoName() == "BasicLighting")
+			//	ImGui::ColorEdit3("Gameobject Color", UI::objectColor);
 			//ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 			ImGui::End();
 		}
@@ -96,7 +96,7 @@ void UI::UpdateUI()
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))
-				glfwSetWindowShouldClose(Application::Inst()->GetWindow(), GL_TRUE);
+				glfwSetWindowShouldClose(Application::Inst()->GetWindow()->GetGLFWWindow(), GL_TRUE);
 			ImGui::End();
 		}
 	}

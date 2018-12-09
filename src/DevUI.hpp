@@ -1,7 +1,7 @@
 #ifndef DEVUI_H
 #define DEVUI_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 #include <vector>
 #include <functional>
@@ -10,7 +10,8 @@ namespace DevUI
 {
 	void Start();
 	void Render();
-	void HandleEvent(int key);
+	
+	void HandleKeyEvent(int key, int scancode, int action, int mode);
 
 	void RegisterOptionsFunc(std::function<void()> func);
 }

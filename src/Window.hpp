@@ -1,30 +1,32 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "Common.hpp"
+#include "Config.hpp"
 
 struct GLFWwindow;
 
 class Window
 {
 public:
-    Window(){};
-    ~Window(){};
 
-    void Start();
-    void Destroy();
+    Window(int width, int height);
+    virtual ~Window();
 
 	void Clear();
 	void Present();
 
-    GLFWwindow* GetWindow() { return _mpWindow; }
+    GLFWwindow* GetGLFWWindow() { return _mWindow; }
 
     int GetWidth() { return _mWidth; }
     int GetHeight() { return _mHeight; }
 
+    bool ShouldClose() { return glfwWindowShouldClose(_mWindow); }
+
 private:
-    GLFWwindow* _mpWindow;
+
+    GLFWwindow* _mWindow;
     int         _mWidth, _mHeight;
+
 };
 
 #endif // WINDOW_H

@@ -1,4 +1,4 @@
-#include "Application.hpp"
+#include <Temporality.hpp>
 #include "GameScene.hpp"
 
 int main()
@@ -10,7 +10,6 @@ int main()
 
     try
     {
-		app.SetDemoName("HelloWorld");
 		app.SetCurrentScene(gameScene);
         app.Run();
     }
@@ -19,6 +18,8 @@ int main()
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
+
+    delete gameScene;
 
     return EXIT_SUCCESS;
 }

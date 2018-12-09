@@ -5,16 +5,18 @@
 
 bool Scene::_sShowAxis = false;
 
-Scene::Scene()
-{
-
+Scene::~Scene() {
+    for (auto& go : _mGameObjects) {
+        delete go.second;
+    }
+    _mGameObjects.clear();
 }
 
 void Scene::Render()
 {
 	for (auto& gameObject : _mGameObjects)
 	{
-		if (gameObject.first == "Sun")
+		if (gameObject.first == "Sun" || gameObject.first == "Light")
 			gameObject.second->Render(_mShaders[1]);
 		else
 			gameObject.second->Render(_mShaders[2]);
@@ -27,7 +29,6 @@ void Scene::Render()
 			gameObject.second->DrawAxis(_mShaders[0]);
 		}
 	}
-		
 }
 
 void Scene::Options()

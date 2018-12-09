@@ -1,7 +1,5 @@
 #include "GameScene.hpp"
 
-#include "UI.hpp"
-
 void GameScene::Start()
 {
 	// Object setup
@@ -15,16 +13,13 @@ void GameScene::Start()
 	SetupShaders();
 
 	// UI
-	UI::StartUI();
+	DevUI::Start();
 
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	Camera::instance().Init(cameraPos, cameraTarget);
-
-	// Set default to lighting
-	_mProg = 1;
+	Camera::Inst().Init(cameraPos, cameraTarget);
 
 	// Physics
 	PhysicsStart();
@@ -49,7 +44,7 @@ void GameScene::SetupShaders()
 	for (int i = 0; i < _mNumShaders; i++)
 	{
 		Shader* shader = new Shader();
-		shader->SetupShaders(vertShaders[i], fragShaders[i]);
+		shader->Load(vertShaders[i], fragShaders[i]);
 		_mShaders.push_back(shader);
 	}
 
@@ -81,7 +76,7 @@ void GameScene::DeleteShaders()
 
 void GameScene::Update(float dt)
 {
-	Camera::instance().Update(dt);
+	Camera::Inst().Update(dt);
 
 	for (auto& gobj : _mGameObjects)
 	{
@@ -89,27 +84,4 @@ void GameScene::Update(float dt)
 	}
 
 	PhysicsUpdate(dt);
-
-	UI::UpdateUI();
-}
-
-void GameScene::Render()
-{
-	
-	// Render Objects
-	for (auto& gameObject : _mGameObjects)
-	{
-		gameObject.second->Render(_mShaders[1]);
-	}
-
-	// Axis Rendering for Objects
-	for (auto& gameOject : _mGameObjects)
-	{
-		if (gameOject.second->IsAxisEnabled())
-		{
-			gameOject.second->DrawAxis(_mShaders[0]);
-		}
-	}
-
-	UI::RenderUI();
 }

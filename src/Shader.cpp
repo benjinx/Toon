@@ -3,6 +3,10 @@
 #include "Window.hpp"
 #include "Utils.hpp"
 
+Shader::~Shader() {
+    Destroy();
+}
+
 void Shader::CheckAttribs()
 {
     // Check for max Attribs
@@ -11,7 +15,7 @@ void Shader::CheckAttribs()
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 }
 
-void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
+void Shader::Load(std::string vertFilename, std::string fragFilename)
 {
     const auto& paths = Utils::GetResourcePaths();
 
@@ -101,6 +105,8 @@ void Shader::SetupShaders(std::string vertFilename, std::string fragFilename)
 
 void Shader::Destroy()
 {
-	glUseProgram(_mID);
-	glDeleteProgram(_mID);
+    if (_mID != 0) {
+	    glDeleteProgram(_mID);
+        _mID = 0;
+    }
 }

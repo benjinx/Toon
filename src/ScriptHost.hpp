@@ -17,7 +17,7 @@ class ScriptHost
 {
 public:
 	ScriptHost();
-	~ScriptHost() {};
+	virtual ~ScriptHost() = default;
 
 	void Load();
 
