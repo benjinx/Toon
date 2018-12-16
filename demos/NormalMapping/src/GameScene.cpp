@@ -27,7 +27,29 @@ void GameScene::Start()
 	_mGameObjects["Moon"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Shaders
-	SetupShaders();
+	printf("\nLoading Shaders\n");
+
+	Application* app = Application::Inst();
+	app->AddShader("passThru", new Shader({
+		"shaders/passThru.vert",
+		"shaders/passThru.frag" }));
+
+	app->AddShader("normalMapping", new Shader({
+		"shaders/normalMapping.vert",
+		"shaders/normalMapping.frag" }));
+
+	_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
+	_mGameObjects["Earth"]->SetShader(app->GetShader("normalMapping"));
+	_mGameObjects["Moon"]->SetShader(app->GetShader("normalMapping"));
+
+	// Clear Window
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	// Depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// UI
 	DevUI::Start();
@@ -39,66 +61,28 @@ void GameScene::Start()
 	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
-void GameScene::SetupShaders()
-{
-	// Shaders
-	_mNumShaders = 3;
-	std::vector<std::string> vertShaders = {
-		"shaders/axis.vert",
-		"shaders/passThru.vert",
-		"shaders/normalMapping.vert",
-	};
-
-	std::vector<std::string> fragShaders = {
-		"shaders/axis.frag",
-		"shaders/passThru.frag",
-		"shaders/normalMapping.frag",
-	};
-
-	printf("\nLoading Shaders\n");
-
-	for (int i = 0; i < _mNumShaders; i++)
-	{
-		Shader* shader = new Shader();
-		shader->Load(vertShaders[i], fragShaders[i]);
-		_mShaders.push_back(shader);
-	}
-
-	// Clear Window
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-void GameScene::DeleteShaders()
-{
-	// Destroy the shaders
-	for (auto& shader : _mShaders)
-		shader->Destroy();
-
-	// Clear shader vector
-	_mShaders.clear();
-}
-
 void GameScene::Update(float dt)
 {
+	// Get the application for ease.
+	Application* app = Application::Inst();
+
+	// Get reference to each shader
+	Shader* passThru = app->GetShader("passThru");
+	Shader* normalMapping = app->GetShader("normalMapping");
+
 	// Set Shader values
 
 	// Set Light Color
-	_mShaders[1]->Use();
+	passThru->Use();
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	_mShaders[1]->SetVec3("passColor", lightColor);
+	passThru->SetVec3("passColor", lightColor);
 
 	// Set Light Position
-	_mShaders[2]->Use();
+	normalMapping->Use();
 
-	_mShaders[2]->SetVec3("lightColor", lightColor);
+	normalMapping->SetVec3("lightColor", lightColor);
 	glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
-	_mShaders[2]->SetVec4("lightPos", lightPos);
+	normalMapping->SetVec4("lightPos", lightPos);
 
 	// Update Camera
 	Camera::Inst().Update(dt);

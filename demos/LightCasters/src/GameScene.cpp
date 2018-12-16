@@ -28,6 +28,7 @@ void GameScene::Start()
 	_mGameObjects["Plane"]->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 
 	_mGameObjects["Sphere"]->SetPosition(glm::vec3(1.5f, 0.0f, 2.0f));
+	_mGameObjects["Sphere"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Sphere"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	_mGameObjects["Cube"]->SetPosition(glm::vec3(-1.5f, -1.0f, 0.0f));
@@ -47,7 +48,33 @@ void GameScene::Start()
 	_mGameObjects["Torus3"]->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	// Shaders
-	SetupShaders();
+	printf("\nLoading Shaders\n");
+
+	Application* app = Application::Inst();
+	app->AddShader("passThru", new Shader({
+		"shaders/passThru.vert",
+		"shaders/passThru.frag" }));
+
+	app->AddShader("lightCasters", new Shader({
+		"shaders/lightCasters.vert",
+		"shaders/lightCasters.frag" }));
+
+	_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
+	_mGameObjects["Plane"]->SetShader(app->GetShader("lightCasters"));
+	_mGameObjects["Sphere"]->SetShader(app->GetShader("lightCasters"));
+	_mGameObjects["Cube"]->SetShader(app->GetShader("lightCasters"));
+	_mGameObjects["Torus"]->SetShader(app->GetShader("lightCasters"));
+	_mGameObjects["Torus2"]->SetShader(app->GetShader("lightCasters"));
+	_mGameObjects["Torus3"]->SetShader(app->GetShader("lightCasters"));
+
+	// Clear Window
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	// Depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// UI
 	DevUI::Start();
@@ -64,74 +91,36 @@ void GameScene::Start()
 	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
-void GameScene::SetupShaders()
-{
-	// Shaders
-	_mNumShaders = 3;
-	std::vector<std::string> vertShaders = {
-		"shaders/axis.vert",
-		"shaders/passThru.vert",
-		"shaders/lightCasters.vert",
-	};
-
-	std::vector<std::string> fragShaders = {
-		"shaders/axis.frag",
-		"shaders/passThru.frag",
-		"shaders/lightCasters.frag",
-	};
-
-	printf("\nLoading Shaders\n");
-
-	for (int i = 0; i < _mNumShaders; i++)
-	{
-		Shader* shader = new Shader();
-		shader->Load(vertShaders[i], fragShaders[i]);
-		_mShaders.push_back(shader);
-	}
-
-	// Clear Window
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-void GameScene::DeleteShaders()
-{
-	// Destroy the shaders
-	for (auto& shader : _mShaders)
-		shader->Destroy();
-
-	// Clear shader vector
-	_mShaders.clear();
-}
-
 void GameScene::Update(float dt)
 {
+	// Get the application for ease.
+	Application* app = Application::Inst();
+
+	// Get reference to each shader
+	Shader* passThru = app->GetShader("passThru");
+	Shader* lightCasters = app->GetShader("lightCasters");
+
 	// Set Shader values
 
 	// Set Light Color
-	_mShaders[1]->Use();
+	passThru->Use();
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	_mShaders[1]->SetVec3("passColor", lightColor);
+	passThru->SetVec3("passColor", lightColor);
 
 	// Set Light Position
-	_mShaders[2]->Use();
-	_mShaders[2]->SetVec3("lightColor", lightColor);
+	lightCasters->Use();
+	lightCasters->SetVec3("lightColor", lightColor);
 
 	// Directional Lighting
 	// Set Directional Light Position
 	glm::vec4 lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f);
 	if (_mDirLight)
 	{
-		_mShaders[2]->SetBool("lightCheck.Directional", true);
-		_mShaders[2]->SetVec4("dirLight.direction", lightDir);
+		lightCasters->SetBool("lightCheck.Directional", true);
+		lightCasters->SetVec4("dirLight.direction", lightDir);
 	}
 	else
-		_mShaders[2]->SetBool("lightCheck.Directional", false);
+		lightCasters->SetBool("lightCheck.Directional", false);
 
 	// Point Lighting
 	// Set attenuation values
@@ -141,35 +130,35 @@ void GameScene::Update(float dt)
 
 	if (_mPointLight)
 	{
-		_mShaders[2]->SetBool("lightCheck.Point", true);
-		_mShaders[2]->SetFloat("pointLight.constant", constant);
-		_mShaders[2]->SetFloat("pointLight.linear", linear);
-		_mShaders[2]->SetFloat("pointLight.quadratic", quadratic);
+		lightCasters->SetBool("lightCheck.Point", true);
+		lightCasters->SetFloat("pointLight.constant", constant);
+		lightCasters->SetFloat("pointLight.linear", linear);
+		lightCasters->SetFloat("pointLight.quadratic", quadratic);
 
 		glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
-		_mShaders[2]->SetVec4("pointLight.position", lightPos);
+		lightCasters->SetVec4("pointLight.position", lightPos);
 
 		lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 1.0f);
-		_mShaders[2]->SetVec4("pointLight.direction", lightDir);
+		lightCasters->SetVec4("pointLight.direction", lightDir);
 	}
 	else
-		_mShaders[2]->SetBool("lightCheck.Point", false);
+		lightCasters->SetBool("lightCheck.Point", false);
 
 	// Spotlight Lighting
 	if (_mSpotLight)
 	{
-		_mShaders[2]->SetBool("lightCheck.Spot", true);
-		_mShaders[2]->SetVec3("spotlight.position", Camera::Inst().GetCameraPos());
+		lightCasters->SetBool("lightCheck.Spot", true);
+		lightCasters->SetVec3("spotlight.position", Camera::Inst().GetCameraPos());
 
 		// Change 0.0f to 1.0f to just enable spotlight
 		glm::vec4 camFront = glm::vec4(Camera::Inst().GetCameraForward(), 1.0f);
-		_mShaders[2]->SetVec4("spotlight.direction", camFront);
+		lightCasters->SetVec4("spotlight.direction", camFront);
 
-		_mShaders[2]->SetFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
-		_mShaders[2]->SetFloat("spotlight.outerCutoff", glm::cos(glm::radians(17.5f)));
+		lightCasters->SetFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
+		lightCasters->SetFloat("spotlight.outerCutoff", glm::cos(glm::radians(17.5f)));
 	}
 	else
-		_mShaders[2]->SetBool("lightCheck.Spot", false);
+		lightCasters->SetBool("lightCheck.Spot", false);
 
 	// Update Camera
 	Camera::Inst().Update(dt);

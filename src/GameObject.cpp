@@ -1,5 +1,6 @@
 #include "GameObject.hpp"
 
+#include "Application.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
@@ -45,17 +46,20 @@ void GameObject::Update(const float dt)
 	//_mRigidbody.ClampToGround(this, min, res);
 }
 
-void GameObject::Render(Shader* shader)
+void GameObject::Render()
 {
-	for (Mesh* mesh : _mMeshes)
+	if (_mShader != nullptr)
 	{
-		mesh->Render(shader, GetModelMatrix());
+		for (Mesh* mesh : _mMeshes)
+		{
+			mesh->Render(_mShader, GetModelMatrix());
+		}
 	}
+}
 
-	//if (_sShowAxis)
-	//{
-	//	DrawAxis(shader);
-	//}
+void GameObject::SetShader(Shader* shader)
+{
+	_mShader = shader;
 }
 
 void GameObject::InitAxis()
@@ -94,8 +98,10 @@ void GameObject::InitAxis()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void GameObject::DrawAxis(Shader* shader)
+void GameObject::DrawAxis()
 {
+	Shader* shader = Application::Inst()->GetShader("axis");
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->GetShaderID());
 

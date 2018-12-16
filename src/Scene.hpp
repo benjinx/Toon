@@ -22,7 +22,6 @@ public:
 	virtual void Render();
 	
 	virtual void SetupShaders() { }
-	virtual void DeleteShaders() { }
 
 	GameObjectMap GetGameObjects() { return _mGameObjects; }
 
@@ -30,13 +29,6 @@ public:
 	static void Options();
 
 protected:
-
-	// Shader information
-	int _mNumShaders;
-	int _mProg;
-
-	std::vector<Shader*> _mShaders;
-
 	// Show gameobject axis?
 	static bool _sShowAxis;
 

@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 
+#include "Application.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
@@ -16,17 +17,14 @@ void Scene::Render()
 {
 	for (auto& gameObject : _mGameObjects)
 	{
-		if (gameObject.first == "Sun" || gameObject.first == "Light")
-			gameObject.second->Render(_mShaders[1]);
-		else
-			gameObject.second->Render(_mShaders[2]);
+		gameObject.second->Render();
 	}
 
 	if (_sShowAxis)
 	{
 		for (auto& gameObject : _mGameObjects)
 		{
-			gameObject.second->DrawAxis(_mShaders[0]);
+			gameObject.second->DrawAxis();
 		}
 	}
 }

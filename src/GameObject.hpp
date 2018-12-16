@@ -25,7 +25,7 @@ public:
 	virtual ~GameObject();
 
 	void Update(const float dt);
-	void Render(Shader* shader);
+	void Render();
 	
 	void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
 
@@ -81,8 +81,10 @@ public:
 	}
 
 	void InitAxis();
-	void DrawAxis(Shader* shader);
+	void DrawAxis();
 
+	void SetShader(Shader* shader);
+	
 protected:
 	// Transform
 	Transform _mTransform;
@@ -102,6 +104,9 @@ protected:
 	// Axis Rendering
 	GLuint _mVAO;
 	GLuint _mVBO[2];
+
+	// Gobjs Shader
+	Shader* _mShader;
 };
 
 // GameObject needs to know which components are attached to each gameobject.

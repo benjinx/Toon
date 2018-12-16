@@ -26,6 +26,8 @@ Application::~Application() {
 	Camera::Delete();
 	
     ImGui_ImplGlfwGL3_Shutdown();
+
+	DeleteShaders();
 }
 
 void Application::Run()
@@ -57,6 +59,11 @@ void Application::Start()
 
 	// Display OpenGL info
 	OpenGLInfo();
+
+	// Load Engine Shaders
+	AddShader("axis", new Shader({
+		"shaders/axis.vert",
+		"shaders/axis.frag" }));
 
 	// Setup Scene
 	_mCurrentScene->Start();
@@ -157,6 +164,31 @@ void Application::Screenshot()
 	stbi_write_png("Screenshot.png", GetWindow()->GetWidth(), GetWindow()->GetHeight(), 3, pixels.data(), 3 * GetWindow()->GetWidth());
 }
 
+void Application::AddShader(std::string name, Shader* shader)
+{
+	_mShaders[name] = shader;
+}
+
+Shader* Application::GetShader(std::string name)
+{
+	if (_mShaders.find(name) == _mShaders.end())
+	{
+		return nullptr;
+	}
+
+	return _mShaders[name];
+}
+
+void Application::DeleteShaders()
+{
+	// Destroy the shaders
+	for (auto& shader : _mShaders)
+		shader.second->Destroy();
+
+	// Clear shader vector
+	_mShaders.clear();
+}
+
 void Application::HandleInput(float dt)
 {
 	if (_mInputMap[GLFW_KEY_W])
@@ -191,8 +223,8 @@ void Application::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int a
 			{
 				std::cout << "\nReloading shaders!\n";
 				
-				_mCurrentScene->DeleteShaders();
-				_mCurrentScene->SetupShaders();
+				//_mCurrentScene->DeleteShaders();
+				//_mCurrentScene->SetupShaders();
 
 				break;
 			}

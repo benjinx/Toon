@@ -9,11 +9,13 @@ class Shader
 {
 public:
 
-    Shader() = default;
+	Shader() = default;
+    Shader(std::initializer_list<std::string> files);
     ~Shader();
 
     void CheckAttribs();
 
+	void Load(std::initializer_list<std::string> files);
     void Load(std::string vertFilename, std::string fragFilename);
 
     void Destroy();

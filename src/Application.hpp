@@ -39,6 +39,10 @@ public:
 
 	void Screenshot();
 
+	void AddShader(std::string name, Shader* shader);
+	Shader* GetShader(std::string name);
+	void DeleteShaders();
+
 private:
 
     static Application* _sInst;
@@ -53,6 +57,9 @@ private:
 	Scene* _mCurrentScene = nullptr;
     
     std::unordered_map<int, bool> _mInputMap;
+
+	// List of Shaders
+	std::unordered_map<std::string, Shader*> _mShaders;
     
 	float _mLastMX = -1, 
           _mLastMY = -1;

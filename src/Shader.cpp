@@ -3,6 +3,11 @@
 #include "Window.hpp"
 #include "Utils.hpp"
 
+Shader::Shader(std::initializer_list<std::string> files)
+{
+	Load(files);
+}
+
 Shader::~Shader() {
     Destroy();
 }
@@ -13,6 +18,133 @@ void Shader::CheckAttribs()
     GLint nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+}
+
+void Shader::Load(std::initializer_list<std::string> files)
+{
+	const auto& paths = Utils::GetResourcePaths();
+
+	std::vector<GLuint> shaderIds;
+
+	GLint success;
+	GLchar infoLog[512];
+
+	for (auto& f : files)
+	{
+		// Output files loading
+		printf("Loading: [%s]\n", f.c_str());
+
+		// Find shader type
+		GLuint shaderType;
+		std::string ext = f.substr(f.find_last_of(".") + 1);
+		if (ext == "vert")
+		{
+			shaderType = GL_VERTEX_SHADER;
+		}
+		else if (ext == "frag")
+		{
+			shaderType = GL_FRAGMENT_SHADER;
+		}
+		else if (ext == "gs")
+		{
+			shaderType = GL_GEOMETRY_SHADER;
+		}
+#ifdef GL_VERSION_4_0
+		// Requires OpenGL 4.0+
+		else if (ext == "tcs")
+		{
+			shaderType = GL_TESS_CONTROL_SHADER;
+		}
+		else if (ext == "tes")
+		{
+			shaderType = GL_TESS_EVALUATION_SHADER;
+		}
+#endif // GL_VERSION_4_0
+#ifdef GL_VERSION_4_3
+		else if (ext == "cs")
+		{
+			shaderType = GL_COMPUTE_SHADER;
+		}
+#endif // GL_VERSION_4_3
+
+		// Load Shader
+		std::ifstream shaderFile;
+		bool loaded = false;
+		for (auto& p : paths)
+		{
+			std::string fullFilename = p + "/" + f;
+
+			shaderFile.open(fullFilename);
+
+			if (shaderFile.is_open())
+			{
+				printf("Loaded:  [%s]\n", fullFilename.c_str());
+				loaded = true;
+				break;
+			}
+		}
+
+		if (!loaded)
+		{
+			fprintf(stderr, "Failed to load shaders [%s]", f.c_str());
+			return;
+		}
+
+		// Create Shader
+		std::string shaderCode((std::istreambuf_iterator<char>(shaderFile)),
+								std::istreambuf_iterator<char>());
+
+		// Clean up!
+		shaderFile.close();
+
+		// Get Pointer to string
+		const GLchar* pShaderCode = shaderCode.c_str();
+
+		// Create shader
+		GLuint shader;
+		shader = glCreateShader(shaderType);
+		glShaderSource(shader, 1, &pShaderCode, NULL);
+		glCompileShader(shader);
+
+		// Check status
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
+			fprintf(stderr, "Failed to compile shaders [%s]", f.c_str());
+			return;
+		}
+
+		// Store Ids
+		shaderIds.push_back(shader);
+	}
+
+	// Create Program
+	_mID = glCreateProgram();
+
+	// Attach shaders to program
+	for (auto& id : shaderIds)
+	{
+		glAttachShader(_mID, id);
+	}
+
+	// Link Program
+	glLinkProgram(_mID);
+
+	// Check status
+	glGetProgramiv(_mID, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(_mID, sizeof(infoLog), NULL, infoLog);
+		fprintf(stderr, "Failed to link shader [%d]", _mID);
+		return;
+	}
+
+	// Clean up!
+	for (auto& id : shaderIds)
+	{
+		glDeleteShader(id);
+	}
 }
 
 void Shader::Load(std::string vertFilename, std::string fragFilename)
