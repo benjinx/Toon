@@ -27,5 +27,3 @@ Dependencies
 * glfw
 * glm
 * imgui
-* openal
-* sol2
