@@ -35,15 +35,6 @@ void GameScene::Start()
 	_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
 	_mGameObjects["Cube"]->SetShader(app->GetShader("advLighting"));
 
-	// Clear Window
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// UI
 	DevUI::Start();
 	DevUI::RegisterOptionsFunc([this]() {

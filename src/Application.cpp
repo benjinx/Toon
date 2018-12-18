@@ -65,6 +65,17 @@ void Application::Start()
 		"shaders/axis.vert",
 		"shaders/axis.frag" }));
 
+	// Clear Window
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	// Depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	// Blend
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Setup Scene
 	_mCurrentScene->Start();
 

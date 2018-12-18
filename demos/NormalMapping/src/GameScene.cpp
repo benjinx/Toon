@@ -42,15 +42,6 @@ void GameScene::Start()
 	_mGameObjects["Earth"]->SetShader(app->GetShader("normalMapping"));
 	_mGameObjects["Moon"]->SetShader(app->GetShader("normalMapping"));
 
-	// Clear Window
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// UI
 	DevUI::Start();
 

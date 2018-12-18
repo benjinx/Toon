@@ -67,15 +67,6 @@ void GameScene::Start()
 	_mGameObjects["Torus2"]->SetShader(app->GetShader("lightCasters"));
 	_mGameObjects["Torus3"]->SetShader(app->GetShader("lightCasters"));
 
-	// Clear Window
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	// Depth
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// UI
 	DevUI::Start();
 	DevUI::RegisterOptionsFunc([this]() {
