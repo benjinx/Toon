@@ -21,10 +21,7 @@ void GameScene::Start()
 
 void GameScene::Update(float dt)
 {
-	Camera::Inst().Update(dt);
+	Scene::Update(dt);
 
-	for (auto& gobj : _mGameObjects)
-	{
-		gobj.second->Update(dt);
-	}
+	Camera::Inst().Update(dt);
 }

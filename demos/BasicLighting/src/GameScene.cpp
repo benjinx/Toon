@@ -65,6 +65,8 @@ void GameScene::Start()
 
 void GameScene::Update(float dt)
 {
+	Scene::Update(dt);
+
 	// Set Shader values
 	
 	// Get the application for ease.
@@ -98,10 +100,4 @@ void GameScene::Update(float dt)
 	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.25f * dt, 0.0f, 0.0f));
 	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
 	_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.0f, 0.25f * dt));
-
-	// Update objects
-	for (auto& gobj : _mGameObjects)
-	{
-		gobj.second->Update(dt);
-	}
 }

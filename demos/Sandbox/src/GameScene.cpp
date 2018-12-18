@@ -73,6 +73,8 @@ void GameScene::PhysicsUpdate(float dt)
 
 void GameScene::Update(float dt)
 {
+	Scene::Update(dt);
+
 	// Get the application for ease.
 	App* app = App::Inst();
 
@@ -91,13 +93,7 @@ void GameScene::Update(float dt)
 	glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
 	advLighting->SetVec3("lightVec", lightPos);
 
-
 	Camera::Inst().Update(dt);
 
-	for (auto& gobj : _mGameObjects)
-	{
-		gobj.second->Update(dt);
-	}
-
-	PhysicsUpdate(dt);
+	//PhysicsUpdate(dt);
 }

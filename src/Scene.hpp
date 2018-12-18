@@ -18,7 +18,7 @@ public:
 	virtual void Pause() { }
 	virtual void Resume() { }
 
-	virtual void Update(float dt) { }
+	virtual void Update(float dt);
 	virtual void Render();
 	
 	virtual void SetupShaders() { }

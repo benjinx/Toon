@@ -13,6 +13,14 @@ Scene::~Scene() {
     _mGameObjects.clear();
 }
 
+void Scene::Update(float dt)
+{
+	for (auto& gobj : _mGameObjects)
+	{
+		gobj.second->Update(dt);
+	}
+}
+
 void Scene::Render()
 {
 	for (auto& gameObject : _mGameObjects)

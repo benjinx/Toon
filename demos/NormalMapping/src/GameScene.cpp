@@ -54,6 +54,8 @@ void GameScene::Start()
 
 void GameScene::Update(float dt)
 {
+	Scene::Update(dt);
+
 	// Get the application for ease.
 	App* app = App::Inst();
 
@@ -100,11 +102,4 @@ void GameScene::Update(float dt)
 	glm::vec3 newPos = glm::vec3(x, 0.0f, -z);
 	
 	_mGameObjects["Moon"]->SetPosition(newPos);
-
-
-	// Update objects
-	for (auto& gobj : _mGameObjects)
-	{
-		gobj.second->Update(dt);
-	}
 }
