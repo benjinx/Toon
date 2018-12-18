@@ -23,7 +23,7 @@ void GameScene::Start()
 	// Shaders
 	printf("\nLoading Shaders\n");
 
-	Application* app = Application::Inst();
+	App* app = App::Inst();
 	app->AddShader("passThru", new Shader({
 		"shaders/passThru.vert",
 		"shaders/passThru.frag" }));
@@ -74,7 +74,7 @@ void GameScene::PhysicsUpdate(float dt)
 void GameScene::Update(float dt)
 {
 	// Get the application for ease.
-	Application* app = Application::Inst();
+	App* app = App::Inst();
 
 	// Get reference to each shader
 	Shader* passThru = app->GetShader("passThru");

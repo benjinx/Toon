@@ -1,6 +1,6 @@
 #include "GameObject.hpp"
 
-#include "Application.hpp"
+#include "App.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
@@ -100,7 +100,7 @@ void GameObject::InitAxis()
 
 void GameObject::DrawAxis()
 {
-	Shader* shader = Application::Inst()->GetShader("axis");
+	Shader* shader = App::Inst()->GetShader("axis");
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader->GetShaderID());

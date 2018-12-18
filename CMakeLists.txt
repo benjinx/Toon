@@ -34,8 +34,8 @@ SET(AUDIO_SRC
 
 # Core src
 SET(CORE_SRC
-	src/Application.cpp
-	src/Application.hpp
+	src/App.cpp
+	src/App.hpp
 	src/Camera.cpp
 	src/Camera.hpp
 	src/Window.cpp

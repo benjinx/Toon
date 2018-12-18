@@ -8,7 +8,7 @@ int main()
 		printf("%s\n", p.c_str());
 	}
 
-    Application app;
+    App app;
 	Scene* gameScene = new GameScene();
 
     try

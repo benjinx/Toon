@@ -1,7 +1,7 @@
 #include "UI.hpp"
 
 #include "Window.hpp"
-#include "Application.hpp"
+#include "App.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
@@ -16,7 +16,7 @@ float UI::objectColor[3] = { 1.0f, 1.0f, 1.0f };
 void UI::StartUI()
 {
 	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(Application::Inst()->GetWindow()->GetGLFWWindow(), true);
+	ImGui_ImplGlfwGL3_Init(App::Inst()->GetWindow()->GetGLFWWindow(), true);
 }
 
 void UI::UpdateUI()
@@ -41,7 +41,7 @@ void UI::UpdateUI()
 				ImGui::EndMenu();
 			}
 
-			ImGui::SameLine((float)Application::Inst()->GetWindow()->GetWidth() - 150, 0.0f);
+			ImGui::SameLine((float)App::Inst()->GetWindow()->GetWidth() - 150, 0.0f);
 			ImGui::Text("%.2f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
@@ -96,7 +96,7 @@ void UI::UpdateUI()
 			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 			if (ImGui::Button("Quit"))
-				glfwSetWindowShouldClose(Application::Inst()->GetWindow()->GetGLFWWindow(), GL_TRUE);
+				glfwSetWindowShouldClose(App::Inst()->GetWindow()->GetGLFWWindow(), GL_TRUE);
 			ImGui::End();
 		}
 	}

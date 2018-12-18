@@ -5,7 +5,7 @@ int main()
 {
 	const auto& paths = Utils::GetResourcePaths();
     
-	Application app;
+	App app;
 	Scene* gameScene = new GameScene();
 
     try

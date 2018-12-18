@@ -1,7 +1,7 @@
 #ifndef TEMPORALITY_HPP
 #define TEMPORALITY_HPP
 
-#include "Application.hpp"
+#include "App.hpp"
 #include "Camera.hpp"
 #include "DevUI.hpp"
 #include "UI.hpp" // TODO: Remove

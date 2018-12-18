@@ -1,7 +1,7 @@
 #include "Camera.hpp"
 
 #include "Window.hpp"
-#include "Application.hpp"
+#include "App.hpp"
 
 Camera * Camera::_sInst = nullptr;
 
@@ -11,7 +11,7 @@ void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
     _mTarget   = cameraTarget;
 	_mFoV = 45.0f;
 	
-	Window * window = Application::Inst()->GetWindow();
+	Window * window = App::Inst()->GetWindow();
 
     // 1 - FOV, 2 - Aspect Ratio, 3 - Near clipping, 4 - Far clipping
     _mProjectionMat =
@@ -45,7 +45,7 @@ void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
 
 void Camera::Update(float dt)
 {
-	Window * window = Application::Inst()->GetWindow();
+	Window * window = App::Inst()->GetWindow();
 	_mProjectionMat = glm::perspective(glm::radians(_mFoV), (float)window->GetWidth() / (float)window->GetHeight(), 0.1f, 10000.0f);
 	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mForward, _mUp);
 }
@@ -134,6 +134,6 @@ void Camera::HandleFoV(float xoffset, float yoffset)
 
 glm::vec2 Camera::GetResolution()
 {
-	Window * window = Application::Inst()->GetWindow();
+	Window * window = App::Inst()->GetWindow();
 	return glm::vec2((float)window->GetWidth(), (float)window->GetHeight());
 }

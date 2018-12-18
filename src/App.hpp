@@ -14,16 +14,16 @@
 #include "DevUI.hpp"
 #include "Cube.hpp"
 
-class Application
+class App
 {
 public:
 
-    static Application* Inst() { 
+    static App* Inst() { 
         return _sInst; 
     }
 
-    Application() { _sInst = this; }
-    ~Application();
+    App() { _sInst = this; }
+    ~App();
 
     void Run();
 
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    static Application* _sInst;
+    static App* _sInst;
 
     void Start();
     void Update(float dt);

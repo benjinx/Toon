@@ -1,6 +1,6 @@
 #include "Scene.hpp"
 
-#include "Application.hpp"
+#include "App.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
