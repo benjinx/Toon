@@ -200,6 +200,12 @@ void App::DeleteShaders()
 	_mShaders.clear();
 }
 
+void App::ReloadShaders()
+{
+	for (auto s : _mShaders)
+		s.second->Reload();
+}
+
 void App::HandleInput(float dt)
 {
 	if (_mInputMap[GLFW_KEY_W])
@@ -236,7 +242,7 @@ void App::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, i
 				
 				//_mCurrentScene->DeleteShaders();
 				//_mCurrentScene->SetupShaders();
-
+				ReloadShaders();
 				break;
 			}
 				

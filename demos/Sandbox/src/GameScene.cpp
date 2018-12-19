@@ -13,12 +13,10 @@ void GameScene::Start()
 	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
 
 	// Initialize Objs
-	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	_mGameObjects["Cube"]->SetPosition(glm::vec3(-1.5f, -1.0f, 0.0f));
 	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
-	_mGameObjects["Cube"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// Shaders
 	printf("\nLoading Shaders\n");

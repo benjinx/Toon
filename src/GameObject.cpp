@@ -7,6 +7,11 @@
 
 GameObject::GameObject()
 {
+	// Transform Defaults
+	SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+
 	// Physics
 	_mRigidbody.SetMass(1.0f);
 	_mRigidbody.SetFixedAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
@@ -18,7 +23,10 @@ GameObject::GameObject()
 
 GameObject::GameObject(glm::vec3 position)
 {
-	_mTransform.position = position;
+	// Transform Defaults
+	SetPosition(position);
+	SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// Physics
 	_mRigidbody.SetMass(1.0f);

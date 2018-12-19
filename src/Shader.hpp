@@ -16,7 +16,10 @@ public:
     void CheckAttribs();
 
 	void Load(std::initializer_list<std::string> files);
+	void Load(std::vector<std::string> files);
     void Load(std::string vertFilename, std::string fragFilename);
+
+	void Reload();
 
     void Destroy();
 
@@ -91,6 +94,7 @@ public:
 private:
 
 	GLuint _mID;
+	std::vector<std::string> _mFiles;
 
 };
 
