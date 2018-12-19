@@ -35,15 +35,23 @@ void App::Run()
     const float targetElapsed = 1.0f / TARGET_FPS;
 
     Start();
+
 	float prevTime = 0.0f;
+	float frameTime = 0.0f;
     while (!GetWindow()->ShouldClose()) {
 		float currTime = (float)glfwGetTime();
 		float elapsed = currTime - prevTime;
+		frameTime += elapsed;
         float dt = elapsed / targetElapsed;
 
 		HandleInput(dt);
         Update(dt);
-        Render();
+
+		if (frameTime >= targetElapsed)
+		{
+			frameTime = 0.0f;
+			Render();
+		}
 
 		prevTime = currTime;
     }
