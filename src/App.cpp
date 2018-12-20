@@ -20,14 +20,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mode)
 void mouse_pos_callback(GLFWwindow* window, double x, double y);
 
 App::~App() {
-	delete _mWindow;
-	_mWindow = nullptr;
-
 	Camera::Delete();
-	
-    ImGui_ImplGlfwGL3_Shutdown();
 
 	DeleteShaders();
+
+    ImGui_ImplGlfwGL3_Shutdown();
+
+	delete _mWindow;
+	_mWindow = nullptr;
 }
 
 void App::Run()
