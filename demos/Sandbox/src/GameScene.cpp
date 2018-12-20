@@ -9,8 +9,8 @@ void GameScene::Start()
 	printf("\nLoading Materials\n");
 
 	// Scene Objs
-	_mGameObjects.emplace("Light", Utils::LoadObj("models/Primitives/pCube.obj"));
-	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.obj"));
 
 	// Initialize Objs
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));

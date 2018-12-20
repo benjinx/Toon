@@ -8,18 +8,18 @@ void GameScene::Start()
 	printf("\nLoading Models/Materials\n");
 
 	// Light Source
-	_mGameObjects.emplace("Light", Utils::LoadObj("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.obj"));
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	// Scene Objs
-	_mGameObjects.emplace("Plane", Utils::LoadObj("models/Primitives/pPlane.obj"));
-	_mGameObjects.emplace("Sphere", Utils::LoadObj("models/Primitives/pSphere.obj"));
-	_mGameObjects.emplace("Cube", Utils::LoadObj("models/Primitives/pCube.obj"));
-	_mGameObjects.emplace("Torus", Utils::LoadObj("models/Primitives/pTorus.obj"));
-	_mGameObjects.emplace("Torus2", Utils::LoadObj("models/Primitives/pTorus.obj"));
-	_mGameObjects.emplace("Torus3", Utils::LoadObj("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Plane", new GameObject("models/Primitives/pPlane.obj"));
+	_mGameObjects.emplace("Sphere", new GameObject("models/Primitives/pSphere.obj"));
+	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Torus", new GameObject("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Torus2", new GameObject("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Torus3", new GameObject("models/Primitives/pTorus.obj"));
 
 	// Initialize Objs
 

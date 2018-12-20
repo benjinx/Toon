@@ -8,15 +8,15 @@ void GameScene::Start()
 	printf("\nLoading Models/Materials\n");
 
 	// Light Source
-	_mGameObjects.emplace("Light", Utils::LoadObj("models/Primitives/pSphere.obj"));
+	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pSphere.obj"));
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(-2.0f, -0.5f, 1.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 	_mGameObjects["Light"]->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Initialize Objs
-	_mGameObjects.emplace("Earth", Utils::LoadObj("models/earth.obj"));
-	_mGameObjects.emplace("Moon", Utils::LoadObj("models/moon.obj"));
+	_mGameObjects.emplace("Earth", new GameObject("models/earth.obj"));
+	_mGameObjects.emplace("Moon", new GameObject("models/moon.obj"));
 
 	_mGameObjects["Earth"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	_mGameObjects["Earth"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
