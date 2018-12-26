@@ -5,7 +5,6 @@
 #include "Config.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "Rigidbody.hpp"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
@@ -106,9 +105,6 @@ protected:
 
 	// Children
 	std::unordered_map<std::string, GameObject*> _mChildren;
-
-	// Rigidbody
-	Rigidbody _mRigidbody;
 
 	// Axis Rendering
 	GLuint _mVAO;

@@ -45,6 +45,8 @@ namespace Utils
 	std::string GetBasename(const std::string& path);
 	std::string GetDirname(const std::string& path);
 
+	Mesh* Get2DMesh(glm::vec4 screenCords, glm::vec4 textureCords);
+
 	//void Log(LogLevel flag, std::string infoStr);
 }
 

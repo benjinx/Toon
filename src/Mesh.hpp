@@ -42,7 +42,7 @@ public:
 
 private:
 
-    Material* _mMaterial;
+	Material * _mMaterial = nullptr;
 
     /* Render Data */
     GLuint       _mVAO, _mVBOs[5];

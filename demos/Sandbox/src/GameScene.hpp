@@ -12,9 +12,12 @@ public:
 	void Update(float dt) override;
 	void PhysicsStart();
 	void PhysicsUpdate(float dt);
+	void Render() override;
 
 private:
 	bool _mDirLight, _mPointLight, _mSpotLight;
+
+	Mesh* mesh;
 };
 
 #endif // GAMESCENE_H

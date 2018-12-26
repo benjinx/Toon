@@ -92,4 +92,25 @@ namespace Utils
 		}
 		return std::string();
 	}
+
+	Mesh* Get2DMesh(glm::vec4 screenCords, glm::vec4 textureCords)
+	{
+		return new Mesh(
+			{
+				{screenCords[2], screenCords[1], 0},
+				{screenCords[2], screenCords[3], 0},
+				{screenCords[0], screenCords[3], 0},
+				{screenCords[2], screenCords[1], 0},
+				{screenCords[0], screenCords[3], 0},
+				{screenCords[0], screenCords[1], 0} },
+			{},
+			{
+				{textureCords[2], textureCords[3]},
+				{textureCords[2], textureCords[1]},
+				{textureCords[0], textureCords[1]},
+				{textureCords[2], textureCords[3]},
+				{textureCords[0], textureCords[1]},
+				{textureCords[0], textureCords[3]} },
+			{}, {});
+	}
 }
