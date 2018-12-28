@@ -13,13 +13,6 @@ struct aiScene;
 struct aiMaterial;
 class Mesh;
 
-enum LogLevel
-{
-	LOG_INFO = 0,
-	LOG_WARNING,
-	LOG_ERROR,
-};
-
 namespace Utils
 {
     inline std::vector<std::string> GetResourcePaths()
@@ -46,8 +39,6 @@ namespace Utils
 	std::string GetDirname(const std::string& path);
 
 	Mesh* Get2DMesh(glm::vec4 screenCords, glm::vec4 textureCords);
-
-	//void Log(LogLevel flag, std::string infoStr);
 }
 
 #endif // UTILITIES_H

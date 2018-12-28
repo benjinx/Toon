@@ -1,7 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
+//#include <Temporality.hpp>
 
 #include "Config.hpp"
+#include "Log.hpp"
 
 class Window;
 

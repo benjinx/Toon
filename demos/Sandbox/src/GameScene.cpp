@@ -118,11 +118,10 @@ void GameScene::Render()
 {
 	Scene::Render();
 
+	// Render 2D Mesh below
 
-	glClear(GL_DEPTH_BUFFER_BIT);
-	//test mesh2d
-	App* app = App::Inst();
-	Shader* ui = app->GetShader("ui");
-	mesh->Render(ui, glm::mat4(1));
-
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//App* app = App::Inst();
+	//Shader* ui = app->GetShader("ui");
+	//mesh->Render(ui, glm::mat4(1));
 }

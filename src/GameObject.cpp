@@ -4,6 +4,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
+#include "Log.hpp"
 
 GameObject::GameObject()
 {
@@ -134,7 +135,7 @@ void GameObject::LoadObj(std::string filename)
 {
 	const auto& paths = Utils::GetResourcePaths();
 
-	printf("Loading: [%s]\n", filename.c_str());
+	LogInfo("Loading: [%s]\n", filename.c_str());
 
 	Assimp::Importer importer;
 	for (const std::string& p : paths) {
@@ -147,7 +148,7 @@ void GameObject::LoadObj(std::string filename)
 
 		if (!scene) continue;
 
-		printf("Loaded:  [%s]\n", fullFilename.c_str());
+		LogInfo("Loaded:  [%s]\n", fullFilename.c_str());
 
 		std::string dirname = Utils::GetDirname(fullFilename) + "/";
 
@@ -161,7 +162,7 @@ void GameObject::LoadObj(std::string filename)
 		return;
 	}
 
-	fprintf(stderr, "Failed to load [%s]", filename.c_str());
+	LogError("Failed to load [%s]", filename.c_str());
 }
 
 void GameObject::ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes, std::string dirname)

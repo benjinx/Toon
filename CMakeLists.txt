@@ -10,6 +10,12 @@ INCLUDE("cmake/Compiler.cmake")
 # Allow for custom organization of files in VisualStudio
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# Allow verbose logging
+OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
+IF(VERBOSE_LOGGING)
+    ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
+ENDIF()
+
 # Configuration
 FILE(RELATIVE_PATH RESOURCE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/resources")
 						
@@ -88,6 +94,7 @@ SET(SCRIPTING_SRC
 
 # Utilities src
 SET(UTILITIES_SRC
+	src/Log.hpp
 	src/Utils.cpp
 	src/Utils.hpp
 )

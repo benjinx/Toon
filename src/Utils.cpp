@@ -4,6 +4,7 @@
 #include "GameObject.hpp"
 #include "Material.hpp"
 #include <sstream>
+#include "Log.hpp"
 
 namespace Utils
 {
@@ -12,7 +13,7 @@ namespace Utils
         const auto& paths = GetResourcePaths();
         FILE * file = NULL;
 
-	    printf("Loading: [%s]\n", filename.c_str());
+	    LogInfo("Loading: [%s]\n", filename.c_str());
 
         for (const std::string& p : paths) {
             std::string fullFilename = p + "/" + filename;
@@ -20,7 +21,7 @@ namespace Utils
 
             if (!file) continue;
 
-		    printf("Loaded:  [%s]\n", fullFilename.c_str());
+		    LogInfo("Loaded:  [%s]\n", fullFilename.c_str());
 
             // Remember to call stbi_image_free(image) after using the image and before another.
     		// bpp - bits per pixel
@@ -77,7 +78,7 @@ namespace Utils
 		size_t pos = path.find_last_of("/\\");
 		if (std::string::npos != pos)
 		{
-			return path.substr(pos);
+			return path.substr(pos + 1);
 		}
 		return path;
 	}

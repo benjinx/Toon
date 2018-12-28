@@ -69,6 +69,7 @@ void App::Start()
 	OpenGLInfo();
 
 	// Load Engine Shaders
+	printf("\nLoading Engine Shaders\n");
 	AddShader("axis", new Shader({
 		"shaders/axis.vert",
 		"shaders/axis.frag" }));
@@ -134,42 +135,42 @@ void App::Render()
 void App::OpenGLInfo()
 {
 	// OpenGL Basic Info
-	printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
-	printf("OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
-	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-	printf("GLSL Version: %s\n\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	LogInfo("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
+	LogInfo("OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
+	LogInfo("OpenGL Version: %s\n", glGetString(GL_VERSION));
+	LogInfo("GLSL Version: %s\n\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	// Anti-Aliasing
 	int samples;
 	glGetIntegerv(GL_SAMPLES, &samples);
-	printf("Anti-Aliasing: %dx\n", samples);
+	LogInfo("Anti-Aliasing: %dx\n", samples);
 
 	// Binary Shader Formats
 	GLint formats = 0;
 	glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats);
-	printf("Binary Shader Formats: %d\n", formats);
+	LogInfo("Binary Shader Formats: %d\n", formats);
 
 	// Max UBO Size
 	int tmp;
 	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &tmp);
-	printf("Max UBO Size: %d\n", tmp);
+	LogInfo("Max UBO Size: %d\n", tmp);
 
 	// Max Vertex UBOs
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &tmp);
-	printf("Max Vertex UBOs: %d\n", tmp);
+	LogInfo("Max Vertex UBOs: %d\n", tmp);
 
 	// Max Fragment UBOs
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS, &tmp);
-	printf("Max Fragment UBOs: %d\n", tmp);
+	LogInfo("Max Fragment UBOs: %d\n", tmp);
 
 	// Max Geometry UBOs
 	glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, &tmp);
-	printf("Max Geometry UBOs: %d\n", tmp);
+	LogInfo("Max Geometry UBOs: %d\n", tmp);
 
 	// Max UBO Bindings
 	int maxBindings;
 	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxBindings);
-	printf("Max UBO Bindings: %d\n", maxBindings);
+	LogInfo("Max UBO Bindings: %d\n", maxBindings);
 }
 
 void App::Screenshot()

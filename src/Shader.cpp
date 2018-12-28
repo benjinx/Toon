@@ -17,7 +17,7 @@ void Shader::CheckAttribs()
     // Check for max Attribs
     GLint nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+	LogInfo("Maximum number of vertex attributes supported: ", nrAttributes);
 }
 
 void Shader::Load(std::initializer_list<std::string> files)
@@ -39,7 +39,7 @@ void Shader::Load(std::vector<std::string> files)
 	for (auto& f : files)
 	{
 		// Output files loading
-		printf("Loading: [%s]\n", f.c_str());
+		LogInfo("Loading: [%s]\n", f.c_str());
 
 		// Find shader type
 		GLuint shaderType;
@@ -85,7 +85,7 @@ void Shader::Load(std::vector<std::string> files)
 
 			if (shaderFile.is_open())
 			{
-				printf("Loaded:  [%s]\n", fullFilename.c_str());
+				LogInfo("Loaded:  [%s]\n", fullFilename.c_str());
 				loaded = true;
 				break;
 			}
@@ -93,7 +93,7 @@ void Shader::Load(std::vector<std::string> files)
 
 		if (!loaded)
 		{
-			fprintf(stderr, "Failed to load shaders [%s]", f.c_str());
+			LogError("Failed to load shaders [%s]", f.c_str());
 			return;
 		}
 
@@ -118,7 +118,7 @@ void Shader::Load(std::vector<std::string> files)
 		if (!success)
 		{
 			glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-			fprintf(stderr, "Failed to compile shaders [%s]", f.c_str());
+			LogError("Failed to compile shaders [%s]", f.c_str());
 			return;
 		}
 
@@ -143,7 +143,7 @@ void Shader::Load(std::vector<std::string> files)
 	if (!success)
 	{
 		glGetProgramInfoLog(_mID, sizeof(infoLog), NULL, infoLog);
-		fprintf(stderr, "Failed to link shader [%d]", _mID);
+		LogError("Failed to link shader [%d]", _mID);
 		return;
 	}
 

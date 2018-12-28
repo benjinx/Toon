@@ -1,6 +1,8 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <Temporality.hpp>
+
 #include "Config.hpp"
 
 #include "Camera.hpp"

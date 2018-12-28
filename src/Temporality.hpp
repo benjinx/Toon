@@ -7,6 +7,7 @@
 #include "UI.hpp" // TODO: Remove
 #include "GameObject.hpp"
 #include "Light.hpp"
+#include "Log.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "Rigidbody.hpp"
