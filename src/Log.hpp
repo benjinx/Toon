@@ -82,18 +82,18 @@ static inline void Log(LogLevel level, const char * format, ...)
 #endif
 
 #define LogInfo(M, ...) \
-    do { Log(LogLevel::LOG_INFO, "[INFO](%s:%d) \n" M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_INFO, "[INFO](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogWarn(M, ...) \
-    do { Log(LogLevel::LOG_WARN, "[WARN](%s:%d) \n" M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_WARN, "[WARN](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogError(M, ...) \
-    do { Log(LogLevel::LOG_ERROR, "[ERRO](%s:%d) \n" M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_ERROR, "[ERRO](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogPerf(M, ...) \
-    do { Log(LogLevel::LOG_PERF, "[PERF](%s:%d) \n" M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_PERF, "[PERF](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogLoad(M, ...) \
-    do { Log(LogLevel::LOG_LOAD, "[LOAD](%s:%d) \n" M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_LOAD, "[LOAD](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #endif //LOG_HPP
