@@ -4,6 +4,10 @@
 #include <cstdarg> // for va_list
 #include <cstdio> // for printf, vsnprintf
 
+#if defined(WIN32)
+#include <windows.h>
+#endif
+
 #include "Utils.hpp"
 
 /// Start Benchmark
@@ -32,6 +36,39 @@ enum LogLevel {
 
 static inline void Log(LogLevel level, const char * format, ...)
 {
+	#if defined(WIN32)
+
+	static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	const int DEFAULT = 7;
+
+	int color = DEFAULT;
+
+	switch (level)
+	{
+	case LOG_INFO:
+		color = 7; // White
+		break;
+	case LOG_WARN:
+		color = 6; // Yellow
+		break;
+	case LOG_ERROR:
+		color = 4; // Red
+		break;
+	case LOG_PERF:
+		color = 5; // Magenta
+		break;
+	case LOG_VERBOSE:
+		color = 8; // Grey
+		break;
+	case LOG_LOAD:
+		color = 2; // Green
+		break;
+	}
+
+	SetConsoleTextAttribute(hConsole, color);
+
+	#else 
 	const short FG_DEFAULT = 39;
 	const short BG_DEFAULT = 49;
 
@@ -60,18 +97,24 @@ static inline void Log(LogLevel level, const char * format, ...)
 		break;
 	}
 
-#ifndef WIN32
 	printf("\033[%dm\033[%dm", fgColor, bgColor);
-#endif
+
+	#endif
 
 	va_list valist;
 	va_start(valist, format);
 	vprintf(format, valist);
 	va_end(valist);
 
-#ifndef WIN32
+	#if defined(WIN32)
+	
+	SetConsoleTextAttribute(hConsole, DEFAULT);
+
+	#else
+
 	printf("\033[%dm\033[%dm", FG_DEFAULT, BG_DEFAULT);
-#endif
+
+	#endif
 }
 
 #ifndef TEMPORALITY_ENABLE_VERBOSE_LOGGING

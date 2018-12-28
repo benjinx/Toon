@@ -5,6 +5,15 @@
 
 void GameScene::Start()
 {
+	// Log Test
+	printf("\n");
+	LogInfo("Info\n");
+	LogWarn("Warning\n");
+	LogError("Error\n");
+	LogPerf("Perf\n");
+	LogVerbose("Verb\n");
+	LogLoad("Load\n");
+
 	// Object setup
 	printf("\nLoading Materials\n");
 
