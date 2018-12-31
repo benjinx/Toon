@@ -152,6 +152,26 @@ void Shader::Load(std::vector<std::string> files)
 	{
 		glDeleteShader(id);
 	}
+
+	// Cache our uniforms
+	CacheUniforms();
+}
+
+void Shader::CacheUniforms()
+{
+	GLint tmpSize; // size of the variable
+	GLenum tmpType; // type of the variable (float, vec3 or mat4, etc)
+
+	GLchar buffer[256]; // variable name in GLSL
+	GLsizei length; // name length
+
+	GLint count;
+	glGetProgramiv(_mID, GL_ACTIVE_UNIFORMS, &count);
+	for (GLint i = 0; i < count; ++i)
+	{
+		glGetActiveUniform(_mID, (GLuint)i, sizeof(buffer), &length, &tmpSize, &tmpType, buffer);
+		_mUniforms.emplace(buffer, glGetUniformLocation(_mID, buffer));
+	}
 }
 
 void Shader::Reload()

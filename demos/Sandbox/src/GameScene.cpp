@@ -20,12 +20,16 @@ void GameScene::Start()
 	// Scene Objs
 	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.obj"));
 	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("bulbs", new GameObject("models/bulbasaur.obj"));
 
 	// Initialize Objs
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	_mGameObjects["Cube"]->SetPosition(glm::vec3(-1.5f, -1.0f, 0.0f));
 	_mGameObjects["Cube"]->SetRotation(glm::vec3(20.0f, 0.0f, 20.0f));
+
+	_mGameObjects["bulbs"]->SetPosition(glm::vec3(0.5f, 0.5f, 0.5f));
+	_mGameObjects["bulbs"]->SetRotation(glm::vec3(0.0f, -90.0f, 0.0f));
 
 	// Shaders
 	printf("\nLoading Shaders\n");
@@ -41,6 +45,7 @@ void GameScene::Start()
 
 	_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
 	_mGameObjects["Cube"]->SetShader(app->GetShader("advLighting"));
+	_mGameObjects["bulbs"]->SetShader(app->GetShader("advLighting"));
 
 	// UI
 	DevUI::Start();
@@ -49,6 +54,8 @@ void GameScene::Start()
 		ImGui::Checkbox("Enable Point Light", &_mPointLight);
 		ImGui::Checkbox("Enable Spot Light", &_mSpotLight);
 	});
+
+	
 
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
