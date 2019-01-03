@@ -45,7 +45,7 @@ matrix:
 before_install:
   - env
   - export SRC_DIR="`pwd`"
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; export J=1; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
 
 script:
@@ -55,4 +55,4 @@ script:
   - cd "$TRAVIS_BUILD_DIR/build"
   - pwd
   - cmake -Dstdlib=libstdc++ -DVERBOSE_LOGGING=ON -G "Unix Makefiles" "$SRC_DIR"
-  - make -j
+  - make -j$J
