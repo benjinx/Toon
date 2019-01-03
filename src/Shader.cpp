@@ -39,7 +39,7 @@ void Shader::Load(std::vector<std::string> files)
 	for (auto& f : files)
 	{
 		// Output files loading
-		LogInfo("Loading: [%s]\n", f.c_str());
+		LogInfo("Loading: [%s]\n", f);
 
 		// Find shader type
 		GLuint shaderType;
@@ -85,7 +85,7 @@ void Shader::Load(std::vector<std::string> files)
 
 			if (shaderFile.is_open())
 			{
-				LogInfo("Loaded:  [%s]\n", fullFilename.c_str());
+				LogInfo("Loaded:  [%s]\n", fullFilename);
 				loaded = true;
 				break;
 			}
@@ -93,7 +93,7 @@ void Shader::Load(std::vector<std::string> files)
 
 		if (!loaded)
 		{
-			LogError("Failed to load shaders [%s]", f.c_str());
+			LogError("Failed to load shaders [%s]", f);
 			return;
 		}
 
@@ -118,7 +118,7 @@ void Shader::Load(std::vector<std::string> files)
 		if (!success)
 		{
 			glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-			LogError("Failed to compile shaders [%s] \n%s", f.c_str(), infoLog);
+			LogError("Failed to compile shaders [%s] \n%s", f, infoLog);
 			return;
 		}
 

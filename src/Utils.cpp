@@ -13,7 +13,7 @@ namespace Utils
         const auto& paths = GetResourcePaths();
         FILE * file = NULL;
 
-	    LogInfo("Loading: [%s]\n", filename.c_str());
+	    LogInfo("Loading: [%s]\n", filename);
 
         for (const std::string& p : paths) {
             std::string fullFilename = p + "/" + filename;
@@ -21,7 +21,7 @@ namespace Utils
 
             if (!file) continue;
 
-		    LogInfo("Loaded:  [%s]\n", fullFilename.c_str());
+		    LogInfo("Loaded:  [%s]\n", fullFilename);
 
             // Remember to call stbi_image_free(image) after using the image and before another.
     		// bpp - bits per pixel
@@ -59,7 +59,7 @@ namespace Utils
 		unsigned char* img = LoadPng(filename, width, height, bpp);
 
 		if (!img) {
-			fprintf(stderr, "Failed to load [%s]", filename.c_str());
+			LogError("Failed to load [%s]\n", filename);
 		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);

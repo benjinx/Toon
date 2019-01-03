@@ -1,7 +1,6 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
-#include <cstdarg> // for va_list
 #include <cstdio> // for printf, vsnprintf
 
 #if defined(WIN32)
@@ -34,7 +33,24 @@ enum LogLevel {
 	LOG_LOAD,
 };
 
-static inline void Log(LogLevel level, const char * format, ...)
+
+template <class T>
+static auto LogWrap(const T& v) {
+	return v;
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+
+    template <> 
+    auto LogWrap<std::string>(const std::string& v) {
+        return v.c_str();
+    }
+	
+#pragma clang diagnostic pop
+
+template <class ...Args>
+static inline void Log(LogLevel level, const char * format, Args... args)
 {
 	#if defined(WIN32)
 
@@ -101,10 +117,7 @@ static inline void Log(LogLevel level, const char * format, ...)
 
 	#endif
 
-	va_list valist;
-	va_start(valist, format);
-	vprintf(format, valist);
-	va_end(valist);
+	printf(format, LogWrap(args)...);
 
 	#if defined(WIN32)
 	
