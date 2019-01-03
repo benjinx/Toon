@@ -26,8 +26,8 @@ in vertexData
 	vec3 fragPos;
 	vec3 normal;
 	vec2 texCoords;
-	vec4 lightDir;
-	vec4 eyeDir;
+	vec3 lightDir;
+	vec3 eyeDir;
 } pass;
 
 // Targets
@@ -37,8 +37,8 @@ void main()
 {
 	vec3 objectColor = texture(material.diffuse, pass.texCoords).rgb;
 
-	vec3 L = normalize(pass.lightDir.xyz);
-	vec3 V = normalize(pass.eyeDir.xyz);
+	vec3 L = pass.lightDir;
+	vec3 V = pass.eyeDir;
 
 	// ambient
     float ambientStrength = 0.1;
@@ -48,20 +48,20 @@ void main()
 	vec3 N;
 	if (hasNormal)
 		N = normalize(texture(material.normal, pass.texCoords).rgb * 2.0 - 1.0);
-	else
-		N = normalize(pass.normal);
+	//else
+	//	N = normalize(pass.normal);
 
     float diff = max(dot(N, L), 0.0);
 
     vec3 diffuse;
-	if (hasDiffuse)
+	//if (hasDiffuse)
 		diffuse = diff * objectColor;
-	else
-		diffuse = diff * material.diffuseVal * lightColor;
+	//else
+	//	diffuse = diff * material.diffuseVal * lightColor;
 
     // specular
 	float shininess = material.shininess;
-	if (shininess <= 1.0)
+	//if (shininess <= 1.0)
 		shininess = 32.0;
 
 	vec3 halfwayDir = normalize(L + V);
@@ -69,9 +69,9 @@ void main()
 
 	vec3 specular;
 	if (hasSpecular)
-		specular = texture(material.specular, pass.texCoords).rgb * spec * lightColor;
-	else
-		specular = spec * material.specularVal * lightColor;
+		specular = texture(material.specular, pass.texCoords).rgb * spec;
+	//else
+	//	specular = spec * material.specularVal * lightColor;
         
     vec3 result = (ambient + diffuse + specular);
 	fragColor = vec4(result, 1.0);

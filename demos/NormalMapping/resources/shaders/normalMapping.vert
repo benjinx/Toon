@@ -21,8 +21,8 @@ out vertexData
 	vec3 fragPos;
 	vec3 normal;
 	vec2 texCoords;
-	vec4 lightDir;
-	vec4 eyeDir;
+	vec3 lightDir;
+	vec3 eyeDir;
 } pass;
 
 void main()
@@ -30,20 +30,20 @@ void main()
 	pass.fragPos = vec3(modelMat * vec4(position.xyz, 1.0));
 	pass.texCoords = texCoords;
 
-	vec3 T = normalize(mat3(modelMat) * tangent.xyz);
-	vec3 B = normalize(mat3(modelMat) * bitangent.xyz);
-	vec3 N = normalize(mat3(modelMat) * normal.xyz);
+	mat3 normalMatrix = transpose(inverse(mat3(modelMat)));
+	vec3 T = normalize(normalMatrix * tangent.xyz);
+	vec3 N = normalize(normalMatrix * normal.xyz);
+	T = normalize(T - dot(T, N) * N);
+	vec3 B = cross(N, T);
 
-	vec3 lightVec = (lightPos.xyz - pass.fragPos);
-	vec3 eyeVec = (eyePos.xyz - pass.fragPos);
+	mat3 TBN = transpose(mat3(T, B, N));
 
-	pass.lightDir.x = dot(T, lightVec);
-	pass.lightDir.y = dot(B, lightVec);
-	pass.lightDir.z = dot(N, lightVec);
+	vec3 tangentLightPos = TBN * lightPos.xyz;
+	vec3 tangentEyePos = TBN * eyePos.xyz;
+	vec3 tangentFragPos = TBN * pass.fragPos;
 
-	pass.eyeDir.x = dot(T, eyeVec);
-	pass.eyeDir.y = dot(B, eyeVec);
-	pass.eyeDir.z = dot(N, eyeVec);
+	pass.lightDir = normalize(tangentLightPos - tangentFragPos);
+	pass.eyeDir = normalize(tangentEyePos - tangentFragPos);
 
-	gl_Position =  projMat * viewMat * vec4(pass.fragPos, 1.0);
+	gl_Position =  projMat * viewMat * modelMat * vec4(position.xyz, 1.0);
 }

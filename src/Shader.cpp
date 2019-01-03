@@ -118,7 +118,7 @@ void Shader::Load(std::vector<std::string> files)
 		if (!success)
 		{
 			glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-			LogError("Failed to compile shaders [%s]", f.c_str());
+			LogError("Failed to compile shaders [%s] \n%s", f.c_str(), infoLog);
 			return;
 		}
 
