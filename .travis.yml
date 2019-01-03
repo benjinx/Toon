@@ -11,6 +11,22 @@ git:
 matrix:
   include:
     - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+      env: CMAKE_BUILD_TYPE=DEBUG
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+      env: CMAKE_BUILD_TYPE=RELEASE
+
+    - os: linux
       compiler: clang
       addons:
         apt:
@@ -29,6 +45,7 @@ matrix:
 before_install:
   - env
   - export SRC_DIR="`pwd`"
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
 
 script:
@@ -37,5 +54,5 @@ script:
   - mkdir "$TRAVIS_BUILD_DIR/build"
   - cd "$TRAVIS_BUILD_DIR/build"
   - pwd
-  - cmake -Dstdlib=libstdc++ -G "Unix Makefiles" "$SRC_DIR"
+  - cmake -Dstdlib=libstdc++ -DVERBOSE_LOGGING=ON -G "Unix Makefiles" "$SRC_DIR"
   - make -j
