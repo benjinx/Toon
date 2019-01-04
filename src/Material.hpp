@@ -3,77 +3,74 @@
 
 #include "Config.hpp"
 
+#include <memory>
+
+class Shader;
+class Texture;
+
 class Material
 {
 public:
 
-    enum TexID {
+    enum TextureID {
         AMBIENT = 0,
-        DIFFUSE,
-        SPECULAR,
-        NORMAL,
+        DIFFUSE = 1,
+        SPECULAR = 2,
+        NORMAL = 3,
+        ALPHA = 4,
+        DISPLACEMENT = 5,
+        METALLIC_ROUGHNESS = 6,
+        SHEEN = 7,
+        EMISSIVE = 8,
     };
 
-    Material(float       ambient[3],
-             float       diffuse[3],
-             float       specular[3],
-             float       shininess,
-             std::string ambientFile,
-             std::string diffuseFile,
-             std::string specularFile,
-             std::string normalFile);
-    virtual ~Material();
+    Material(glm::vec3 ambient,
+             glm::vec3 diffuse,
+             glm::vec3 specular,
+             float shininess,
+             std::shared_ptr<Texture> ambientMap,
+             std::shared_ptr<Texture> diffuseMap,
+             std::shared_ptr<Texture> specularMap,
+             std::shared_ptr<Texture> normalMap);
+    virtual ~Material() = default;
 
-    void Bind();
+    void Bind(Shader* shader);
 
-	glm::vec3 GetAmbient() { return _mAmbient; }
-	glm::vec3 GetDiffuse() { return _mDiffuse; }
-	glm::vec3 GetSpecular() { return _mSpecular; }
-	float GetShininess() { return _mShininess; }
-
-    bool AmbientTexExists()
-    {
-        if (_mAmbientTex != 0)
-            return true;
-        else
-            return false;
-    }
-
-    bool DiffuseTexExists()
-    {
-        if (_mDiffuseTex != 0)
-            return true;
-        else
-            return false;
-    }
-
-    bool SpecularTexExists()
-    {
-        if (_mSpecularTex != 0)
-            return true;
-        else
-            return false;
-    }
-
-    bool NormalTexExists()
-    {
-        if (_mNormalTex != 0)
-            return true;
-        else
-            return false;
-    }
-
-	GLuint GetAmbientTex() { return _mAmbientTex; }
-	GLuint GetDiffuseTex() { return _mDiffuseTex; }
-	GLuint GetSpecularTex() { return _mSpecularTex; }
-	GLuint GetNormalTex() { return _mNormalTex; }
+    bool AmbientMapExists() { return (_mAmbientMap != nullptr); }
+    bool DiffuseMapExists() { return (_mDiffuseMap != nullptr); }
+    bool SpecularMapExists() { return (_mSpecularMap != nullptr); }
+    bool NormalMapExists() { return (_mNormalMap != nullptr); }
+    bool AlphaMapExists() { return (_mAlphaMap != nullptr); }
+    bool DisplacementMapExists() { return (_mDisplacementMap != nullptr); }
+    bool MetallicRoughnessMapExists() { return (_mMetallicRoughnessMap != nullptr); }
+    bool SheenMapExists() { return (_mSheenMap != nullptr); }
+    bool EmissiveMapExists() { return (_mEmissiveMap != nullptr); }
 
 private:
-    glm::vec3 _mAmbient, _mDiffuse, _mSpecular;
+    glm::vec3   _mAmbient = glm::vec3(0),
+                _mDiffuse = glm::vec3(0),
+                _mSpecular = glm::vec3(0),
+                _mEmissive = glm::vec3(0);
 
-    float _mShininess;
+    float       _mRoughness = 0.0f,
+                _mMetallic = 0.0f,
+                _mShininess = 1.0f,
+                _mDissolve = 1.0f,
+                _mSheen = 0.0f,
+                _mClearcoatThickness = 0.0f,
+                _mClearcoatRoughness = 0.0f,
+                _mAnisotropy = 0.0f,
+                _mAnisotropyRotation = 0.0f;
 
-    GLuint _mAmbientTex, _mDiffuseTex, _mSpecularTex, _mNormalTex;
+    std::shared_ptr<Texture>    _mAmbientMap,
+                                _mDiffuseMap,
+                                _mSpecularMap,
+                                _mNormalMap,
+                                _mAlphaMap,
+                                _mDisplacementMap,
+                                _mMetallicRoughnessMap,
+                                _mSheenMap,
+                                _mEmissiveMap;
 };
 
 #endif // MATERIAL_H

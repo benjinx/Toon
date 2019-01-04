@@ -1,13 +1,13 @@
 #version 330 core
 
 struct Material {
-	vec3 ambientVal;
-	vec3 diffuseVal;
-	vec3 specularVal;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;
-	sampler2D diffuse;
-	sampler2D specular;
-	sampler2D normal;
+	sampler2D diffuseMap;
+	sampler2D specularMap;
+	sampler2D normalMap;
 };
 
 // Uniforms
@@ -35,7 +35,7 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec3 objectColor = texture(material.diffuse, pass.texCoords).rgb;
+	vec3 objectColor = texture(material.diffuseMap, pass.texCoords).rgb;
 
 	vec3 L = pass.lightDir;
 	vec3 V = pass.eyeDir;
@@ -46,8 +46,8 @@ void main()
   	
     // diffuse 
 	vec3 N;
-	if (hasNormal)
-		N = normalize(texture(material.normal, pass.texCoords).rgb * 2.0 - 1.0);
+	//if (hasNormal)
+		N = normalize(texture(material.normalMap, pass.texCoords).rgb * 2.0 - 1.0);
 	//else
 	//	N = normalize(pass.normal);
 
@@ -57,7 +57,7 @@ void main()
 	//if (hasDiffuse)
 		diffuse = diff * objectColor;
 	//else
-	//	diffuse = diff * material.diffuseVal * lightColor;
+	//	diffuse = diff * material.diffuse * lightColor;
 
     // specular
 	float shininess = material.shininess;
@@ -68,8 +68,8 @@ void main()
     float spec = pow(max(dot(N, halfwayDir), 0.0), shininess);
 
 	vec3 specular;
-	if (hasSpecular)
-		specular = texture(material.specular, pass.texCoords).rgb * spec;
+	//if (hasSpecular)
+		specular = texture(material.specularMap, pass.texCoords).rgb * spec;
 	//else
 	//	specular = spec * material.specularVal * lightColor;
         

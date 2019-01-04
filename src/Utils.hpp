@@ -31,10 +31,6 @@ namespace Utils
         return paths;
     }
 
-	unsigned char* LoadPng(std::string filename, int& w, int& h, int& bpp);
-	void FreePng(unsigned char* img);
-	GLuint LoadTexture(std::string filename);
-
 	std::string GetBasename(const std::string& path);
 	std::string GetDirname(const std::string& path);
 

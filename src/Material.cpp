@@ -1,100 +1,104 @@
 #include "Material.hpp"
-#include "Utils.hpp"
+#include <Temporality.hpp>
+#include "Shader.hpp"
+#include "Texture.hpp"
 
-Material::Material(float       ambient[3],
-                   float       diffuse[3],
-                   float       specular[3],
-                   float       shininess,
-                   std::string ambientFile,
-                   std::string diffuseFile,
-                   std::string specularFile,
-                   std::string normalFile)
+Material::Material(glm::vec3 ambient,
+                   glm::vec3 diffuse,
+                   glm::vec3 specular,
+                   float shininess,
+                   std::shared_ptr<Texture> ambientMap,
+                   std::shared_ptr<Texture> diffuseMap,
+                   std::shared_ptr<Texture> specularMap,
+                   std::shared_ptr<Texture> normalMap)
+                   : _mAmbient(ambient)
+                   , _mDiffuse(diffuse)
+                   , _mSpecular(specular)
+                   , _mShininess(shininess)
+                   , _mAmbientMap(ambientMap)
+                   , _mDiffuseMap(diffuseMap)
+                   , _mSpecularMap(specularMap)
+                   , _mNormalMap(normalMap) {}
+
+void Material::Bind(Shader* shader)
 {
-    _mAmbient  = {ambient[0], ambient[1], ambient[2]};
-    _mDiffuse  = {diffuse[0], diffuse[1], diffuse[2]};
-    _mSpecular = {specular[0], specular[1], specular[2]};
+    shader->Use();
 
-    _mShininess = shininess;
+    shader->SetVec3("material.ambient", _mAmbient);
+    shader->SetVec3("material.diffuse", _mDiffuse);
+    shader->SetVec3("material.specular", _mSpecular);
+    shader->SetVec3("material.emissive", _mEmissive);
 
-    if (ambientFile != "")
+    shader->SetFloat("material.roughness", _mRoughness);
+    shader->SetFloat("material.metallic", _mMetallic);
+    shader->SetFloat("material.shininess", _mShininess);
+    shader->SetFloat("material.dissolve", _mDissolve);
+    shader->SetFloat("material.sheen", _mSheen);
+    shader->SetFloat("material.clearcoatThickness", _mClearcoatThickness);
+    shader->SetFloat("material.clearcoatRoughness", _mClearcoatRoughness);
+    shader->SetFloat("material.anisotropy", _mAnisotropy);
+    shader->SetFloat("material.anisotropyRotation", _mAnisotropyRotation);
+
+    if (_mAmbientMap)
     {
-        _mAmbientTex = Utils::LoadTexture(ambientFile);
+        shader->SetInt("material.ambientMap", Material::TextureID::AMBIENT);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::AMBIENT);
+        _mAmbientMap->Bind();
     }
-	else
-	{
-		_mAmbientTex = 0;
-	}
-
-    if (diffuseFile != "")
+    
+    if (_mDiffuseMap)
     {
-        _mDiffuseTex = Utils::LoadTexture(diffuseFile);
+        shader->SetInt("material.diffuseMap", Material::TextureID::DIFFUSE);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::DIFFUSE);
+        _mDiffuseMap->Bind();
     }
-	else
-	{
-		_mDiffuseTex = 0;
-	}
 
-    if (specularFile != "")
+    if (_mSpecularMap)
     {
-        _mSpecularTex = Utils::LoadTexture(specularFile);
+        shader->SetInt("material.specularMap", Material::TextureID::SPECULAR);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::SPECULAR);
+        _mSpecularMap->Bind();
     }
-	else
-	{
-		_mSpecularTex = 0;
-	}
 
-    if (normalFile != "")
+    if (_mNormalMap)
     {
-		_mNormalTex = Utils::LoadTexture(normalFile);
+        shader->SetInt("material.normalMap", Material::TextureID::NORMAL);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::NORMAL);
+        _mNormalMap->Bind();
     }
-	else
-	{
-		_mNormalTex = 0;
-	}
-}
 
-Material::~Material() {
-    if (_mAmbientTex != 0) {
-        glDeleteTextures(1, &_mAmbientTex);
-        _mAmbientTex = 0;
-    }
-    if (_mDiffuseTex != 0) {
-        glDeleteTextures(1, &_mDiffuseTex);
-        _mDiffuseTex = 0;
-    }
-    if (_mSpecularTex != 0) {
-        glDeleteTextures(1, &_mSpecularTex);
-        _mSpecularTex = 0;
-    }
-    if (_mNormalTex != 0) {
-        glDeleteTextures(1, &_mNormalTex);
-        _mNormalTex = 0;
-    }
-}
-
-void Material::Bind()
-{
-    if (_mAmbientTex != 0)
+    if (_mAlphaMap)
     {
-        glActiveTexture(GL_TEXTURE0 + TexID::AMBIENT);
-        glBindTexture(GL_TEXTURE_2D, _mAmbientTex);
+        shader->SetInt("material.alphaMap", Material::TextureID::ALPHA);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::ALPHA);
+        _mAlphaMap->Bind();
     }
 
-    if (_mDiffuseTex != 0)
+    if (_mDisplacementMap)
     {
-        glActiveTexture(GL_TEXTURE0 + TexID::DIFFUSE);
-        glBindTexture(GL_TEXTURE_2D, _mDiffuseTex);
+        shader->SetInt("material.displacementMap", Material::TextureID::DISPLACEMENT);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::DISPLACEMENT);
+        _mDisplacementMap->Bind();
     }
 
-    if (_mSpecularTex != 0)
+    if (_mMetallicRoughnessMap)
     {
-        glActiveTexture(GL_TEXTURE0 + TexID::SPECULAR);
-        glBindTexture(GL_TEXTURE_2D, _mSpecularTex);
+        shader->SetInt("material.metallicRoughnessMap", Material::TextureID::METALLIC_ROUGHNESS);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::METALLIC_ROUGHNESS);
+        _mMetallicRoughnessMap->Bind();
     }
 
-    if (_mNormalTex != 0)
+    if (_mSheenMap)
     {
-        glActiveTexture(GL_TEXTURE0 + TexID::NORMAL);
-        glBindTexture(GL_TEXTURE_2D, _mNormalTex);
+        shader->SetInt("material.sheenMap", Material::TextureID::SHEEN);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::SHEEN);
+        _mSheenMap->Bind();
+    }
+
+    if (_mEmissiveMap)
+    {
+        shader->SetInt("material.emissiveMap", Material::TextureID::EMISSIVE);
+        glActiveTexture(GL_TEXTURE0 + Material::TextureID::EMISSIVE);
+        _mEmissiveMap->Bind();
     }
 }

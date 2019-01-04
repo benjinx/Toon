@@ -1,7 +1,7 @@
 #version 330 core
 
 struct Material {
-	sampler2D diffuse;
+	sampler2D diffuseMap;
 };
 
 // Varyings
@@ -24,7 +24,7 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec3 objectColor = texture(material.diffuse, pass.texCoords).rgb;
+	vec3 objectColor = texture(material.diffuseMap, pass.texCoords).rgb;
 
 	// ambient
     float ambientStrength = 0.1;

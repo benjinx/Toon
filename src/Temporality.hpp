@@ -13,6 +13,7 @@
 #include "Rigidbody.hpp"
 #include "Scene.hpp"
 #include "ScriptHost.hpp"
+#include "Texture.hpp"
 #include "Utils.hpp"
 #include "Window.hpp"
 

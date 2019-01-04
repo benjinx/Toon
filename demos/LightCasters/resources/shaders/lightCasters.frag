@@ -1,7 +1,7 @@
 #version 330 core
 
 struct Material {
-	sampler2D diffuse;
+	sampler2D diffuseMap;
 };
 
 struct DirLight {
@@ -150,7 +150,7 @@ void main()
 	// Setup
 	vec3 normal = normalize(pass.normal);
 	vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
-	vec3 objectColor = texture(material.diffuse, pass.texCoords).rgb;
+	vec3 objectColor = texture(material.diffuseMap, pass.texCoords).rgb;
 
 	// Directional Light
 	vec3 result;

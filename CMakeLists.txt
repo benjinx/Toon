@@ -68,6 +68,8 @@ SET(GRAPHICS_SRC
 	src/Mesh.hpp
 	src/Shader.cpp
 	src/Shader.hpp
+	src/Texture.cpp
+	src/Texture.hpp
 )
 
 # Input src

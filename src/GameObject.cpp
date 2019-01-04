@@ -5,6 +5,8 @@
 #include "Shader.hpp"
 #include "Camera.hpp"
 #include "Log.hpp"
+#include "Texture.hpp"
+#include <memory>
 
 GameObject::GameObject()
 {
@@ -255,28 +257,31 @@ Mesh* GameObject::ProcessMesh(aiMesh* mesh, const aiScene* scene, std::vector<Me
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		// Ambient
-		std::string ambientTex = GetMaterialTextureName(material, aiTextureType_AMBIENT, dirname);
+		std::string ambientMap = GetMaterialTextureName(material, aiTextureType_AMBIENT, dirname);
 
 		// Diffuse
-		std::string diffuseTex = GetMaterialTextureName(material, aiTextureType_DIFFUSE, dirname);
+		std::string diffuseMap = GetMaterialTextureName(material, aiTextureType_DIFFUSE, dirname);
 
 		// Specular
-		std::string specularTex = GetMaterialTextureName(material, aiTextureType_SPECULAR, dirname);
+		std::string specularMap = GetMaterialTextureName(material, aiTextureType_SPECULAR, dirname);
 
 		// Normal
-		std::string normalTex = GetMaterialTextureName(material, aiTextureType_NORMALS, dirname);
+		std::string normalMap = GetMaterialTextureName(material, aiTextureType_NORMALS, dirname);
 
 		aiColor4D aiAmb;
 		aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &aiAmb);
 		float amb[3] = { aiAmb.r, aiAmb.g, aiAmb.b };
+		glm::vec3 ambient = glm::vec3(amb[0], amb[1], amb[2]);
 
 		aiColor4D aiDiff;
 		aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &aiDiff);
 		float diff[3] = { aiDiff.r, aiDiff.g, aiDiff.b };
+		glm::vec3 diffuse = glm::vec3(diff[0], diff[1], diff[2]);
 
 		aiColor4D aiSpec;
 		aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &aiSpec);
 		float spec[3] = { aiSpec.r, aiSpec.g, aiSpec.b };
+		glm::vec3 specular = glm::vec3(spec[0], spec[1], spec[2]);
 
 		aiColor4D aiShininess;
 		aiGetMaterialColor(material, AI_MATKEY_SHININESS, &aiShininess);
@@ -287,7 +292,7 @@ Mesh* GameObject::ProcessMesh(aiMesh* mesh, const aiScene* scene, std::vector<Me
 		// Add all the other materials, Albedo, Metallic, roughness, AO?, etc
 
 
-		newMat = new Material(amb, diff, spec, aiShininess.r, ambientTex, diffuseTex, specularTex, normalTex);
+		newMat = new Material(ambient, diffuse, specular, aiShininess.r, std::make_shared<Texture>(ambientMap), std::make_shared<Texture>(diffuseMap), std::make_shared<Texture>(specularMap), std::make_shared<Texture>(normalMap));
 		newMesh->SetMaterial(newMat);
 	}
 

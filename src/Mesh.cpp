@@ -75,64 +75,7 @@ void Mesh::Render(Shader * shader, glm::mat4 modelMat)
 
 	if (_mMaterial != nullptr)
 	{
-		// Material values
-		auto ambient = _mMaterial->GetAmbient();
-		shader->SetVec3("material.ambientVal", ambient);
-
-		auto diffuse = _mMaterial->GetDiffuse();
-		shader->SetVec3("material.diffuseVal", diffuse);
-
-		auto specular = _mMaterial->GetSpecular();
-		shader->SetVec3("material.specularVal", specular);
-
-		auto shininess = _mMaterial->GetShininess();
-		shader->SetFloat("material.shininess", shininess);
-
-		_mMaterial->Bind();
-
-		//if (_mMaterial->AmbientTexExists())
-		//{
-		//	//shader->SetInt("ambientTex", Material::TexID::AMBIENT);
-		//	shader->SetInt("material.ambientTex", Material::TexID::AMBIENT);
-		//	shader->SetBool("hasAmbient", true);
-		//}
-		//else
-		//{
-		//	shader->SetBool("hasAmbient", false);
-		//}
-
-		if (_mMaterial->DiffuseTexExists())
-		{
-			//shader->SetInt("diffuseTex", Material::TexID::DIFFUSE);
-			shader->SetInt("material.diffuse", Material::TexID::DIFFUSE);
-			shader->SetBool("hasDiffuse", true);
-		}
-		else
-		{
-			shader->SetBool("hasDiffuse", false);
-		}
-
-		if (_mMaterial->SpecularTexExists())
-		{
-			//shader->SetInt("specularTex", Material::TexID::SPECULAR);
-			shader->SetInt("material.specular", Material::TexID::SPECULAR);
-			shader->SetBool("hasSpecular", true);
-		}
-		else
-		{
-			shader->SetBool("hasSpecular", false);
-		}
-
-		if (_mMaterial->NormalTexExists())
-		{
-			//shader->SetInt("normalTex", Material::TexID::NORMAL);
-			shader->SetInt("material.normal", Material::TexID::NORMAL);
-			shader->SetBool("hasNormal", true);
-		}
-		else
-		{
-			shader->SetBool("hasNormal", false);
-		}
+		_mMaterial->Bind(shader);
 	}
 
     glBindVertexArray(_mVAO);

@@ -13,10 +13,10 @@ struct Vertex {
 	glm::vec3 texCoords;
 };
 
-struct Texture {
-	unsigned int id;
-	std::string type;
-};
+//struct Texture {
+//	unsigned int id;
+//	std::string type;
+//};
 
 class Mesh
 {
