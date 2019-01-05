@@ -8,17 +8,7 @@ A C++ Game Engine, using OpenGL/GLSL designed to easily create AI, Gameplay, Gra
 Building
 ---
 
-#### Windows
-
-```
-git clone https://github.com/benjinx/Temporality.git
-cd Temporality
-mkdir build && cd build
-cmake ..
-cmake --build .
-```
-
-### Linux
+#### Linux && Windows
 
 ```
 git clone https://github.com/benjinx/Temporality.git
@@ -46,3 +36,5 @@ Dependencies
 * glfw
 * glm
 * imgui
+* stb
+* tinyglfw
