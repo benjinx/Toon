@@ -13,11 +13,30 @@ Building
 ```
 git clone https://github.com/benjinx/Temporality.git
 cd Temporality
-git submodule update --init
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 cmake --build .
+```
+
+### Linux
+
+```
+git clone https://github.com/benjinx/Temporality.git
+cd Temporality
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+Running Examples
+---
+
+The examples are built to run from their source directories. To facilitate this, there are convenience targets prefixed with `run-`.
+
+### Example
+
+```
+cmake --build . --target run-HelloWorld
 ```
 
 Dependencies
