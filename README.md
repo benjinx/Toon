@@ -32,9 +32,5 @@ cmake --build . --target run-HelloWorld
 Dependencies
 ---
 * assimp
-* glad
 * glfw
 * glm
-* imgui
-* stb
-* tinyglfw
