@@ -31,6 +31,5 @@ cmake --build . --target run-HelloWorld
 
 Dependencies
 ---
-* assimp
 * glfw
 * glm
