@@ -37,7 +37,7 @@ namespace Utils
 				_mAssetPaths.push_back(path);
 			}
 			_mAssetPaths.push_back("");
-			reverse(_mAssetPaths.begin(), _mAssetPaths.end());
+			std::reverse(_mAssetPaths.begin(), _mAssetPaths.end());
 		}
 		return _mAssetPaths;
 	}
