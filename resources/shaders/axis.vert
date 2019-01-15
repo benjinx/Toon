@@ -8,7 +8,7 @@
 
 // attributes
 layout (location = 0) in vec4 position;
-layout (location = 3) in vec4 color;
+layout (location = 5) in vec4 color;
 
 // uniforms
 uniform mat4 modelMat;

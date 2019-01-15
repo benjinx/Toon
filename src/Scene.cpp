@@ -1,16 +1,21 @@
 #include "Scene.hpp"
 
-#include "App.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include <imgui/imgui.h>
 
 bool Scene::_sShowAxis = false;
 
 Scene::~Scene() {
+	delete _mSceneAxis;
+
     for (auto& go : _mGameObjects) {
         delete go.second;
     }
     _mGameObjects.clear();
+}
+
+void Scene::Start()
+{
+	_mSceneAxis = new Axis();
 }
 
 void Scene::Update(float dt)
@@ -32,7 +37,8 @@ void Scene::Render()
 	{
 		for (auto& gameObject : _mGameObjects)
 		{
-			gameObject.second->DrawAxis();
+			//gameObject.second->DrawAxis();
+			_mSceneAxis->Render(gameObject.second->GetWorldTransform());
 		}
 	}
 }

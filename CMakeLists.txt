@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 # Initialize Projects
 PROJECT(Temporality VERSION 0.2)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+LIST(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 INCLUDE("cmake/Macros.cmake")
 INCLUDE("cmake/Compiler.cmake")
 
@@ -24,143 +24,61 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 CONFIGURE_FILE(
-	${CMAKE_SOURCE_DIR}/src/Config.hpp.in
+	${CMAKE_SOURCE_DIR}/include/Config.hpp.in
 	${CMAKE_BINARY_DIR}/Config.hpp
 )
 
-# AI
-SET(AI_SRC
-	src/State.cpp
-	src/State.hpp
+# Glob
+FILE(GLOB_RECURSE 
+    _ENGINE_RESOURCES
+    "${CMAKE_SOURCE_DIR}/Resources/*"
 )
 
-# Audio src
-SET(AUDIO_SRC
+FILE(GLOB_RECURSE 
+    _ENGINE_INCLUDES
+    "${CMAKE_SOURCE_DIR}/include/*.hpp"
+	"${CMAKE_SOURCE_DIR}/include/*.h"
 )
 
-# Core src
-SET(CORE_SRC
-	src/App.cpp
-	src/App.hpp
-	src/Camera.cpp
-	src/Camera.hpp
-	src/Window.cpp
-	src/Window.hpp
-)
-
-# Game src
-SET(GAME_SRC
-	src/Cube.cpp
-	src/Cube.hpp
-	src/GameObject.cpp
-	src/GameObject.hpp
-	src/Light.cpp
-	src/Light.hpp
-	src/Scene.cpp
-	src/Scene.hpp
-)
-
-# Graphics src
-SET(GRAPHICS_SRC
-	src/Material.cpp
-	src/Material.hpp
-	src/Mesh.cpp
-	src/Mesh.hpp
-	src/Shader.cpp
-	src/Shader.hpp
-	src/Texture.cpp
-	src/Texture.hpp
-)
-
-# Input src
-SET(INPUT_SRC
-)
-
-# Interface src
-SET(INTERFACE_SRC
-	src/UI.cpp
-	src/UI.hpp
-	src/DevUI.cpp
-	src/DevUI.hpp
-)
-
-# Network src
-SET(NETWORK_SRC
-)
-
-# Scripting src
-SET(SCRIPTING_SRC
-	src/ScriptHost.cpp
-	src/ScriptHost.hpp
-)
-
-# Utilities src
-SET(UTILITIES_SRC
-	src/Log.hpp
-	src/Utils.cpp
-	src/Utils.hpp
-)
-
-# Third-party source files
-SET(GLAD_SRC
-    src/KHR/khrplatform.h
-    src/glad/glad.h
-	src/glad/glad.c
-)
-
-SET(IMGUI_SRC
-    src/imgui/imgui.h
-    src/imgui/imgui_internal.h
-    src/imgui/imgui_impl_glfw_gl3.h
-	src/imgui/imgui.cpp
-	src/imgui/imgui_draw.cpp
-	src/imgui/imgui_demo.cpp
-	src/imgui/imgui_impl_glfw_gl3.cpp
-)
-
-SET(STB_SRC
-    src/stb/stb_image.h
-)
-
-SOURCE_GROUP("AI" FILES ${PROJECT_NAME} ${AI_SRC})
-SOURCE_GROUP("Audio" FILES ${PROJECT_NAME} ${AUDIO_SRC})
-SOURCE_GROUP("Core" FILES ${PROJECT_NAME} ${CORE_SRC})
-SOURCE_GROUP("Game" FILES ${PROJECT_NAME} ${GAME_SRC})
-SOURCE_GROUP("Graphics" FILES ${PROJECT_NAME} ${GRAPHICS_SRC})
-SOURCE_GROUP("Input" FILES ${PROJECT_NAME} ${INPUT_SRC})
-SOURCE_GROUP("Interface" FILES ${PROJECT_NAME} ${INTERFACE_SRC})
-SOURCE_GROUP("Network" FILES ${PROJECT_NAME} ${NETWORK_SRC})
-SOURCE_GROUP("Scripting" FILES ${PROJECT_NAME} ${SCRIPTING_SRC})
-SOURCE_GROUP("Utilities" FILES ${PROJECT_NAME} ${UTILITIES_SRC})
-
-SOURCE_GROUP("3rdParty\\STB" FILES ${PROJECT_NAME} ${STB_SRC})
-SOURCE_GROUP("3rdParty\\Glad" FILES ${PROJECT_NAME} ${GLAD_SRC})
-SOURCE_GROUP("3rdParty\\ImGui" FILES ${PROJECT_NAME} ${IMGUI_SRC})
-
-INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/src
-	${CMAKE_BINARY_DIR}
+FILE(GLOB_RECURSE 
+    _ENGINE_SOURCES  
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/*.c"
+    "${CMAKE_SOURCE_DIR}/src/*.hpp"
+    "${CMAKE_SOURCE_DIR}/src/*.h"
 )
 
 # Add source to executables
 ADD_LIBRARY(
 	${PROJECT_NAME}
 	${CMAKE_BINARY_DIR}/Config.hpp
-	${AI_SRC}
-	${AUDIO_SRC}
-	${CORE_SRC}
-	${GAME_SRC}
-	${GRAPHICS_SRC}
-	${INPUT_SRC}
-	${INTERFACE_SRC}
-	${NETWORK_SRC}
-	${SCRIPTING_SRC}
-	${UTILITIES_SRC}
-	${STB_SRC}
-	${GLAD_SRC}
-	${IMGUI_SRC}
-	${RESOURCES}
+	${_ENGINE_INCLUDES}
+	${_ENGINE_SOURCES}
+	#${_ENGINE_RESOURCES}
 )
+
+# Include Dirs
+TARGET_INCLUDE_DIRECTORIES(
+    ${PROJECT_NAME}
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/>
+    PRIVATE
+        "${CMAKE_SOURCE_DIR}/include"
+        "${CMAKE_SOURCE_DIR}/include/imgui"
+        "${CMAKE_SOURCE_DIR}/src"
+        "${CMAKE_BINARY_DIR}/depend"
+		"${CMAKE_BINARY_DIR}"
+)
+
+# Folders to filters
+FOREACH(file IN ITEMS ${_ENGINE_INCLUDES} ${_ENGINE_SOURCES})
+    FILE(RELATIVE_PATH file_path ${CMAKE_SOURCE_DIR} ${file})
+    GET_FILENAME_COMPONENT(file_path ${file_path} DIRECTORY)
+    FILE(TO_NATIVE_PATH ${file_path} file_path)
+    SOURCE_GROUP(${file_path} FILES ${file})
+ENDFOREACH()
 
 # Load Dependencies
 INCLUDE(ExternalProject)
@@ -237,40 +155,6 @@ ENDIF()
 
 ADD_DEPENDENCIES(${PROJECT_NAME} depend-glfw)
 
-# assimp
-ExternalProject_Add(depend-assimp
-    GIT_REPOSITORY  "https://github.com/assimp/assimp"
-    GIT_TAG         "master"
-    GIT_SHALLOW     TRUE
-    SOURCE_DIR      "${CMAKE_BINARY_DIR}/depend/assimp"
-    BINARY_DIR      "${CMAKE_BINARY_DIR}/depend/build/assimp"
-    CMAKE_ARGS      -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-                    -DASSIMP_BUILD_SAMPLES=OFF
-                    -DASSIMP_BUILD_TESTS=OFF
-                    -DASSIMP_BUILD_ZLIB=${TRUE_WHEN_WIN32}
-                    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-                    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-                    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-    UPDATE_COMMAND  ""
-    INSTALL_COMMAND ""
-    TEST_COMMAND    ""
-)
-
-INCLUDE_DIRECTORIES(
-    "${CMAKE_BINARY_DIR}/depend/assimp/code"
-    "${CMAKE_BINARY_DIR}/depend/assimp/include"
-    "${CMAKE_BINARY_DIR}/depend/build/assimp/include"
-)
-
-IF(WIN32)
-    LIST(APPEND _DEPEND_LIBRARIES_DEBUG "assimp-${MSVC_PREFIX}-mt.lib;IrrXML.lib;zlibstaticd.lib")
-    LIST(APPEND _DEPEND_LIBRARIES_RELEASE "assimp-${MSVC_PREFIX}-mt.lib;IrrXML.lib;zlibstatic.lib")
-ELSE()
-    LIST(APPEND _DEPEND_LIBRARIES "libassimp.so")
-ENDIF()
-
-ADD_DEPENDENCIES(${PROJECT_NAME} depend-assimp)
-
 # Link all libraries
 FOREACH(lib IN ITEMS ${_DEPEND_LIBRARIES})
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} "${CMAKE_BINARY_DIR}/${lib}")
@@ -298,5 +182,5 @@ SET_TARGET_PROPERTIES(
 # Add Demos Sub
 ADD_SUBDIRECTORY(demos)
 
-SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
+SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")

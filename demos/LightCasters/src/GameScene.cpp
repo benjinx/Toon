@@ -1,30 +1,39 @@
 #include "GameScene.hpp"
 
-#include "imgui/imgui.h"
+#include <Light.hpp>
+
+#include <imgui/imgui.h>
 
 void GameScene::Start()
 {
+	Scene::Start();
+
 	// Object setup
 	printf("\nLoading Models/Materials\n");
 
+	// Camera
+	auto camera = new Camera();
+	_mGameObjects.emplace("Camera", camera);
+	_mGameObjects["Camera"]->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+	App::Inst()->SetCurrentCamera(camera);
+
 	// Light Source
-	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Light", new GameObject("/models/Primitives/pCube.glb"));
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	// Scene Objs
-	_mGameObjects.emplace("Plane", new GameObject("models/Primitives/pPlane.obj"));
-	_mGameObjects.emplace("Sphere", new GameObject("models/Primitives/pSphere.obj"));
-	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.obj"));
-	_mGameObjects.emplace("Torus", new GameObject("models/Primitives/pTorus.obj"));
-	_mGameObjects.emplace("Torus2", new GameObject("models/Primitives/pTorus.obj"));
-	_mGameObjects.emplace("Torus3", new GameObject("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Plane", new GameObject("/models/Primitives/pPlane.glb"));
+	_mGameObjects.emplace("Sphere", new GameObject("/models/Primitives/pSphere.glb"));
+	_mGameObjects.emplace("Cube", new GameObject("/models/Primitives/pCube.glb"));
+	_mGameObjects.emplace("Torus", new GameObject("/models/Primitives/pTorus.glb"));
+	_mGameObjects.emplace("Torus2", new GameObject("/models/Primitives/pTorus.glb"));
+	_mGameObjects.emplace("Torus3", new GameObject("/models/Primitives/pTorus.glb"));
 
 	// Initialize Objs
 
 	_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -2.5f, 0.0f));
-	_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 	_mGameObjects["Plane"]->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 
 	_mGameObjects["Sphere"]->SetPosition(glm::vec3(1.5f, 0.0f, 2.0f));
@@ -52,8 +61,8 @@ void GameScene::Start()
 
 	App* app = App::Inst();
 	app->AddShader("passThru", new Shader({
-		"shaders/passThru.vert",
-		"shaders/passThru.frag" }));
+		"shaders/passThruColor.vert",
+		"shaders/passThruColor.frag" }));
 
 	app->AddShader("lightCasters", new Shader({
 		"shaders/lightCasters.vert",
@@ -78,8 +87,6 @@ void GameScene::Start()
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
 void GameScene::Update(float dt)
@@ -106,58 +113,58 @@ void GameScene::Update(float dt)
 
 	// Directional Lighting
 	// Set Directional Light Position
-	glm::vec4 lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f);
+	DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f));
 	if (_mDirLight)
 	{
 		lightCasters->SetBool("lightCheck.Directional", true);
-		lightCasters->SetVec4("dirLight.direction", lightDir);
+		lightCasters->SetVec4("dirLight.direction", glm::vec4(dirLight.GetDirection(), 0.0f));
 	}
 	else
 		lightCasters->SetBool("lightCheck.Directional", false);
 
 	// Point Lighting
 	// Set attenuation values
-	float	constant = 1.0f,
-			linear = 0.09f,
-			quadratic = 0.032f;
-
+	PointLight pointLight(_mGameObjects["Light"]->GetPosition(),
+						1.0f,
+						0.09f,
+						0.032f);
 	if (_mPointLight)
 	{
 		lightCasters->SetBool("lightCheck.Point", true);
-		lightCasters->SetFloat("pointLight.constant", constant);
-		lightCasters->SetFloat("pointLight.linear", linear);
-		lightCasters->SetFloat("pointLight.quadratic", quadratic);
+		lightCasters->SetFloat("pointLight.constant", pointLight.GetConstant());
+		lightCasters->SetFloat("pointLight.linear", pointLight.GetLinear());
+		lightCasters->SetFloat("pointLight.quadratic", pointLight.GetQuadratic());
 
-		glm::vec4 lightPos = glm::vec4(_mGameObjects["Light"]->GetPosition(), 1.0f);
-		lightCasters->SetVec4("pointLight.position", lightPos);
+		lightCasters->SetVec4("pointLight.position", glm::vec4(pointLight.GetPosition(), 1.0f));
 
-		lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 1.0f);
-		lightCasters->SetVec4("pointLight.direction", lightDir);
+		//lightDir = glm::vec4(-0.2f, -1.0f, -0.3f, 1.0f);
+		//lightCasters->SetVec4("pointLight.direction", lightDir);
 	}
 	else
 		lightCasters->SetBool("lightCheck.Point", false);
 
 	// Spotlight Lighting
+	SpotLight spotLight(App::Inst()->GetCurrentCamera()->GetPosition(),
+						App::Inst()->GetCurrentCamera()->GetForward(), 
+						glm::cos(glm::radians(12.5f)),
+						glm::cos(glm::radians(17.5f)));
 	if (_mSpotLight)
 	{
 		lightCasters->SetBool("lightCheck.Spot", true);
-		lightCasters->SetVec3("spotlight.position", Camera::Inst().GetCameraPos());
+		lightCasters->SetVec3("spotlight.position", spotLight.GetPosition());
 
 		// Change 0.0f to 1.0f to just enable spotlight
-		glm::vec4 camFront = glm::vec4(Camera::Inst().GetCameraForward(), 1.0f);
+		glm::vec4 camFront = glm::vec4(spotLight.GetDirection(), 1.0f);
 		lightCasters->SetVec4("spotlight.direction", camFront);
 
-		lightCasters->SetFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
-		lightCasters->SetFloat("spotlight.outerCutoff", glm::cos(glm::radians(17.5f)));
+		lightCasters->SetFloat("spotlight.cutoff", spotLight.GetCutOff());
+		lightCasters->SetFloat("spotlight.outerCutoff", spotLight.GetOuterCutOff());
 	}
 	else
 		lightCasters->SetBool("lightCheck.Spot", false);
 
-	// Update Camera
-	Camera::Inst().Update(dt);
-
 	// Rotate objects
-	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
-	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
-	_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.0f, 0.25f * dt));
+	//_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
+	//_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
+	//_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.0f, 0.25f * dt));
 }

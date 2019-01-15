@@ -1,14 +1,24 @@
 ﻿#include "App.hpp"
-#include "Config.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include <Camera.hpp>
+#include <DevUI.hpp>
+#include <Log.hpp>
+#include <Shader.hpp>
+
+#include <iostream>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+
+#define TINYGLTF_IMPLEMENTATION
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#include <tinygltf/tiny_gltf.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
+#include <stb/stb_image_write.h>
 
 App* App::_sInst = nullptr;
 
@@ -20,8 +30,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mode)
 void mouse_pos_callback(GLFWwindow* window, double x, double y);
 
 App::~App() {
-	Camera::Delete();
-
 	DeleteShaders();
 
     ImGui_ImplGlfwGL3_Shutdown();
@@ -218,17 +226,17 @@ void App::ReloadShaders()
 void App::HandleInput(float dt)
 {
 	if (_mInputMap[GLFW_KEY_W])
-		Camera::Inst().HandleMovement(Direction::FORWARD, dt);
+		_mCurrentCamera->HandleMovement(Direction::FORWARD, dt);
 	if (_mInputMap[GLFW_KEY_S])
-		Camera::Inst().HandleMovement(Direction::BACKWARD, dt);
+		_mCurrentCamera->HandleMovement(Direction::BACKWARD, dt);
 	if (_mInputMap[GLFW_KEY_A])
-		Camera::Inst().HandleMovement(Direction::LEFT, dt);
+		_mCurrentCamera->HandleMovement(Direction::LEFT, dt);
 	if (_mInputMap[GLFW_KEY_D])
-		Camera::Inst().HandleMovement(Direction::RIGHT, dt);
+		_mCurrentCamera->HandleMovement(Direction::RIGHT, dt);
 	if (_mInputMap[GLFW_KEY_Q])
-		Camera::Inst().HandleMovement(Direction::UP, dt);
+		_mCurrentCamera->HandleMovement(Direction::UP, dt);
 	if (_mInputMap[GLFW_KEY_E])
-		Camera::Inst().HandleMovement(Direction::DOWN, dt);
+		_mCurrentCamera->HandleMovement(Direction::DOWN, dt);
 }
 
 void App::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -248,9 +256,6 @@ void App::HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, i
 			case GLFW_KEY_F5: // Reloads shaders
 			{
 				std::cout << "\nReloading shaders!\n";
-				
-				//_mCurrentScene->DeleteShaders();
-				//_mCurrentScene->SetupShaders();
 				ReloadShaders();
 				break;
 			}
@@ -287,7 +292,7 @@ void App::HandleGLFWMouseButton(GLFWwindow* window, int button, int action, int 
 
 void App::HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
-	Camera::Inst().HandleFoV((float)xoffset, (float)yoffset);
+	//Camera::Inst().HandleFoV((float)xoffset, (float)yoffset);
 
     // scroll
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
@@ -308,7 +313,7 @@ void App::HandleGLFWMousePos(GLFWwindow* window, double x, double y)
 
     // handle mouse pos
 	if (_mInputMap[GLFW_MOUSE_BUTTON_RIGHT]) {
-		Camera::Inst().HandleRotation(xoffset, yoffset);
+		_mCurrentCamera->HandleRotation(xoffset, yoffset);
 	}
 }
 

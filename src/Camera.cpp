@@ -1,97 +1,174 @@
 #include "Camera.hpp"
 
-#include "Window.hpp"
-#include "App.hpp"
+#include <App.hpp>
+#include <Utils.hpp>
+#include <Window.hpp>
 
-Camera * Camera::_sInst = nullptr;
+//Camera * Camera::_sInst = nullptr;
 
-void Camera::Init(glm::vec3 cameraPos, glm::vec3 cameraTarget)
+Camera::Camera()
 {
-    _mPosition = cameraPos;
-    _mTarget   = cameraTarget;
-	_mFoV = 45.0f;
-	
-	Window * window = App::Inst()->GetWindow();
-
-    // 1 - FOV, 2 - Aspect Ratio, 3 - Near clipping, 4 - Far clipping
-    _mProjectionMat =
-        glm::perspective(glm::radians(_mFoV), (float)window->GetWidth() / (float)window->GetHeight(), 0.1f, 10000.0f);
-
-    // Camera Dir
-	_mForward = glm::normalize(_mTarget - _mPosition);
-
-	// Set world up
-	_mWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    // Camera Right Axis
-    _mRight = glm::normalize(glm::cross(_mWorldUp, _mForward));
-
-    // Camera Up Axis
-    _mUp = glm::cross(_mForward, _mRight);
-
-    // Look At
-    _mViewMat = glm::lookAt(_mPosition, _mTarget, _mWorldUp);
-
-    // View movement
-    // glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f);
-	_mVelocity = glm::vec3(0);
-	_mAcceleration = glm::vec3(0);
-	_mForce = glm::vec3(0);
-
-	// Movement vals
-	_mMovementSpeed = 0.1f;
-	_mFirstMouse = true;
+	const glm::ivec2& size = glm::ivec2(App::Inst()->GetWindow()->GetWidth(),
+										App::Inst()->GetWindow()->GetHeight());
+	SetAspect(size);
+	SetViewportSize(_mViewportSize);
 }
 
-void Camera::Update(float dt)
+glm::mat4 Camera::GetView() const
 {
-	Window * window = App::Inst()->GetWindow();
-	_mProjectionMat = glm::perspective(glm::radians(_mFoV), (float)window->GetWidth() / (float)window->GetHeight(), 0.1f, 10000.0f);
-	_mViewMat = glm::lookAt(_mPosition, _mPosition + _mForward, _mUp);
+	return glm::lookAt(GetWorldPosition(), GetWorldPosition() + GetForward(), _mUp);
 }
 
-void Camera::AddForce(glm::vec3 force)
+glm::mat4 Camera::GetProjection() const
 {
-	_mForce += force;
+	if (_mMode == Mode::Perspective)
+	{
+		return glm::perspective(_mFovX, _mAspect, _mClip[0], _mClip[1]);
+	}
+	else if (_mMode == Mode::Orthographic)
+	{
+		const auto& view = GetViewport();
+		return glm::ortho(view[0], view[1], view[2], view[3], _mClip[0], _mClip[1]);
+	}
+
+	return glm::mat4(1.0f);
 }
 
-void Camera::UpdateAcceleration()
+void Camera::SetMode(Mode mode)
 {
-	_mAcceleration = _mForce; // Assuming mass for camera is 1, meaning massInv is the same, also no gravity applied to camera.
-	_mForce = glm::vec3(0);
+	_mMode = mode;
 }
 
-void Camera::UpdateFirstOrder(float dt)
+void Camera::SetAspect(float aspect)
 {
-	_mPosition += _mVelocity * dt;
-	_mVelocity += _mAcceleration * dt;
+	_mAspect = aspect;
+}
 
-	UpdateAcceleration();
+void Camera::SetAspect(const glm::vec2& size)
+{
+	_mAspect = size.x / size.y;
+}
+
+void Camera::SetFOVX(float fovx)
+{
+	_mFovX = fovx;
+}
+
+void Camera::SetFOVY(float fovy)
+{
+	_mFovX = 2.0f * atanf(tanf(fovy * 0.5f) * _mAspect);
+}
+
+void Camera::SetViewportScale(float left, float right, float bottom, float top)
+{
+	_mViewportScale = glm::vec4(left, right, bottom, top);
+}
+
+void Camera::SetViewportScale(const glm::vec4& viewScale)
+{
+	_mViewportScale = viewScale;
+}
+
+void Camera::SetViewportSize(float width, float height)
+{
+	_mViewportSize.x = width;
+	_mViewportSize.y = height;
+}
+
+void Camera::SetViewportSize(const glm::vec2& viewSize)
+{
+	_mViewportSize = viewSize;
+}
+
+glm::vec4 Camera::GetViewport() const
+{
+	glm::vec4 scale = GetViewportScale();
+	glm::vec2 size = GetViewportSize();
+
+	if (_mAspect > 1.0f)
+	{
+		size.y /= _mAspect;
+	}
+	else
+	{
+		size.x *= _mAspect;
+	}
+
+	return glm::vec4(
+		size.x * scale[0],
+		size.x * scale[1],
+		size.y * scale[2],
+		size.y * scale[3]);
+}
+
+void Camera::SetClip(float near, float far)
+{
+	_mClip.x = near;
+	_mClip.y = far;
+}
+
+void Camera::SetClip(const glm::vec2& clip)
+{
+	_mClip = clip;
+}
+
+void Camera::SetUp(const glm::vec3& up)
+{
+	_mUp = up;
+}
+
+void Camera::SetForward(const glm::vec3& forward)
+{
+	if ((normalize(forward) + _mUp) == glm::vec3(0.0f))
+	{
+		SetRotation(glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+	}
+	else
+	{
+		SetRotation(glm::quatLookAt(glm::normalize(forward), _mUp));
+	}
+}
+
+glm::vec3 Camera::GetForward() const
+{
+	return glm::rotate(GetWorldRotation(), Utils::GetWorldForward());
+}
+
+void Camera::SetLookAt(const glm::vec3& point)
+{
+	SetForward(point - GetPosition());
+}
+
+void Camera::SetAutoResize(bool autoResize)
+{
+	_mAutoResize = autoResize;
 }
 
 void Camera::HandleMovement(Direction dir, float dt)
 {
 	float velocity = _mMovementSpeed * dt;
 
+	glm::vec3 right = glm::normalize(glm::cross(_mUp, GetForward()));
+
 	switch (dir)
 	{
 	case FORWARD:
-		_mPosition += _mForward * velocity;
+		SetPosition(GetPosition() + (GetForward() * velocity));
 		break;
 	case BACKWARD:
-		_mPosition -= _mForward * velocity;
+		SetPosition(GetPosition() - (GetForward() * velocity));
 		break;
 	case LEFT:
-		_mPosition -= glm::normalize(glm::cross(_mForward, _mUp)) * velocity;
+		SetPosition(GetPosition() - (glm::normalize(glm::cross(GetForward(), _mUp)) * velocity));
 		break;
 	case RIGHT:
-		_mPosition += glm::normalize(glm::cross(_mForward, _mUp)) * velocity;
+		SetPosition(GetPosition() + (glm::normalize(glm::cross(GetForward(), _mUp)) * velocity));
 		break;
 	case UP:
-		_mPosition += glm::normalize(glm::cross(_mForward, _mRight)) * velocity;
+		SetPosition(GetPosition() + (glm::normalize(glm::cross(GetForward(), right)) * velocity));
 		break;
 	case DOWN:
-		_mPosition -= glm::normalize(glm::cross(_mForward, _mRight)) * velocity;
+		SetPosition(GetPosition() - (glm::normalize(glm::cross(GetForward(), right)) * velocity));
 		break;
 	default:
 		break;
@@ -100,40 +177,20 @@ void Camera::HandleMovement(Direction dir, float dt)
 
 void Camera::HandleRotation(float xoffset, float yoffset)
 {
-	float sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+	glm::vec2 delta(xoffset, yoffset);
 
-	_mYaw += xoffset;
-	_mPitch += yoffset;
+	delta *= _mRotateSpeed;
+	delta.x *= -1.0f;
 
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (_mPitch > 89.0f)
-		_mPitch = 89.0f;
-	if (_mPitch < -89.0f)
-		_mPitch = -89.0f;
+	if (_mInverse)
+		delta.y *= -1.0f;
 
-	glm::vec3 front;
-	front.x = cos(glm::radians(_mPitch)) * cos(glm::radians(_mYaw));
-	front.y = sin(glm::radians(_mPitch));
-	front.z = cos(glm::radians(_mPitch)) * sin(glm::radians(_mYaw));
-	_mForward = glm::normalize(front);
-	_mRight = glm::normalize(glm::cross(_mForward, _mWorldUp));
-	_mUp = glm::normalize(glm::cross(_mRight, _mForward));
-}
+	glm::vec3 forward = GetForward();
+	glm::vec3 right = glm::normalize(glm::cross(Utils::GetWorldUp(), forward));
+	SetUp(glm::cross(forward, right));
 
-void Camera::HandleFoV(float xoffset, float yoffset)
-{
-	if (_mFoV >= 1.0f && _mFoV <= 45.0f)
-		_mFoV -= yoffset;
-	if (_mFoV <= 1.0f)
-		_mFoV = 1.0f;
-	if (_mFoV >= 45.0f)
-		_mFoV = 45.0f;
-}
-
-glm::vec2 Camera::GetResolution()
-{
-	Window * window = App::Inst()->GetWindow();
-	return glm::vec2((float)window->GetWidth(), (float)window->GetHeight());
+	glm::quat rotation = GetRotation();
+	rotation = glm::angleAxis(delta.x, GetUp()) * rotation;
+	rotation = glm::angleAxis(delta.y, GetRight()) * rotation;
+	SetRotation(rotation);
 }

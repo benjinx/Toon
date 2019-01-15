@@ -2,25 +2,32 @@
 
 void GameScene::Start()
 {
+	Scene::Start();
+
 	// Object setup
 	printf("\nLoading Models/Materials\n");
 
+	// Camera
+	auto camera = new Camera();
+	_mGameObjects.emplace("Camera", camera);
+	_mGameObjects["Camera"]->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+	App::Inst()->SetCurrentCamera(camera);
+
 	// Light Source
-	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.obj"));
+	_mGameObjects.emplace("Light", new GameObject("/models/Primitives/pCube.glb"));
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	// Scene Objs
-	_mGameObjects.emplace("Plane", new GameObject("models/Primitives/pPlane.obj"));
-	_mGameObjects.emplace("Sphere", new GameObject("models/Primitives/pSphere.obj"));
-	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.obj"));
-	_mGameObjects.emplace("Torus", new GameObject("models/Primitives/pTorus.obj"));
+	_mGameObjects.emplace("Plane", new GameObject("/models/Primitives/pPlane.glb"));
+	_mGameObjects.emplace("Sphere", new GameObject("/models/Primitives/pSphere.glb"));
+	_mGameObjects.emplace("Cube", new GameObject("/models/Primitives/pCube.glb"));
+	_mGameObjects.emplace("Torus", new GameObject("/models/Primitives/pTorus.glb"));
 
 	// Initialize Objs
 
 	_mGameObjects["Plane"]->SetPosition(glm::vec3(0.0f, -2.5f, 0.0f));
-	_mGameObjects["Plane"]->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 	_mGameObjects["Plane"]->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 
 	_mGameObjects["Sphere"]->SetPosition(glm::vec3(1.5f, 0.0f, 2.0f));
@@ -40,8 +47,8 @@ void GameScene::Start()
 
 	App* app = App::Inst();
 	app->AddShader("passThru", new Shader({
-		"shaders/passThru.vert",
-		"shaders/passThru.frag" }));
+		"shaders/passThruColor.vert",
+		"shaders/passThruColor.frag" }));
 
 	app->AddShader("basicLighting", new Shader({
 		"shaders/basicLighting.vert",
@@ -59,8 +66,6 @@ void GameScene::Start()
 	// Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	Camera::Inst().Init(cameraPos, cameraTarget);
 }
 
 void GameScene::Update(float dt)
@@ -93,11 +98,8 @@ void GameScene::Update(float dt)
 	glm::vec3 objColor = glm::vec3(UI::objectColor[0], UI::objectColor[1], UI::objectColor[2]);
 	basicLighting->SetVec3("objectColor", objColor);
 
-	// Update Camera
-	Camera::Inst().Update(dt);
-
 	// Rotate objects
-	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.25f * dt, 0.0f, 0.0f));
-	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
-	_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.0f, 0.25f * dt));
+	//_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() + glm::vec3(0.25f * dt, 0.0f, 0.0f));
+	//_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() + glm::vec3(0.0f, 0.25f * dt, 0.0f));
+	//_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() + glm::vec3(0.0f, 0.0f, 0.25f * dt));
 }

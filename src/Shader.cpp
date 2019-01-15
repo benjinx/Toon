@@ -1,7 +1,9 @@
 #include "Shader.hpp"
 
-#include "Window.hpp"
-#include "Utils.hpp"
+#include <Utils.hpp>
+#include <Log.hpp>
+
+#include <fstream>
 
 Shader::Shader(std::initializer_list<std::string> files)
 {

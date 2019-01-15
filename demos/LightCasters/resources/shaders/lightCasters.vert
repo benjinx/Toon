@@ -2,8 +2,8 @@
 
 // Attributes
 layout (location = 0) in vec4 position;
-layout (location = 2) in vec4 normal;
-layout (location = 8) in vec2 texCoords;
+layout (location = 1) in vec4 normal;
+layout (location = 2) in vec2 texCoords;
 
 // Uniforms
 uniform mat4 mvp;
@@ -23,7 +23,7 @@ void main()
 {
 	pass.fragPos = vec3(modelMat * vec4(position.xyz, 1.0));
 	pass.normal = mat3(transpose(inverse(modelMat))) * normal.xyz;
-	pass.texCoords = texCoords;
+	pass.texCoords = vec2(texCoords.x, 1.0 - texCoords.y);
 
 	gl_Position =  projMat * viewMat * vec4(pass.fragPos, 1.0);
 }

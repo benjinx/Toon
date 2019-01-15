@@ -1060,10 +1060,10 @@ class TinyGLTF {
 #endif
 #endif
 
-#include "./json.hpp"
+#include <nlohmann/json.hpp>
 
 #ifndef TINYGLTF_NO_STB_IMAGE
-#include "./stb_image.h"
+#include <stb/stb_image.h>
 #endif
 
 #ifndef TINYGLTF_NO_STB_IMAGE_WRITE

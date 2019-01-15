@@ -1,7 +1,11 @@
 #include "Texture.hpp"
-//#include "Utils.hpp"
-//#include <iostream>
-//#include "Log.hpp"
+
+#include <Log.hpp>
+#include <Utils.hpp>
+
+#include <iostream>
+
+#include <stb/stb_image.h>
 
 Texture::Texture(const std::string& filename/*, Options opts = Options()*/)
 {

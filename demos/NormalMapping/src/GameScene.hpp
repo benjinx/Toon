@@ -14,6 +14,7 @@ public:
 private:
 
 	float _mAngle = 0;
+	float _mMarsAngle = 0;
 };
 
 #endif // GAMESCENE_H

@@ -1,9 +1,9 @@
 #include "UI.hpp"
 
-#include "Window.hpp"
-#include "App.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include <App.hpp>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
 bool UI::consoleSelected = false;
 bool UI::optionsSelected = true;
