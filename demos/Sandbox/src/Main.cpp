@@ -4,6 +4,7 @@
 
 int main()
 {
+	Utils::SetAssetPath(RESOURCE_PATH);
     const auto& paths = Utils::GetResourcePaths();
     for (auto& p : paths) {
         //printf("%s\n", p.c_str());

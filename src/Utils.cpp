@@ -8,27 +8,70 @@
 
 namespace Utils
 {
-	std::string GetBasename(const std::string& path)
+	std::string _mAssetPath;
+
+	std::vector<std::string> _mAssetPaths;
+
+
+	void SetAssetPath(const std::string& path)
 	{
-		size_t pos = path.find_last_of("/\\");
-		if (std::string::npos != pos)
-		{
-			return path.substr(pos + 1);
-		}
-		return path;
+		//LogInfo("Setting Asset Path: %s\n", path.c_str());
+		_mAssetPath = path;
+		_mAssetPaths.clear();
 	}
 
-	std::string GetDirname(const std::string& path)
+	std::string GetAssetPath()
 	{
-		size_t pos = path.find_last_of("/\\");
-		if (std::string::npos != pos)
-		{
-			return path.substr(0, pos);
-		}
-		return std::string();
+		return _mAssetPath;
 	}
 
-	std::string GetExtension(const std::string& path)
+	std::vector<std::string> GetResourcePaths()
+	{
+		if (_mAssetPaths.empty()) {
+			std::stringstream ss(GetAssetPath());
+			std::string path;
+			while (std::getline(ss, path, ':')) {
+				if (path.empty()) continue;
+				if (path.back() != '/') path.push_back('/');
+
+				_mAssetPaths.push_back(path);
+			}
+			_mAssetPaths.push_back("");
+			reverse(_mAssetPaths.begin(), _mAssetPaths.end());
+		}
+		return _mAssetPaths;
+	}
+
+	void CleanSlashes(std::string& path)
+	{
+		for (unsigned int i = 0; i < path.size(); ++i)
+		{
+			if (path[i] == '\\')
+			{
+				path[i] = '/';
+			}
+		}
+	}
+
+	std::string GetBasename(std::string path)
+	{
+		CleanSlashes(path);
+		size_t pivot = path.find_last_of('/');
+		return (pivot == std::string::npos
+			? std::string()
+			: path.substr(pivot + 1));
+	}
+
+	std::string GetDirname(std::string path)
+	{
+		CleanSlashes(path);
+		size_t pivot = path.find_last_of('/');
+		return (pivot == std::string::npos
+			? "./"
+			: path.substr(0, pivot));
+	}
+
+	std::string GetExtension(std::string path)
 	{
 		size_t pivot = path.find_last_of('.');
 		return (pivot == std::string::npos

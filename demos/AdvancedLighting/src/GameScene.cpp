@@ -14,16 +14,16 @@ void GameScene::Start()
 	App::Inst()->SetCurrentCamera(camera);
 
 	// Light Source
-	_mGameObjects.emplace("Light", new GameObject("/models/Primitives/pCube.glb"));
+	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.glb"));
 
 	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
 	// Scene Objs
-	_mGameObjects.emplace("Plane", new GameObject("/models/Primitives/pPlane.glb"));
-	_mGameObjects.emplace("Sphere", new GameObject("/models/Primitives/pSphere.glb"));
-	_mGameObjects.emplace("Cube", new GameObject("/models/Primitives/pCube.glb"));
-	_mGameObjects.emplace("Torus", new GameObject("/models/Primitives/pTorus.glb"));
+	_mGameObjects.emplace("Plane", new GameObject("models/Primitives/pPlane.glb"));
+	_mGameObjects.emplace("Sphere", new GameObject("models/Primitives/pSphere.glb"));
+	_mGameObjects.emplace("Cube", new GameObject("models/Primitives/pCube.glb"));
+	_mGameObjects.emplace("Torus", new GameObject("models/Primitives/pTorus.glb"));
 
 	// Initialize Objs
 
@@ -99,17 +99,11 @@ void GameScene::Update(float dt)
 
 	
 	// Rotate objects
-	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetRotation() *
-										 (dt * 
-										 glm::angleAxis(glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f))
-										 ));
-	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetRotation() *
-									   (dt *
-									   glm::angleAxis(glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f))
-									   ));
-	_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetRotation() *
-										(dt *
-										glm::angleAxis(glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f))
-										));
+	_mGameObjects["Sphere"]->SetRotation(_mGameObjects["Sphere"]->GetWorldRotation()
+		* glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(1.0f, 0.0f, 0.0f)));
+	_mGameObjects["Cube"]->SetRotation(_mGameObjects["Cube"]->GetWorldRotation()
+		* glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
+	_mGameObjects["Torus"]->SetRotation(_mGameObjects["Torus"]->GetWorldRotation()
+		* glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
 	//LogInfo("dt: %f \n", dt);
 }

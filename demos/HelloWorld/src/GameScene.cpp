@@ -14,11 +14,11 @@ void GameScene::Start()
 	App::Inst()->SetCurrentCamera(camera);
 
 	// Scene Objs
-	_mGameObjects.emplace("Logo", new GameObject("/models/logo/logo.glb"));
+	_mGameObjects.emplace("Logo", new GameObject("models/logo/logo.glb"));
 
 	// Initialize Objs
 	_mGameObjects["Logo"]->SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-	_mGameObjects["Logo"]->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+	_mGameObjects["Logo"]->SetRotation(glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	// Shaders
 	printf("\nLoading Shaders\n");

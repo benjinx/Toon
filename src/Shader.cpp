@@ -95,7 +95,7 @@ void Shader::Load(std::vector<std::string> files)
 
 		if (!loaded)
 		{
-			LogError("Failed to load shaders [%s]", f);
+			LogError("Failed to load shaders [%s]\n", f);
 			return;
 		}
 

@@ -23,8 +23,8 @@ void GameScene::Start()
 	printf("\nLoading Materials\n");
 
 	// Scene Objs
-	_mGameObjects.emplace("Light", new GameObject("/models/Primitives/pCube.glb"));
-	_mGameObjects.emplace("helmet", new GameObject("/models/DamagedHelm.glb"));
+	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.glb"));
+	_mGameObjects.emplace("helmet", new GameObject("models/DamagedHelm.glb"));
 
 	_mGameObjects["helmet"]->SetParent(_mGameObjects["Light"]);
 	_mGameObjects["Light"]->AddChild(_mGameObjects["helmet"]);
@@ -106,9 +106,8 @@ void GameScene::Update(float dt)
 {
 	Scene::Update(dt);
 
-	
-
-	_mGameObjects["helmet"]->SetRotation(_mGameObjects["helmet"]->GetRotation() * glm::angleAxis(glm::radians(0.5f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
+	_mGameObjects["helmet"]->SetRotation(_mGameObjects["helmet"]->GetWorldRotation()
+		* glm::angleAxis(glm::radians(0.5f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
 	//_mGameObjects["helmet"]->SetRotation(glm::angleAxis(glm::radians(170.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
 	//LogInfo("Scale: %f, %f, %f\n", _mGameObjects["helmet"]->GetScale().x, _mGameObjects["helmet"]->GetScale().y, _mGameObjects["helmet"]->GetScale().z);
 
