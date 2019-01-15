@@ -30,7 +30,7 @@ void GameScene::Start()
 	_mGameObjects["Light"]->AddChild(_mGameObjects["helmet"]);
 
 	// Initialize Objs
-	_mGameObjects["Light"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	_mGameObjects["Light"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	_mGameObjects["Light"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	_mGameObjects["helmet"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));

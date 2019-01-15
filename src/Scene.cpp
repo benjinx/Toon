@@ -38,7 +38,11 @@ void Scene::Render()
 		for (auto& gameObject : _mGameObjects)
 		{
 			//gameObject.second->DrawAxis();
+			// Render the gobjs axis
 			_mSceneAxis->Render(gameObject.second->GetWorldTransform());
+
+			// Render the scenes axis
+			_mSceneAxis->Render(_mSceneTransform);
 		}
 	}
 }

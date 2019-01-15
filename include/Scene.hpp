@@ -31,12 +31,13 @@ public:
 	static void Options();
 
 protected:
-	// Show gameobject axis?
 	static bool _sShowAxis;
 
 	GameObjectMap _mGameObjects;
 
 	Axis* _mSceneAxis;
+
+	glm::mat4 _mSceneTransform = glm::mat4(1);
 };
 
 #endif // SCENE_H
