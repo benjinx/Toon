@@ -22,8 +22,6 @@ public:
 
 	virtual void Update(const float dt);
 	void Render();
-	void InitAxis();
-	void DrawAxis();
 
 	void SetShader(Shader* shader);
 
@@ -120,10 +118,6 @@ protected:
 	glm::vec3 _mPosition = glm::vec3(0.0f),
 			  _mScale = glm::vec3(1.0f);
 	glm::quat _mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-
-	// Axis Rendering
-	GLuint _mVAO;
-	GLuint _mVBO[2];
 
 	// Gobjs Shader
 	Shader* _mShader;

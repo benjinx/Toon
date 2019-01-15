@@ -15,7 +15,6 @@
 
 Model::Model(std::string filename)
 {
-	//LoadObj(filename);
 	Load(filename);
 }
 
