@@ -4,6 +4,7 @@
 #include <Mesh.hpp>
 #include <Model.hpp>
 
+#include <algorithm>
 #include <sstream>
 
 namespace Utils
