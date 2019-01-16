@@ -13,6 +13,11 @@
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include <tinygltf/tiny_gltf.h>
 
+Model::Model(std::vector<Mesh*> meshes)
+{
+	_mMeshes = meshes;
+}
+
 Model::Model(std::string filename)
 {
 	Load(filename);
@@ -66,7 +71,7 @@ bool Model::Load(std::string filename)
 
 	if (!loaded)
 	{
-		LogError("Fail to load model, '%s'\n", filename);
+		LogError("Failed to load model, '%s'\n", filename);
 		return false;
 	}
 

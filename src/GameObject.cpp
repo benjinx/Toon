@@ -20,7 +20,10 @@ GameObject::GameObject(std::string filename)
 
 GameObject::~GameObject()
 {
+	for (auto c : _mChildren)
+		delete c;
 
+	delete _mModel;
 }
 
 void GameObject::Update(const float dt)

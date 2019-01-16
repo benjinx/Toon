@@ -23,6 +23,7 @@ class Mesh;
 class Model
 {
 public:
+	Model(std::vector<Mesh*> meshes);
 	Model(std::string filename);
 	~Model();
 

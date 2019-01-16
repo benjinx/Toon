@@ -27,7 +27,11 @@ public:
 
 	void SetParent(GameObject* parent) { _mParent = parent; }
 	GameObject* GetParent() const { return _mParent; }
-	void AddChild(GameObject* child) { _mChildren.push_back(child); }
+	void AddChild(GameObject* child)
+	{ 
+		child->SetParent(this);
+		_mChildren.push_back(child);
+	}
 	std::vector<GameObject*> GetChildren() { return _mChildren; }
 
 	//// LOCAL
@@ -112,6 +116,11 @@ public:
 		return GetScale();
 	}
 	//// END WORLD
+
+	void SetName(std::string name) { _mName = name; }
+	std::string GetName() { return _mName; }
+
+	void SetModel(Model* model) { _mModel = model; }
 	
 protected:
 	// Pos, rot, scale
@@ -130,5 +139,7 @@ protected:
 
 	// Children
 	std::vector<GameObject*> _mChildren;
+
+	std::string _mName;
 };
 #endif // GAMEOBJECT_HPP

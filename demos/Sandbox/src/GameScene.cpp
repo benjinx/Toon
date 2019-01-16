@@ -23,18 +23,19 @@ void GameScene::Start()
 	printf("\nLoading Materials\n");
 
 	// Scene Objs
-	_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.glb"));
-	_mGameObjects.emplace("helmet", new GameObject("models/DamagedHelm.glb"));
+	Load("models/TestScene.glb");
+	 _mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.glb"));
+	// _mGameObjects.emplace("helmet", new GameObject("models/DamagedHelm.glb"));
 
-	_mGameObjects["helmet"]->SetParent(_mGameObjects["Light"]);
-	_mGameObjects["Light"]->AddChild(_mGameObjects["helmet"]);
+	// _mGameObjects["helmet"]->SetParent(_mGameObjects["Light"]);
+	// _mGameObjects["Light"]->AddChild(_mGameObjects["helmet"]);
 
-	// Initialize Objs
-	_mGameObjects["Light"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	_mGameObjects["Light"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	// // Initialize Objs
+	 _mGameObjects["Light"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+	 _mGameObjects["Light"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
-	_mGameObjects["helmet"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
-	_mGameObjects["helmet"]->SetRotation(glm::angleAxis(glm::radians(60.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
+	// _mGameObjects["helmet"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	// _mGameObjects["helmet"]->SetRotation(glm::angleAxis(glm::radians(60.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
 
 	// Shaders
 	printf("\nLoading Shaders\n");
@@ -48,12 +49,12 @@ void GameScene::Start()
 		"shaders/advLighting.vert",
 		"shaders/advLighting.frag" }));
 
-	app->AddShader("normalMapping", new Shader({
-		"shaders/normalMapping.vert",
-		"shaders/normalMapping.frag" }));
+	//app->AddShader("normalMapping", new Shader({
+	//	"shaders/normalMapping.vert",
+	//	"shaders/normalMapping.frag" }));
 
-	_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
-	_mGameObjects["helmet"]->SetShader(app->GetShader("normalMapping"));
+	 _mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
+	// _mGameObjects["helmet"]->SetShader(app->GetShader("normalMapping"));
 
 	// UI
 	DevUI::Start();
@@ -106,8 +107,8 @@ void GameScene::Update(float dt)
 {
 	Scene::Update(dt);
 
-	_mGameObjects["helmet"]->SetRotation(_mGameObjects["helmet"]->GetWorldRotation()
-		* glm::angleAxis(glm::radians(0.5f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
+	//_mGameObjects["helmet"]->SetRotation(_mGameObjects["helmet"]->GetWorldRotation()
+	//	* glm::angleAxis(glm::radians(0.5f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
 	//_mGameObjects["helmet"]->SetRotation(glm::angleAxis(glm::radians(170.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
 	//LogInfo("Scale: %f, %f, %f\n", _mGameObjects["helmet"]->GetScale().x, _mGameObjects["helmet"]->GetScale().y, _mGameObjects["helmet"]->GetScale().z);
 

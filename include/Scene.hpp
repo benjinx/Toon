@@ -4,7 +4,9 @@
 #include <Axis.hpp>
 #include <Config.hpp>
 #include <GameObject.hpp>
+#include <Mesh.hpp>
 
+#include <memory>
 #include <unordered_map>
 
 class Scene //: public GameObject
@@ -22,8 +24,9 @@ public:
 
 	virtual void Update(float dt);
 	virtual void Render();
-	
-	virtual void SetupShaders() { }
+
+	bool Load(std::string filename);
+
 
 	GameObjectMap GetGameObjects() { return _mGameObjects; }
 
@@ -31,6 +34,9 @@ public:
 	static void Options();
 
 protected:
+
+	void AddGameObject(std::unique_ptr<GameObject> gameObject);
+
 	static bool _sShowAxis;
 
 	GameObjectMap _mGameObjects;
@@ -38,6 +44,8 @@ protected:
 	Axis* _mSceneAxis;
 
 	glm::mat4 _mSceneTransform = glm::mat4(1);
+
+	std::vector<Mesh*> _mMeshes;
 };
 
 #endif // SCENE_H
