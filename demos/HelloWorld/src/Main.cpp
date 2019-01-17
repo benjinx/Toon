@@ -4,15 +4,15 @@
 
 int main()
 {
-	Utils::SetAssetPath(RESOURCE_PATH);
+    Utils::SetAssetPath(RESOURCE_PATH);
     const auto& paths = Utils::GetResourcePaths();
     
     App app;
-	Scene* gameScene = new GameScene();
+    Scene* gameScene = new GameScene();
 
     try
     {
-		app.SetCurrentScene(gameScene);
+        app.SetCurrentScene(gameScene);
         app.Run();
     }
     catch (const std::runtime_error& e)

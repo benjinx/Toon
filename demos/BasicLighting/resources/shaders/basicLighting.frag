@@ -2,8 +2,8 @@
 // Varyings
 in vertexData
 {
-	vec3 fragPos;
-	vec3 normal;
+    vec3 fragPos;
+    vec3 normal;
 } pass;
 
 // Uniforms
@@ -17,13 +17,13 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	// ambient
+    // ambient
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
-  	
+      
     // diffuse 
     vec3 norm = normalize(pass.normal);
-	vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
+    vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
@@ -36,5 +36,5 @@ void main()
     vec3 specular = specularStrength * spec * lightColor;
 
     vec3 result = (ambient + diffuse + specular) * objectColor;
-	fragColor = vec4(result, 1.0);
+    fragColor = vec4(result, 1.0);
 }

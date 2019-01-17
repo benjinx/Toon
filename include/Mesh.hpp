@@ -13,12 +13,12 @@ class Shader;
 class Mesh
 {
 public:
-	Mesh() = default;
+    Mesh() = default;
 
     /* Functions */
     Mesh(GLuint vao, GLenum mode, GLsizei count, GLenum type, GLsizei offset, std::shared_ptr<Material> material);
 
-	void Render(Shader * shader, glm::mat4 modelMat);
+    void Render(Shader * shader, glm::mat4 modelMat);
 
     //void SetMaterial(Material* material) { _mMaterial = material; }
 
@@ -26,12 +26,12 @@ public:
 
 private:
     /* Render Data */
-	GLuint _mVAO;
-	GLenum	_mMode;
-	GLsizei _mCount;
-	GLenum _mType;
-	GLsizei _mOffset;
-	std::shared_ptr<Material> _mMaterial = nullptr;
+    GLuint _mVAO;
+    GLenum    _mMode;
+    GLsizei _mCount;
+    GLenum _mType;
+    GLsizei _mOffset;
+    std::shared_ptr<Material> _mMaterial = nullptr;
 };
 
 #endif // MESH_H

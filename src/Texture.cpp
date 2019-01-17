@@ -46,7 +46,7 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
 {
     // Load img
     int            bpp;
-	unsigned char* image = nullptr;
+    unsigned char* image = nullptr;
     const auto& paths = Utils::GetResourcePaths();
     FILE * file = NULL;
 

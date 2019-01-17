@@ -1,15 +1,15 @@
 #version 330 core
 
 struct Material {
-	sampler2D diffuseMap;
+    sampler2D diffuseMap;
 };
 
 // Varyings
 in vertexData
 {
-	vec3 fragPos;
-	vec3 normal;
-	vec2 texCoords;
+    vec3 fragPos;
+    vec3 normal;
+    vec2 texCoords;
 } pass;
 
 // Uniforms
@@ -24,12 +24,12 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-	vec3 objectColor = texture(material.diffuseMap, pass.texCoords).rgb;
+    vec3 objectColor = texture(material.diffuseMap, pass.texCoords).rgb;
 
-	// ambient
+    // ambient
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
-  	
+      
     // diffuse 
     vec3 norm = normalize(pass.normal);
     vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
@@ -39,10 +39,10 @@ void main()
     // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
-	vec3 halfwayDir = normalize(lightDir + viewDir);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
     vec3 specular = specularStrength * spec * lightColor;
         
     vec3 result = (ambient + diffuse + specular) * objectColor;
-	fragColor = vec4(result, 1.0);
+    fragColor = vec4(result, 1.0);
 }

@@ -13,14 +13,14 @@ uniform mat4 projMat;
 // Varyings
 out vertexData
 {
-	vec3 fragPos;
-	vec3 normal;
+    vec3 fragPos;
+    vec3 normal;
 } pass;
 
 void main()
 {
-	pass.fragPos = vec3(modelMat * vec4(position.xyz, 1.0));
-	pass.normal = mat3(transpose(inverse(modelMat))) * normal.xyz;
+    pass.fragPos = vec3(modelMat * vec4(position.xyz, 1.0));
+    pass.normal = mat3(transpose(inverse(modelMat))) * normal.xyz;
 
-	gl_Position =  projMat * viewMat * vec4(pass.fragPos, 1.0);
+    gl_Position =  projMat * viewMat * vec4(pass.fragPos, 1.0);
 }

@@ -15,131 +15,131 @@ class GameObject
 {
 public:
 
-	GameObject();
-	GameObject(glm::vec3 position);
-	GameObject(std::string filename);
-	virtual ~GameObject();
+    GameObject();
+    GameObject(glm::vec3 position);
+    GameObject(std::string filename);
+    virtual ~GameObject();
 
-	virtual void Update(const float dt);
-	void Render();
+    virtual void Update(const float dt);
+    void Render();
 
-	void SetShader(Shader* shader);
+    void SetShader(Shader* shader);
 
-	void SetParent(GameObject* parent) { _mParent = parent; }
-	GameObject* GetParent() const { return _mParent; }
-	void AddChild(GameObject* child)
-	{ 
-		child->SetParent(this);
-		_mChildren.push_back(child);
-	}
-	std::vector<GameObject*> GetChildren() { return _mChildren; }
+    void SetParent(GameObject* parent) { _mParent = parent; }
+    GameObject* GetParent() const { return _mParent; }
+    void AddChild(GameObject* child)
+    { 
+        child->SetParent(this);
+        _mChildren.push_back(child);
+    }
+    std::vector<GameObject*> GetChildren() { return _mChildren; }
 
-	//// LOCAL
-	// Local Transform
-	void SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
-	{
-		_mPosition = position;
-		_mRotation = rotation;
-		_mScale = scale;
-	}
+    //// LOCAL
+    // Local Transform
+    void SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
+    {
+        _mPosition = position;
+        _mRotation = rotation;
+        _mScale = scale;
+    }
 
-	glm::mat4 GetTransform() const
-	{ 
-		glm::mat4 transform = glm::mat4(1);
-		transform = glm::translate(transform, _mPosition);
-		transform *= glm::mat4_cast(_mRotation);
-		transform = glm::scale(transform, _mScale);
-		return transform;
-	}
+    glm::mat4 GetTransform() const
+    { 
+        glm::mat4 transform = glm::mat4(1);
+        transform = glm::translate(transform, _mPosition);
+        transform *= glm::mat4_cast(_mRotation);
+        transform = glm::scale(transform, _mScale);
+        return transform;
+    }
 
-	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetPosition(glm::vec3 position) {
-		_mPosition = position;
-	}
+    // Remember matrix order is Translate (Position), Rotate, Scale
+    void SetPosition(glm::vec3 position) {
+        _mPosition = position;
+    }
 
-	glm::vec3 GetPosition() const { return _mPosition; }
+    glm::vec3 GetPosition() const { return _mPosition; }
 
-	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetRotation(glm::quat rotation) {
-		_mRotation = rotation;
-	}
+    // Remember matrix order is Translate (Position), Rotate, Scale
+    void SetRotation(glm::quat rotation) {
+        _mRotation = rotation;
+    }
 
-	glm::quat GetRotation() const { return _mRotation; }
+    glm::quat GetRotation() const { return _mRotation; }
 
-	// Remember matrix order is Translate (Position), Rotate, Scale
-	void SetScale(glm::vec3 scale) {
-		_mScale = scale;
-	}
+    // Remember matrix order is Translate (Position), Rotate, Scale
+    void SetScale(glm::vec3 scale) {
+        _mScale = scale;
+    }
 
-	glm::vec3 GetScale() const { return _mScale; }
-	//// END LOCAL
+    glm::vec3 GetScale() const { return _mScale; }
+    //// END LOCAL
 
-	//// WORLD
-	// World Transform
-	glm::mat4 GetWorldTransform() const
-	{
-		if (GetParent())
-		{
-			return GetParent()->GetTransform() * GetTransform();
-		}
+    //// WORLD
+    // World Transform
+    glm::mat4 GetWorldTransform() const
+    {
+        if (GetParent())
+        {
+            return GetParent()->GetTransform() * GetTransform();
+        }
 
-		return GetTransform();
-	}
+        return GetTransform();
+    }
 
-	glm::vec3 GetWorldPosition() const
-	{
-		if (GetParent())
-		{
-			return GetParent()->GetPosition() + GetPosition();
-		}
+    glm::vec3 GetWorldPosition() const
+    {
+        if (GetParent())
+        {
+            return GetParent()->GetPosition() + GetPosition();
+        }
 
-		return GetPosition();
-	}
+        return GetPosition();
+    }
 
-	glm::quat GetWorldRotation() const
-	{
-		if (GetParent())
-		{
-			return GetParent()->GetRotation() * GetRotation();
-		}
+    glm::quat GetWorldRotation() const
+    {
+        if (GetParent())
+        {
+            return GetParent()->GetRotation() * GetRotation();
+        }
 
-		return GetRotation();
-	}
+        return GetRotation();
+    }
 
-	glm::vec3 GetWorldScale() const
-	{
-		if (GetParent())
-		{
-			return GetParent()->GetScale() * GetScale();
-		}
+    glm::vec3 GetWorldScale() const
+    {
+        if (GetParent())
+        {
+            return GetParent()->GetScale() * GetScale();
+        }
 
-		return GetScale();
-	}
-	//// END WORLD
+        return GetScale();
+    }
+    //// END WORLD
 
-	void SetName(std::string name) { _mName = name; }
-	std::string GetName() { return _mName; }
+    void SetName(std::string name) { _mName = name; }
+    std::string GetName() { return _mName; }
 
-	void SetModel(Model* model) { _mModel = model; }
-	
+    void SetModel(Model* model) { _mModel = model; }
+    
 protected:
-	// Pos, rot, scale
-	glm::vec3 _mPosition = glm::vec3(0.0f),
-			  _mScale = glm::vec3(1.0f);
-	glm::quat _mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    // Pos, rot, scale
+    glm::vec3 _mPosition = glm::vec3(0.0f),
+              _mScale = glm::vec3(1.0f);
+    glm::quat _mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-	// Gobjs Shader
-	Shader* _mShader;
+    // Gobjs Shader
+    Shader* _mShader;
 
-	// Model
-	Model* _mModel = nullptr;
+    // Model
+    Model* _mModel = nullptr;
 
-	// Parent
-	GameObject* _mParent = nullptr;
+    // Parent
+    GameObject* _mParent = nullptr;
 
-	// Children
-	std::vector<GameObject*> _mChildren;
+    // Children
+    std::vector<GameObject*> _mChildren;
 
-	std::string _mName;
+    std::string _mName;
 };
 #endif // GAMEOBJECT_HPP

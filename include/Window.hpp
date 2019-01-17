@@ -13,8 +13,8 @@ public:
     Window(int width, int height);
     virtual ~Window();
 
-	void Clear();
-	void Present();
+    void Clear();
+    void Present();
 
     GLFWwindow* GetGLFWWindow() { return _mWindow; }
 

@@ -6,15 +6,15 @@
 class GameScene : public Scene
 {
 public:
-	GameScene() {};
+    GameScene() {};
 
-	void Start() override;
-	void Update(float dt) override;
+    void Start() override;
+    void Update(float dt) override;
 
 private:
 
-	float _mAngle = 0;
-	float _mMarsAngle = 0;
+    float _mAngle = 0;
+    float _mMarsAngle = 0;
 };
 
 #endif // GAMESCENE_H

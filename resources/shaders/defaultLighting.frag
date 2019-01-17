@@ -1,20 +1,20 @@
 #version 330 core
 
 struct Material {
-	vec3 diffuse,
-		 emissive;
+    vec3 diffuse,
+         emissive;
 
-	float metallic,
-		  roughness,
-		  normalScale,
-		  occlusionStrength;
+    float metallic,
+          roughness,
+          normalScale,
+          occlusionStrength;
 };
 
 // Varyings
 in vertexData
 {
-	vec3 fragPos;
-	vec3 normal;
+    vec3 fragPos;
+    vec3 normal;
 } pass;
 
 // Uniforms
@@ -30,14 +30,14 @@ layout (location = 0) out vec4 fragColor;
 void main()
 {
 
-	vec3 lc = vec3(1.0, 1.0, 1.0);
-	// ambient
+    vec3 lc = vec3(1.0, 1.0, 1.0);
+    // ambient
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
-  	
+      
     // diffuse 
     vec3 norm = normalize(pass.normal);
-	vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
+    vec3 lightDir = normalize(lightVec.xyz - pass.fragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * material.diffuse;
@@ -50,5 +50,5 @@ void main()
     vec3 specular = specularStrength * spec * lightColor;
 
     vec3 result = (ambient + diffuse + specular) * material.diffuse;
-	fragColor = vec4(result, 1.0);
+    fragColor = vec4(result, 1.0);
 }

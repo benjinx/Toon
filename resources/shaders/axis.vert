@@ -1,7 +1,7 @@
 /*
-	Pass Color
-	By Benji Campbell
-	Vertex shader that passes attributes down pipeline.
+    Pass Color
+    By Benji Campbell
+    Vertex shader that passes attributes down pipeline.
 */
 
 #version 330 core
@@ -18,11 +18,11 @@ uniform mat4 projMat;
 //
 out vertexData
 {
-	vec4 color;
+    vec4 color;
 } pass;
 
 void main()
 {
-	gl_Position = projMat * viewMat  * modelMat * position;
-	pass.color = color;
+    gl_Position = projMat * viewMat  * modelMat * position;
+    pass.color = color;
 }

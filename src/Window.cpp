@@ -13,7 +13,7 @@ Window::Window(int width, int height)
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
     glfwWindowHint(GLFW_DECORATED, true);
     glfwWindowHint(GLFW_RESIZABLE, false);
-	glfwWindowHint(GLFW_SAMPLES, 8);
+    glfwWindowHint(GLFW_SAMPLES, 8);
 
     _mWindow = glfwCreateWindow(_mWidth, _mHeight, "Temporality ~ BC/DC Games", nullptr, nullptr);
 
@@ -27,7 +27,7 @@ Window::Window(int width, int height)
 
     glfwSwapInterval(0);
 
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     glfwGetFramebufferSize(_mWindow, &width, &height);
     glViewport(0, 0, width, height);

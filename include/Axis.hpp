@@ -12,11 +12,11 @@ class Shader;
 class Axis
 {
 public:
-	Axis();
+    Axis();
 
-	void Render(glm::mat4 transform);
+    void Render(glm::mat4 transform);
 private:
-	std::shared_ptr<Mesh> _mMesh = nullptr;
+    std::shared_ptr<Mesh> _mMesh = nullptr;
 
 };
 

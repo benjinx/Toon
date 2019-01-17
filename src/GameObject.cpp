@@ -15,15 +15,15 @@ GameObject::GameObject(glm::vec3 position)
 
 GameObject::GameObject(std::string filename)
 {
-	_mModel = new Model(filename);
+    _mModel = new Model(filename);
 }
 
 GameObject::~GameObject()
 {
-	for (auto c : _mChildren)
-		delete c;
+    for (auto c : _mChildren)
+        delete c;
 
-	delete _mModel;
+    delete _mModel;
 }
 
 void GameObject::Update(const float dt)
@@ -32,13 +32,13 @@ void GameObject::Update(const float dt)
 
 void GameObject::Render()
 {
-	if (_mShader != nullptr && _mModel != nullptr)
-	{
-		_mModel->Render(_mShader, GetWorldTransform());
-	}
+    if (_mShader != nullptr && _mModel != nullptr)
+    {
+        _mModel->Render(_mShader, GetWorldTransform());
+    }
 }
 
 void GameObject::SetShader(Shader* shader)
 {
-	_mShader = shader;
+    _mShader = shader;
 }

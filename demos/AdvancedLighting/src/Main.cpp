@@ -4,18 +4,18 @@
 
 int main()
 {
-	Utils::SetAssetPath(RESOURCE_PATH);
-	const auto& paths = Utils::GetResourcePaths();
-	for (auto& p : paths) {
-		printf("%s\n", p.c_str());
-	}
+    Utils::SetAssetPath(RESOURCE_PATH);
+    const auto& paths = Utils::GetResourcePaths();
+    for (auto& p : paths) {
+        printf("%s\n", p.c_str());
+    }
 
     App app;
-	Scene* gameScene = new GameScene();
+    Scene* gameScene = new GameScene();
 
     try
     {
-		app.SetCurrentScene(gameScene);
+        app.SetCurrentScene(gameScene);
         app.Run();
     }
     catch (const std::runtime_error& e)

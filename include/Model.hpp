@@ -9,12 +9,12 @@
 
 enum AttributeID : GLint
 {
-	POSITION = 0,
-	NORMAL = 1,
-	TEXCOORD = 2,
-	TANGENT = 3,
-	BITANGENT = 4,
-	COLOR = 5,
+    POSITION = 0,
+    NORMAL = 1,
+    TEXCOORD = 2,
+    TANGENT = 3,
+    BITANGENT = 4,
+    COLOR = 5,
 };
 
 class Shader;
@@ -23,25 +23,25 @@ class Mesh;
 class Model
 {
 public:
-	Model(std::vector<Mesh*> meshes);
-	Model(std::string filename);
-	~Model();
+    Model(std::vector<Mesh*> meshes);
+    Model(std::string filename);
+    ~Model();
 
-	void Render(Shader* shader, glm::mat4 modelMatrix);
+    void Render(Shader* shader, glm::mat4 modelMatrix);
 
-	void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
+    void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
 
-	Mesh* GetMesh(int index = 0) { return _mMeshes[index]; }
-	unsigned int GetNumMeshes() { return (unsigned int)_mMeshes.size(); }
+    Mesh* GetMesh(int index = 0) { return _mMeshes[index]; }
+    unsigned int GetNumMeshes() { return (unsigned int)_mMeshes.size(); }
 
 private:
-	// Object Loading
-	bool Load(std::string filename);
+    // Object Loading
+    bool Load(std::string filename);
 
-	// Mesh
-	std::vector<Mesh*> _mMeshes;
+    // Mesh
+    std::vector<Mesh*> _mMeshes;
 
-	bool _mLoaded = false;
+    bool _mLoaded = false;
 };
 
 #endif //MODEL_HPP

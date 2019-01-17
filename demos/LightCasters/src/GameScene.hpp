@@ -6,13 +6,13 @@
 class GameScene : public Scene
 {
 public:
-	GameScene() {};
+    GameScene() {};
 
-	void Start() override;
-	void Update(float dt) override;
+    void Start() override;
+    void Update(float dt) override;
 
 private:
-	bool _mDirLight, _mPointLight, _mSpotLight;
+    bool _mDirLight, _mPointLight, _mSpotLight;
 };
 
 #endif // GAMESCENE_H

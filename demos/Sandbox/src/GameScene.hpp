@@ -6,18 +6,18 @@
 class GameScene : public Scene
 {
 public:
-	GameScene() {};
+    GameScene() {};
 
-	void Start() override;
-	void Update(float dt) override;
-	void PhysicsStart();
-	void PhysicsUpdate(float dt);
-	void Render() override;
+    void Start() override;
+    void Update(float dt) override;
+    void PhysicsStart();
+    void PhysicsUpdate(float dt);
+    void Render() override;
 
 private:
-	bool _mDirLight, _mPointLight, _mSpotLight;
+    bool _mDirLight, _mPointLight, _mSpotLight;
 
-	Mesh* mesh;
+    Mesh* mesh;
 };
 
 #endif // GAMESCENE_H

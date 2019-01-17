@@ -15,29 +15,29 @@
 #include <chrono>
 
 #define BenchStart() \
-	auto benchClockStart = std::chrono::high_resolution_clock::now();
+    auto benchClockStart = std::chrono::high_resolution_clock::now();
 
-#define BenchEnd(funcName)														\
-	LogPerf("Function: %s took %.3f millis\n", funcName,					\
-        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(		\
-            std::chrono::high_resolution_clock::now() - benchClockStart	\
+#define BenchEnd(funcName)                                                        \
+    LogPerf("Function: %s took %.3f millis\n", funcName,                    \
+        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(        \
+            std::chrono::high_resolution_clock::now() - benchClockStart    \
         ).count());
 
 /// End Benchmark
 
 enum LogLevel {
-	LOG_INFO,
-	LOG_WARN,
-	LOG_ERROR,
-	LOG_PERF,
-	LOG_VERBOSE,
-	LOG_LOAD,
+    LOG_INFO,
+    LOG_WARN,
+    LOG_ERROR,
+    LOG_PERF,
+    LOG_VERBOSE,
+    LOG_LOAD,
 };
 
 
 template <class T>
 static auto LogWrap(const T& v) {
-	return v;
+    return v;
 }
 
 #pragma clang diagnostic push
@@ -47,88 +47,88 @@ static auto LogWrap(const T& v) {
     auto LogWrap<std::string>(const std::string& v) {
         return v.c_str();
     }
-	
+    
 #pragma clang diagnostic pop
 
 template <class ...Args>
 static inline void Log(LogLevel level, const char * format, Args... args)
 {
-	#if defined(WIN32)
+    #if defined(WIN32)
 
-	static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	const int DEFAULT = 7;
+    const int DEFAULT = 7;
 
-	int color = DEFAULT;
+    int color = DEFAULT;
 
-	switch (level)
-	{
-	case LOG_INFO:
-		color = 7; // White
-		break;
-	case LOG_WARN:
-		color = 6; // Yellow
-		break;
-	case LOG_ERROR:
-		color = 4; // Red
-		break;
-	case LOG_PERF:
-		color = 5; // Magenta
-		break;
-	case LOG_VERBOSE:
-		color = 8; // Grey
-		break;
-	case LOG_LOAD:
-		color = 2; // Green
-		break;
-	}
+    switch (level)
+    {
+    case LOG_INFO:
+        color = 7; // White
+        break;
+    case LOG_WARN:
+        color = 6; // Yellow
+        break;
+    case LOG_ERROR:
+        color = 4; // Red
+        break;
+    case LOG_PERF:
+        color = 5; // Magenta
+        break;
+    case LOG_VERBOSE:
+        color = 8; // Grey
+        break;
+    case LOG_LOAD:
+        color = 2; // Green
+        break;
+    }
 
-	SetConsoleTextAttribute(hConsole, color);
+    SetConsoleTextAttribute(hConsole, color);
 
-	#else 
-	const short FG_DEFAULT = 39;
-	const short BG_DEFAULT = 49;
+    #else 
+    const short FG_DEFAULT = 39;
+    const short BG_DEFAULT = 49;
 
-	short fgColor = FG_DEFAULT;
-	short bgColor = BG_DEFAULT;
+    short fgColor = FG_DEFAULT;
+    short bgColor = BG_DEFAULT;
 
-	switch (level)
-	{
-	case LOG_INFO:
-		fgColor = 97; // White
-		break;
-	case LOG_WARN:
-		fgColor = 33; // Yellow
-		break;
-	case LOG_ERROR:
-		fgColor = 31; // Red
-		break;
-	case LOG_PERF:
-		fgColor = 35; // Magenta
-		break;
-	case LOG_VERBOSE:
-		fgColor = 37; // Grey
-		break;
-	case LOG_LOAD:
-		fgColor = 32; // Green
-		break;
-	}
+    switch (level)
+    {
+    case LOG_INFO:
+        fgColor = 97; // White
+        break;
+    case LOG_WARN:
+        fgColor = 33; // Yellow
+        break;
+    case LOG_ERROR:
+        fgColor = 31; // Red
+        break;
+    case LOG_PERF:
+        fgColor = 35; // Magenta
+        break;
+    case LOG_VERBOSE:
+        fgColor = 37; // Grey
+        break;
+    case LOG_LOAD:
+        fgColor = 32; // Green
+        break;
+    }
 
-	printf("\033[%dm\033[%dm", fgColor, bgColor);
+    printf("\033[%dm\033[%dm", fgColor, bgColor);
 
-	#endif
+    #endif
 
-	printf(format, LogWrap(args)...);
+    printf(format, LogWrap(args)...);
 
-	#if defined(WIN32)
-	
-	SetConsoleTextAttribute(hConsole, DEFAULT);
+    #if defined(WIN32)
+    
+    SetConsoleTextAttribute(hConsole, DEFAULT);
 
-	#else
+    #else
 
-	printf("\033[%dm\033[%dm", FG_DEFAULT, BG_DEFAULT);
+    printf("\033[%dm\033[%dm", FG_DEFAULT, BG_DEFAULT);
 
-	#endif
+    #endif
 }
 
 #ifndef TEMPORALITY_ENABLE_VERBOSE_LOGGING

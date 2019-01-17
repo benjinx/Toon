@@ -8,13 +8,13 @@
 class Cube : public GameObject
 {
 public:
-	Cube();
-	~Cube() {};
+    Cube();
+    ~Cube() {};
 
-	void Update();
+    void Update();
 
 private:
-	Rigidbody _mRigidbody;
+    Rigidbody _mRigidbody;
 };
 
 #endif // !CUBE_H

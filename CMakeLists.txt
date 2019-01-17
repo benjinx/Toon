@@ -18,14 +18,14 @@ ENDIF()
 
 # Configuration
 FILE(RELATIVE_PATH RESOURCE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/resources")
-						
+                        
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 CONFIGURE_FILE(
-	${CMAKE_SOURCE_DIR}/include/Config.hpp.in
-	${CMAKE_BINARY_DIR}/Config.hpp
+    ${CMAKE_SOURCE_DIR}/include/Config.hpp.in
+    ${CMAKE_BINARY_DIR}/Config.hpp
 )
 
 # Glob
@@ -37,7 +37,7 @@ FILE(GLOB_RECURSE
 FILE(GLOB_RECURSE 
     _ENGINE_INCLUDES
     "${CMAKE_SOURCE_DIR}/include/*.hpp"
-	"${CMAKE_SOURCE_DIR}/include/*.h"
+    "${CMAKE_SOURCE_DIR}/include/*.h"
 )
 
 FILE(GLOB_RECURSE 
@@ -50,11 +50,11 @@ FILE(GLOB_RECURSE
 
 # Add source to executables
 ADD_LIBRARY(
-	${PROJECT_NAME}
-	${CMAKE_BINARY_DIR}/Config.hpp
-	${_ENGINE_INCLUDES}
-	${_ENGINE_SOURCES}
-	#${_ENGINE_RESOURCES}
+    ${PROJECT_NAME}
+    ${CMAKE_BINARY_DIR}/Config.hpp
+    ${_ENGINE_INCLUDES}
+    ${_ENGINE_SOURCES}
+    #${_ENGINE_RESOURCES}
 )
 
 # Include Dirs
@@ -69,7 +69,7 @@ TARGET_INCLUDE_DIRECTORIES(
         "${CMAKE_SOURCE_DIR}/include/imgui"
         "${CMAKE_SOURCE_DIR}/src"
         "${CMAKE_BINARY_DIR}/depend"
-		"${CMAKE_BINARY_DIR}"
+        "${CMAKE_BINARY_DIR}"
 )
 
 # Folders to filters
@@ -104,15 +104,15 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
 # glm
 ExternalProject_Add(depend-glm
-    GIT_REPOSITORY		"https://github.com/g-truc/glm.git"
-    GIT_TAG				"0.9.9.3"
-    GIT_SHALLOW			TRUE
-    SOURCE_DIR			"${CMAKE_BINARY_DIR}/depend/glm"
-	CONFIGURE_COMMAND	""
-	BUILD_COMMAND		""
-    UPDATE_COMMAND		""
-    INSTALL_COMMAND		""
-    TEST_COMMAND		""
+    GIT_REPOSITORY        "https://github.com/g-truc/glm.git"
+    GIT_TAG                "0.9.9.3"
+    GIT_SHALLOW            TRUE
+    SOURCE_DIR            "${CMAKE_BINARY_DIR}/depend/glm"
+    CONFIGURE_COMMAND    ""
+    BUILD_COMMAND        ""
+    UPDATE_COMMAND        ""
+    INSTALL_COMMAND        ""
+    TEST_COMMAND        ""
 )
 
 INCLUDE_DIRECTORIES(
@@ -123,27 +123,27 @@ ADD_DEPENDENCIES(${PROJECT_NAME} depend-glm)
 
 # glfw
 ExternalProject_Add(depend-glfw
-    GIT_REPOSITORY		"https://github.com/glfw/glfw"
-    GIT_TAG				"3.2.1"
-    GIT_SHALLOW			TRUE
-    SOURCE_DIR			"${CMAKE_BINARY_DIR}/depend/glfw"
-	BINARY_DIR      	"${CMAKE_BINARY_DIR}/depend/build/glfw"
-	CMAKE_ARGS			-DGLFW_BUILD_EXAMPLES=OFF
-						-DGLFW_BUILD_TESTS=OFF
-						-DGLFW_BUILD_DOCS=OFF
-						-DGLFW_INSTALL=OFF
+    GIT_REPOSITORY        "https://github.com/glfw/glfw"
+    GIT_TAG                "3.2.1"
+    GIT_SHALLOW            TRUE
+    SOURCE_DIR            "${CMAKE_BINARY_DIR}/depend/glfw"
+    BINARY_DIR          "${CMAKE_BINARY_DIR}/depend/build/glfw"
+    CMAKE_ARGS            -DGLFW_BUILD_EXAMPLES=OFF
+                        -DGLFW_BUILD_TESTS=OFF
+                        -DGLFW_BUILD_DOCS=OFF
+                        -DGLFW_INSTALL=OFF
                         -DBUILD_SHARED_LIBS=ON
-						-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-						-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
+                        -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
+                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
                         -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-    UPDATE_COMMAND		""
-    INSTALL_COMMAND		""
-    TEST_COMMAND		""
+    UPDATE_COMMAND        ""
+    INSTALL_COMMAND        ""
+    TEST_COMMAND        ""
 )
 
 INCLUDE_DIRECTORIES(
     "${CMAKE_BINARY_DIR}/depend/glfw/include"
-	"${CMAKE_BINARY_DIR}/depend/build/glfw/include"
+    "${CMAKE_BINARY_DIR}/depend/build/glfw/include"
 )
 
 IF(WIN32)

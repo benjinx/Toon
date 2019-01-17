@@ -13,39 +13,39 @@ class Scene //: public GameObject
 {
 public:
 
-	typedef std::unordered_map<std::string, GameObject*> GameObjectMap;
+    typedef std::unordered_map<std::string, GameObject*> GameObjectMap;
 
-	Scene() = default;
-	virtual ~Scene();
-	
-	virtual void Start();
-	virtual void Pause() { }
-	virtual void Resume() { }
+    Scene() = default;
+    virtual ~Scene();
+    
+    virtual void Start();
+    virtual void Pause() { }
+    virtual void Resume() { }
 
-	virtual void Update(float dt);
-	virtual void Render();
+    virtual void Update(float dt);
+    virtual void Render();
 
-	bool Load(std::string filename);
+    bool Load(std::string filename);
 
 
-	GameObjectMap GetGameObjects() { return _mGameObjects; }
+    GameObjectMap GetGameObjects() { return _mGameObjects; }
 
-	// Ui Options.
-	static void Options();
+    // Ui Options.
+    static void Options();
 
 protected:
 
-	void AddGameObject(std::unique_ptr<GameObject> gameObject);
+    void AddGameObject(std::unique_ptr<GameObject> gameObject);
 
-	static bool _sShowAxis;
+    static bool _sShowAxis;
 
-	GameObjectMap _mGameObjects;
+    GameObjectMap _mGameObjects;
 
-	Axis* _mSceneAxis;
+    Axis* _mSceneAxis;
 
-	glm::mat4 _mSceneTransform = glm::mat4(1);
+    glm::mat4 _mSceneTransform = glm::mat4(1);
 
-	std::vector<Mesh*> _mMeshes;
+    std::vector<Mesh*> _mMeshes;
 };
 
 #endif // SCENE_H
