@@ -82,9 +82,9 @@ void App::Start()
 		"shaders/axis.vert",
 		"shaders/axis.frag" }));
 
-	AddShader("normalMapping", new Shader({
-		"shaders/normalMapping.vert",
-		"shaders/normalMapping.frag" }));
+	AddShader("defaultLighting", new Shader({
+		"shaders/defaultLighting.vert",
+		"shaders/defaultLighting.frag" }));
 
 	// Clear Window
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

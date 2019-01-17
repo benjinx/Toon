@@ -5,6 +5,7 @@
 #include <Log.hpp>
 #include <Material.hpp>
 #include <Model.hpp>
+#include <Shader.hpp>
 #include <Texture.hpp>
 #include <Utils.hpp>
 
@@ -35,8 +36,20 @@ void Scene::Start()
 
 void Scene::Update(float dt)
 {
+	// Use default shader
+	App* app = App::Inst();
+	Shader* defaultLighting = app->GetShader("defaultLighting");
+
+	defaultLighting->Use();
+	glm::vec3 defaultLightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	defaultLighting->SetVec3("lightColor", defaultLightColor);
+
+	glm::vec4 defaultLightPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	defaultLighting->SetVec4("lightPosition", defaultLightPosition);
+
 	for (auto& gobj : _mGameObjects)
 	{
+		// Update gobjs
 		gobj.second->Update(dt);
 	}
 }
@@ -45,6 +58,7 @@ void Scene::Render()
 {
 	for (auto& gameObject : _mGameObjects)
 	{
+		// Render gobjs
 		gameObject.second->Render();
 	}
 
@@ -98,7 +112,7 @@ bool Scene::Load(std::string filename)
 		return false;
 	}
 
-		LogLoad("Loading Mesh from %s\n", fullPath);
+	LogLoad("Loading Mesh from %s\n", fullPath);
 	LogVerbose("Model Generator %s\n", model.asset.generator);
 
 	std::vector<std::shared_ptr<Texture>> textures;
@@ -198,8 +212,6 @@ bool Scene::Load(std::string filename)
 	}
 
 	std::vector<GLuint> vbos;
-
-
 
 	std::function<std::unique_ptr<GameObject>(tinygltf::Node&)> processNode;
     processNode = [&](tinygltf::Node& node) -> std::unique_ptr<GameObject> 
@@ -331,7 +343,7 @@ bool Scene::Load(std::string filename)
 		gobj->SetName(node.name.c_str());
 
 		// SET TEMP SHADER
-		gobj->SetShader(App::Inst()->GetShader("normalMapping"));
+		gobj->SetShader(App::Inst()->GetShader("defaultLighting"));
 
 		// Process all children
 		for (int id : node.children) {

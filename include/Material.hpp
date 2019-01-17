@@ -47,12 +47,12 @@ public:
 	bool OcclusionMapExists() { return (_mOcclusionMap != nullptr); }
 
 private:
-    glm::vec3   _mDiffuse = glm::vec3(0),
+    glm::vec3   _mDiffuse = glm::vec3(0.0f),
                 _mEmissive = glm::vec3(0);
 
     float       _mMetallic = 0.0f, 
 				_mRoughness = 0.0f,
-				_mNormalScale = 0.0f,
+				_mNormalScale = 1.0f,
 				_mOcclusionStrength = 0.0f;
 
     std::shared_ptr<Texture>    _mDiffuseMap,
