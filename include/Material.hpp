@@ -47,7 +47,7 @@ public:
     bool OcclusionMapExists() { return (_mOcclusionMap != nullptr); }
 
 private:
-    glm::vec3   _mDiffuse = glm::vec3(0.0f),
+    glm::vec3   _mDiffuse = glm::vec3(1.0f, 1.0f, 1.0f),
                 _mEmissive = glm::vec3(0);
 
     float       _mMetallic = 0.0f, 
