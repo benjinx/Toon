@@ -22,7 +22,7 @@ uniform vec4 eyePos;
 uniform vec4 lightVec;
 uniform vec3 lightColor;
 
-Material material;
+uniform Material material;
 
 // Targets
 layout (location = 0) out vec4 fragColor;
@@ -49,6 +49,6 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     vec3 specular = specularStrength * spec * lightColor;
 
-    vec3 result = material.diffuse;
+    vec3 result = (ambient + diffuse + specular) * material.diffuse;
     fragColor = vec4(result, 1.0);
 }

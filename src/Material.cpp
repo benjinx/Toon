@@ -9,7 +9,7 @@ void Material::Bind(Shader* shader)
     shader->Use();
 
     shader->SetVec3("material.diffuse", _mDiffuse);
-    LogInfo("Material.diffuse: %f, %f, %f\n", _mDiffuse.x, _mDiffuse.y, _mDiffuse.z);
+    //LogInfo("Material.diffuse: %f, %f, %f\n", _mDiffuse.x, _mDiffuse.y, _mDiffuse.z);
     shader->SetVec3("material.emissive", _mEmissive);
 
     shader->SetFloat("material.roughness", _mRoughness);

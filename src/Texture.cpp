@@ -58,7 +58,7 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
 
         if (!file) continue;
 
-        LogInfo("Loaded:  [%s]\n", fullFilename);
+        LogLoad("Loaded:  [%s]\n", fullFilename);
 
         /* Remember to call stbi_image_free(image) after using the image and before another.
             bpp - bytes per pixel

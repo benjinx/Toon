@@ -87,7 +87,7 @@ void Shader::Load(std::vector<std::string> files)
 
             if (shaderFile.is_open())
             {
-                LogInfo("Loaded:  [%s]\n", fullFilename);
+                LogLoad("Loaded:  [%s]\n", fullFilename);
                 loaded = true;
                 break;
             }

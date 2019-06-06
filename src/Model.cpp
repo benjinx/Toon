@@ -75,7 +75,7 @@ bool Model::Load(std::string filename)
         return false;
     }
 
-    LogLoad("Loading Mesh from %s\n", fullPath);
+    LogInfo("Loading Mesh from %s\n", fullPath);
     LogVerbose("Model Generator %s\n", model.asset.generator);
 
     std::vector<std::shared_ptr<Texture>> textures;
@@ -263,6 +263,7 @@ bool Model::Load(std::string filename)
                                         (GLenum)indexAccessor.componentType,
                                         (GLsizei)indexAccessor.byteOffset,
                                         materials[(primitive.material < 0 ? 0 : primitive.material)]));
+            LogLoad("Loaded Mesh from %s\n", fullPath);
         }
     }
 
