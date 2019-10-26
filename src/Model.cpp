@@ -1,5 +1,7 @@
 #include "Model.hpp"
 
+#include <App.hpp>
+#include <Camera.hpp>
 #include <Log.hpp>
 #include <Material.hpp>
 #include <Mesh.hpp>
@@ -73,6 +75,40 @@ bool Model::Load(std::string filename)
     {
         LogError("Failed to load model, '%s'\n", filename);
         return false;
+    }
+
+    // Load scene cameras
+    for (auto modelcamera : model.cameras)
+    {
+        LogVerbose("Loading Camera(s)...\n");
+        if (modelcamera.name != "")
+        {
+            LogInfo("Loading Camera: %s\n", modelcamera.name);
+            auto camera = new Camera();
+            // How do we store the camera in the scene?
+
+            LogInfo("Type: %s\n", modelcamera.type);
+            if (modelcamera.type == "perspective")
+            {
+                // Loaded aspect ratio was coming up as 0.000? hm
+                //camera->SetAspect(modelcamera.perspective.aspectRatio);
+                camera->SetFOVY(modelcamera.perspective.yfov);
+                camera->SetClip(glm::vec2(modelcamera.perspective.znear, modelcamera.perspective.zfar));
+                camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+
+                // How do we know which is the MAIN camera? based on the name maybe? :thinking:
+                App::Inst()->SetCurrentCamera(camera);
+            }
+            else if (modelcamera.type == "orthographic")
+            {
+                // This hasn't been tested but i'm pretty sure this is right.
+                camera->SetViewportSize(glm::vec2(modelcamera.orthographic.xmag, modelcamera.orthographic.ymag));
+                camera->SetClip(glm::vec2(modelcamera.orthographic.znear, modelcamera.orthographic.zfar));
+
+                // Again, how do we know this is the main camera? question asked above.
+                App::Inst()->SetCurrentCamera(camera);
+            }
+        }
     }
 
     LogInfo("Loading Mesh from %s\n", fullPath);
