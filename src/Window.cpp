@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include <Log.hpp>
+
 #include <iostream>
 
 Window::Window(int width, int height) 
@@ -15,13 +17,17 @@ Window::Window(int width, int height)
     glfwWindowHint(GLFW_RESIZABLE, false);
     glfwWindowHint(GLFW_SAMPLES, 8);
 
+    LogInfo("Creating GLFW Window.\n");
+
     _mWindow = glfwCreateWindow(_mWidth, _mHeight, "Temporality ~ BC/DC Games", nullptr, nullptr);
 
     if (_mWindow == nullptr)
     {
-        std::cout << "Failed to create GLFW Window: " << std::endl;
+        LogError("Failed to create GLFW Window.\n");
         glfwTerminate();
     }
+
+    LogLoad("GLFW Window created successfully.\n\n");
 
     glfwMakeContextCurrent(_mWindow);
 
