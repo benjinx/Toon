@@ -1,0 +1,11 @@
+Prefix Titles:
+Fix
+Feat
+Release
+Docs
+Chore
+
+Example:
+Docs: Prefix Doc
+
+- Added a prefix document and an example in it.
