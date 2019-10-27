@@ -51,7 +51,6 @@ before_install:
 script:
   - $CXX --version
   - cmake --version
-  - mkdir "$TRAVIS_BUILD_DIR/build"
   - cd "$TRAVIS_BUILD_DIR/build"
   - pwd
   - cmake -Dstdlib=libstdc++ -DVERBOSE_LOGGING=ON -G "Unix Makefiles" "$SRC_DIR"

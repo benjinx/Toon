@@ -25,7 +25,6 @@ install:
 
 before_build:
   - cmd: cd C:\projects\Temporality
-  - cmd: md build
   - cmd: cd build
   - cmd: if "%PLATFORM%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 15 2017
   - cmd: if "%PLATFORM%"=="x64"   set CMAKE_GENERATOR_NAME=Visual Studio 15 2017 Win64
