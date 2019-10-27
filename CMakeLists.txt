@@ -1,7 +1,17 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 
+CMAKE_POLICY(SET CMP0048 NEW)
+
+IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
+    CMAKE_POLICY(SET CMP0076 NEW)
+ENDIF()
+
+IF (POLICY CMP0072)
+  CMAKE_POLICY(SET CMP0072 NEW)
+ENDIF()
+
 # Initialize Projects
-PROJECT(Temporality VERSION 0.2)
+PROJECT(Temporality)
 
 LIST(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 INCLUDE("cmake/Macros.cmake")
@@ -9,6 +19,17 @@ INCLUDE("cmake/Compiler.cmake")
 
 # Allow for custom organization of files in VisualStudio
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Get Git revision
+INCLUDE(GetGitRevisionDescription)
+GET_GIT_HEAD_REVISION(GIT_REFSPEC PROJECT_VERSION_GIT_HASH)
+STRING(SUBSTRING "${PROJECT_VERSION_GIT_HASH}" 0 8 PROJECT_VERSION_GIT_HASH)
+
+GIT_DESCRIBE(VERSION --tags)
+STRING(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
+STRING(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
+STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # Allow verbose logging
 OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
@@ -184,3 +205,121 @@ ADD_SUBDIRECTORY(demos)
 
 SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+# Packaging
+
+FIND_PROGRAM(
+    TAR_EXECUTABLE
+    tar
+)
+
+IF (TAR_EXECUTABLE)
+    SET(_PACKAGE "libtemporality-${PROJECT_VERSION}")
+
+    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${_PACKAGE}")
+    
+    ADD_CUSTOM_COMMAND(
+        OUTPUT "${_PACKAGE}.tgz"
+        DEPENDS ${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="" ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E env 
+            DESTDIR="${CMAKE_BINARY_DIR}/${_PACKAGE}" 
+            ${CMAKE_COMMAND} --build . --target install
+        COMMAND ${TAR_EXECUTABLE} -cvzf "${CMAKE_BINARY_DIR}/${_PACKAGE}.tgz" "${CMAKE_BINARY_DIR}/${_PACKAGE}/*"
+    )
+
+    ADD_CUSTOM_TARGET(
+        tgz
+        DEPENDS "${_PACKAGE}.tgz"
+    )
+ENDIF()
+
+FIND_PROGRAM(
+    DPKG_DEB_EXECUTABLE
+    dpkg-deb
+)
+
+IF (DPKG_DEB_EXECUTABLE)
+    SET(_PACKAGE "libtemporality-dev_${PROJECT_VERSION}-1")
+
+    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${_PACKAGE}/DEBIAN")
+
+    CONFIGURE_FILE(
+        "${CMAKE_SOURCE_DIR}/cmake/DEBIAN/control.in"
+        "${CMAKE_BINARY_DIR}/${_PACKAGE}/DEBIAN/control"
+        @ONLY
+    )
+    
+    ADD_CUSTOM_COMMAND(
+        OUTPUT "${_PACKAGE}.deb"
+        DEPENDS ${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="/usr/local" ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E env 
+            DESTDIR="${CMAKE_BINARY_DIR}/${_PACKAGE}" 
+            ${CMAKE_COMMAND} --build . --target install
+        COMMAND ${DPKG_DEB_EXECUTABLE} --build "${CMAKE_BINARY_DIR}/${_PACKAGE}"
+    )
+
+    ADD_CUSTOM_TARGET(
+        deb
+        DEPENDS "${_PACKAGE}.deb"
+    )
+ENDIF()
+
+INSTALL(TARGETS ${PROJECT_NAME}
+    EXPORT TemporalityTargets
+    INCLUDES DESTINATION include
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+INCLUDE(CMakePackageConfigHelpers)
+
+WRITE_BASIC_PACKAGE_VERSION_FILE(
+    "${CMAKE_BINARY_DIR}/TemporalityConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+INSTALL(EXPORT TemporalityTargets
+    FILE TemporalityTargets.cmake
+    NAMESPACE Temporality::
+    DESTINATION lib/cmake/Temporality
+)
+
+CONFIGURE_PACKAGE_CONFIG_FILE(
+    "${CMAKE_SOURCE_DIR}/cmake/TemporalityConfig.cmake.in"
+    "${CMAKE_BINARY_DIR}/TemporalityConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/Temporality
+)
+
+INSTALL(EXPORT TemporalityTargets 
+    DESTINATION lib/cmake/Temporality
+)
+
+INSTALL(FILES 
+    "${CMAKE_BINARY_DIR}/TemporalityConfigVersion.cmake" 
+    "${CMAKE_BINARY_DIR}/TemporalityConfig.cmake"
+    DESTINATION lib/cmake/Temporality
+)
+
+INCLUDE(FindPkgConfig)
+
+IF(PKG_CONFIG_FOUND)
+    CONFIGURE_FILE(
+        "${CMAKE_SOURCE_DIR}/cmake/Temporality.pc.in"
+        "${CMAKE_BINARY_DIR}/Temporality.pc"
+        @ONLY
+    )
+
+    INSTALL(FILES
+        "${CMAKE_BINARY_DIR}/Temporality.pc"
+        DESTINATION share/pkgconfig
+    )
+ENDIF()
+
+INSTALL(DIRECTORY
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    DESTINATION include
+    PATTERN "*.in" EXCLUDE
+)

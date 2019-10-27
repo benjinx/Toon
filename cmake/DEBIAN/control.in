@@ -1,0 +1,13 @@
+Package: libtemporality-dev
+Version: @PROJECT_VERSION@-1
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libopenal-dev, 
+ libglf3-dev, 
+ libogg-dev, 
+ libvorbis-dev, 
+ libtheora-dev, 
+ libglu1-mesa-dev 
+Maintainer: Benjamin Campbell <mynameizkevin@gmail.com>
+Description: Temporality Game Engine

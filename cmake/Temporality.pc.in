@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: Temporality
+Description: Temporality Game Engine
+Version: @VERSION@
+
+Requires:
+Cflags: -I${includedir}
+Libs: -L${libdir} -lTemporality
