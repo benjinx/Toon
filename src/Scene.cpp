@@ -78,6 +78,14 @@ void Scene::Render()
 
 bool Scene::Load(std::string filename)
 {
+    // Open the file
+    // Loop through all of the objects
+    //  Load an object
+    //  Add the object to _mGameObjects via AddGameObject()
+    //  Assign the name via the game objects name
+    //  Camera? Same as before
+    //  Lights same as camera
+
     std::string ext = Utils::GetExtension(filename);
     bool binary = (ext == "glb");
 
@@ -169,7 +177,7 @@ bool Scene::Load(std::string filename)
         if (addIt != addVals.end())
         {
             mat->SetNormalMap(textures[addIt->second.TextureIndex()]);
-            mat->SetNormalScale(addIt->second.Factor());
+            mat->SetNormalScale((float)addIt->second.Factor());
         }
 
         addIt = addVals.find("emissiveFactor");
@@ -189,7 +197,7 @@ bool Scene::Load(std::string filename)
         if (addIt != addVals.end())
         {
             mat->SetOcclusionMap(textures[addIt->second.TextureIndex()]);
-            mat->SetOcclusionStrength(addIt->second.Factor());
+            mat->SetOcclusionStrength((float)addIt->second.Factor());
         }
 
         for (const auto& val : material.values)
@@ -224,11 +232,43 @@ bool Scene::Load(std::string filename)
             // Set all camera values here for if it's a camera
             Camera* camera = new Camera();
             gobj = camera;
+
+            // Load scene cameras
+            for (auto modelcamera : model.cameras)
+            {
+                LogVerbose("%i Camera(s) found.", node.camera);
+                LogInfo("Loading Camera: %s\n", modelcamera.name);
+                LogInfo("Type: %s\n", modelcamera.type);
+
+                if (modelcamera.type == "perspective")
+                {
+                    // Loaded aspect ratio was coming up as 0.000? hm
+                    //camera->SetAspect(modelcamera.perspective.aspectRatio);
+                    camera->SetFOVY((float)modelcamera.perspective.yfov);
+                    camera->SetClip(glm::vec2(modelcamera.perspective.znear, modelcamera.perspective.zfar));
+                    camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+
+                    if (modelcamera.name == "Main Camera")
+                        App::Inst()->SetCurrentCamera(camera);
+                }
+                else if (modelcamera.type == "orthographic")
+                {
+                    // This hasn't been tested but i'm pretty sure this is right.
+                    camera->SetViewportSize(glm::vec2(modelcamera.orthographic.xmag, modelcamera.orthographic.ymag));
+                    camera->SetClip(glm::vec2(modelcamera.orthographic.znear, modelcamera.orthographic.zfar));
+
+                    if (modelcamera.name == "Main Camera")
+                        App::Inst()->SetCurrentCamera(camera);
+                }
+            }
         }
         else
         {
             gobj = new GameObject();
         }
+
+
+
 
         // Check if we have a mesh
         if (node.mesh >= 0)
