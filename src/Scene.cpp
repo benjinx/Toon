@@ -421,6 +421,19 @@ void Scene::AddGameObject(std::unique_ptr<GameObject> gameObject)
     }
 }
 
+GameObject* Scene::GetGameObject(std::string name)
+{
+    for (auto gobj : GetGameObjects())
+    {
+        if (gobj.first == name)
+        {
+            return gobj.second;
+        }
+    }
+
+    return nullptr;
+}
+
 void Scene::Options()
 {
     ImGui::Checkbox("Show GameObject Axis", &_sShowAxis);

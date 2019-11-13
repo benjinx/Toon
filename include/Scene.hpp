@@ -29,6 +29,7 @@ public:
 
 
     GameObjectMap GetGameObjects() { return _mGameObjects; }
+    GameObject* GetGameObject(std::string name);
 
     // Ui Options.
     static void Options();
