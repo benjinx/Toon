@@ -1,15 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 
-CMAKE_POLICY(SET CMP0048 NEW)
-
-IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
-    CMAKE_POLICY(SET CMP0076 NEW)
-ENDIF()
-
-IF (POLICY CMP0072)
-  CMAKE_POLICY(SET CMP0072 NEW)
-ENDIF()
-
 # Initialize Projects
 PROJECT(Temporality)
 
@@ -36,6 +26,56 @@ OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
 IF(VERBOSE_LOGGING)
     ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
 ENDIF()
+
+
+# Third Party Dependencies
+
+OPTION(BUILD_THIRDPARTY "Build Dusk ThirdParty Dependencies" ON)
+
+IF(BUILD_THIRDPARTY)
+    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty")
+
+    SET(GLM_ROOT_DIR        "${CMAKE_BINARY_DIR}/thirdparty/glm")
+    SET(GLFW3_ROOT_DIR      "${CMAKE_BINARY_DIR}/thirdparty/glfw3")
+
+    EXECUTE_PROCESS(
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${CMAKE_SOURCE_DIR}/thirdparty"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty"
+        RESULT_VARIABLE result
+    )
+    IF(result)
+        MESSAGE("${result}")
+        MESSAGE(FATAL_ERROR "Failed to configure thirdparty projects")
+    ENDIF()
+
+    SET(BUILD_COMMAND ${CMAKE_COMMAND} --build . )
+    IF("${CMAKE_GENERATOR}" STREQUAL "Unix Makefiles")
+        SET(BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -l )
+    ENDIF()
+
+    EXECUTE_PROCESS(
+        COMMAND ${BUILD_COMMAND}
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty"
+        RESULT_VARIABLE result
+    )
+
+    IF(result)
+        MESSAGE("${result}")
+        MESSAGE(FATAL_ERROR "Failed to build thirdparty projects")
+    ENDIF()
+ENDIF()
+
+FIND_PACKAGE(GLM REQUIRED)
+FIND_PACKAGE(GLFW3 REQUIRED)
+
+# Allow VS to find .dll's
+SET(CMAKE_MSVCIDE_RUN_PATH 
+    ${GLFW3_RUNTIME_DIR}
+)
+
+SET(RUN_PATH 
+	"PATH=%PATH%" ${CMAKE_MSVCIDE_RUN_PATH}
+)
 
 # Configuration
 FILE(RELATIVE_PATH RESOURCE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/resources")
@@ -89,7 +129,6 @@ TARGET_INCLUDE_DIRECTORIES(
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_SOURCE_DIR}/include/imgui"
         "${CMAKE_SOURCE_DIR}/src"
-        "${CMAKE_BINARY_DIR}/depend"
         "${CMAKE_BINARY_DIR}"
 )
 
@@ -101,110 +140,17 @@ FOREACH(file IN ITEMS ${_ENGINE_INCLUDES} ${_ENGINE_SOURCES})
     SOURCE_GROUP(${file_path} FILES ${file})
 ENDFOREACH()
 
-# Load Dependencies
-INCLUDE(ExternalProject)
-
-SET(_DEPEND_LIBRARIES)
-SET(_DEPEND_LIBRARIES_DEBUG)
-SET(_DEPEND_LIBRARIES_RELEASE)
-
-IF(WIN32)
-    SET(TRUE_WHEN_WIN32 "ON")
-    SET(FALSE_WHEN_WIN32 "OFF")
-ELSE()
-    SET(TRUE_WHEN_WIN32 "OFF")
-    SET(FALSE_WHEN_WIN32 "ON")
-ENDIF()
-
-# opengl
-FIND_PACKAGE(OpenGL REQUIRED)
-
-INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIRS})
-
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OPENGL_LIBRARIES})
-
-# glm
-ExternalProject_Add(depend-glm
-    GIT_REPOSITORY        "https://github.com/g-truc/glm.git"
-    GIT_TAG                "0.9.9.3"
-    GIT_SHALLOW            TRUE
-    SOURCE_DIR            "${CMAKE_BINARY_DIR}/depend/glm"
-    CONFIGURE_COMMAND    ""
-    BUILD_COMMAND        ""
-    UPDATE_COMMAND        ""
-    INSTALL_COMMAND        ""
-    TEST_COMMAND        ""
-)
-
-INCLUDE_DIRECTORIES(
-    "${CMAKE_BINARY_DIR}/depend/glm"
-)
-
-ADD_DEPENDENCIES(${PROJECT_NAME} depend-glm)
-
-# glfw
-ExternalProject_Add(depend-glfw
-    GIT_REPOSITORY        "https://github.com/glfw/glfw"
-    GIT_TAG                "3.2.1"
-    GIT_SHALLOW            TRUE
-    SOURCE_DIR            "${CMAKE_BINARY_DIR}/depend/glfw"
-    BINARY_DIR          "${CMAKE_BINARY_DIR}/depend/build/glfw"
-    CMAKE_ARGS            -DGLFW_BUILD_EXAMPLES=OFF
-                        -DGLFW_BUILD_TESTS=OFF
-                        -DGLFW_BUILD_DOCS=OFF
-                        -DGLFW_INSTALL=OFF
-                        -DBUILD_SHARED_LIBS=ON
-                        -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}
-    UPDATE_COMMAND        ""
-    INSTALL_COMMAND        ""
-    TEST_COMMAND        ""
-)
-
-INCLUDE_DIRECTORIES(
-    "${CMAKE_BINARY_DIR}/depend/glfw/include"
-    "${CMAKE_BINARY_DIR}/depend/build/glfw/include"
-)
-
-IF(WIN32)
-    LIST(APPEND _DEPEND_LIBRARIES_DEBUG "glfw3dll.lib")
-    LIST(APPEND _DEPEND_LIBRARIES_RELEASE "glfw3dll.lib")
-ELSE()
-    LIST(APPEND _DEPEND_LIBRARIES "libglfw.so")
-ENDIF()
-
-ADD_DEPENDENCIES(${PROJECT_NAME} depend-glfw)
-
 # Link all libraries
-FOREACH(lib IN ITEMS ${_DEPEND_LIBRARIES})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} "${CMAKE_BINARY_DIR}/${lib}")
-ENDFOREACH()
-
-FOREACH(debug_lib IN ITEMS ${_DEPEND_LIBRARIES_DEBUG})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug "${CMAKE_BINARY_DIR}/Debug/${debug_lib}")
-ENDFOREACH()
-
-FOREACH(release_lib IN ITEMS ${_DEPEND_LIBRARIES_RELEASE})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} optimized "${CMAKE_BINARY_DIR}/Release/${release_lib}")
-ENDFOREACH()
-
-ADD_CUSTOM_TARGET(
-    run
-    COMMAND $<TARGET_FILE:${PROJECT_NAME}>
-    DEPENDS ${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-SET_TARGET_PROPERTIES(
-    run
-    PROPERTIES FOLDER "Automation"
+TARGET_LINK_LIBRARIES(
+    ${PROJECT_NAME}
+    GLM::GLM
+    GLFW3::GLFW3
 )
 
 # Add Demos Sub
 ADD_SUBDIRECTORY(demos)
 
 SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
-SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 # Packaging
 
