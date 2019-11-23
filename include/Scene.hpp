@@ -9,11 +9,9 @@
 #include <memory>
 #include <unordered_map>
 
-class Scene //: public GameObject
+class Scene : public GameObject
 {
 public:
-
-    typedef std::unordered_map<std::string, GameObject*> GameObjectMap;
 
     Scene() = default;
     virtual ~Scene();
@@ -27,26 +25,22 @@ public:
 
     bool Load(std::string filename);
 
-
-    GameObjectMap GetGameObjects() { return _mGameObjects; }
     GameObject* GetGameObject(std::string name);
 
     // Ui Options.
     static void Options();
 
-protected:
+    void AddGameObject(std::string name, GameObject* gameObject);
+    GameObject* AddGameObject();
+    GameObject* AddGameObject(std::string name);
+    void AddGameObject(GameObject* gobj);
 
-    void AddGameObject(std::unique_ptr<GameObject> gameObject);
-
+private:
     static bool _sShowAxis;
-
-    GameObjectMap _mGameObjects;
 
     Axis* _mSceneAxis;
 
     glm::mat4 _mSceneTransform = glm::mat4(1);
-
-    std::vector<Mesh*> _mMeshes;
 };
 
 #endif // SCENE_H

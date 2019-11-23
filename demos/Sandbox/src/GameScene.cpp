@@ -15,37 +15,18 @@ void GameScene::Start()
 
     // Camera
     auto camera = new Camera();
-    _mGameObjects.emplace("Camera", camera);
-    _mGameObjects["Camera"]->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    AddGameObject("Camera", camera);
+    GetGameObject("Camera")->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
-    // Object setup
-    printf("\nLoading Materials\n");
-
     // Scene Objs
-    //Load("models/TestScene.glb");
-     //_mGameObjects.emplace("Light", new GameObject("models/Primitives/pCube.glb"));
-     //_mGameObjects.emplace("helmet", new GameObject("models/DamagedHelm.glb"));
+    Load("models/TestScene.glb");
+    Load("models/DamagedHelm.glb");
 
-     //_mGameObjects.emplace("Scene", new GameObject("models/TestScene.glb"));
-     
-     //std::unique_ptr<GameObject> Test(new GameObject("models/DamagedHelm.glb"));
-     //Scene::AddGameObject(Test);
-
-     Scene::Load("models/TestScene.glb");
-
-    // _mGameObjects["helmet"]->SetParent(_mGameObjects["Light"]);
-    // _mGameObjects["Light"]->AddChild(_mGameObjects["helmet"]);
-
-    // // Initialize Objs
-     //_mGameObjects["Light"]->SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-    // _mGameObjects["Light"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-
-     //_mGameObjects["Scene"]->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-     //_mGameObjects["Scene"]->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-
-     //_mGameObjects["helmet"]->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
-     //_mGameObjects["helmet"]->SetRotation(glm::angleAxis(glm::radians(60.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
+    // Initialize Objs
+    auto helmet = GetGameObject("node_damagedHelmet_-6514");
+    helmet->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+    helmet->SetRotation(glm::angleAxis(glm::radians(60.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
 
     // Shaders
     printf("\nLoading Shaders\n");
@@ -62,10 +43,9 @@ void GameScene::Start()
     app->AddShader("normalMapping", new Shader({
         "shaders/normalMapping.vert",
         "shaders/normalMapping.frag" }));
-
-    //_mGameObjects["Light"]->SetShader(app->GetShader("passThru"));
-    //_mGameObjects["Scene"]->SetShader(app->GetShader("passThru"));
-    //_mGameObjects["helmet"]->SetShader(app->GetShader("normalMapping"));
+    
+    // Setup Shaders
+    helmet->SetShader(app->GetShader("normalMapping"));
 
     // UI
     DevUI::Start();

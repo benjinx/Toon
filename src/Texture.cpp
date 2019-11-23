@@ -64,8 +64,9 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
             bpp - bytes per pixel
             32 = RGBA = 4 * 8
             24 = RGB = 3 * 8
-        //stbi_set_flip_vertically_on_load(true);
         */
+        //stbi_set_flip_vertically_on_load(true);
+
 
         image = stbi_load_from_file(file, &_mSize.x, &_mSize.y, &bpp, STBI_rgb_alpha);
         fclose(file);

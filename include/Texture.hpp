@@ -8,6 +8,7 @@
 class Texture
 {
 public:
+    Texture() = default;
     Texture(const std::string& filename/*, Options opts = Options()*/);
     Texture(const uint8_t* data, glm::ivec2 size, int comp = 4/*, Options opts = Options()*/);
     Texture(GLuint&& id, glm::ivec2 size);

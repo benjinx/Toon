@@ -6,9 +6,14 @@
 #include <OpenGL.hpp>
 
 #include <vector>
+#include <memory>
 
 class Shader;
+class Material;
 class Model;
+class Texture;
+namespace tinygltf { class Node; }
+namespace tinygltf { class Model; }
 
 //
 class GameObject
@@ -17,7 +22,6 @@ public:
 
     GameObject();
     GameObject(glm::vec3 position);
-    GameObject(std::string filename);
     virtual ~GameObject();
 
     virtual void Update(const float dt);
@@ -121,8 +125,10 @@ public:
     std::string GetName() { return _mName; }
 
     void SetModel(Model* model) { _mModel = model; }
+
+    bool Load(std::string filename);
     
-protected:
+private:
     // Pos, rot, scale
     glm::vec3 _mPosition = glm::vec3(0.0f),
               _mScale = glm::vec3(1.0f);
@@ -140,6 +146,22 @@ protected:
     // Children
     std::vector<GameObject*> _mChildren;
 
+    // Object name
     std::string _mName;
+
+    // Loading
+    tinygltf::Model* _mLoadedModel;
+    std::vector<std::shared_ptr<Texture>> _mTextures;
+    std::vector<std::shared_ptr<Material>> _mMaterials;
+    std::vector<GLuint> _mVBOS;
+
+    // Load Textures
+    bool processTextures();
+
+    // Load Materials
+    bool processMaterials();
+
+    // Part of loading function
+    std::unique_ptr<GameObject> processNode(tinygltf::Node& node);
 };
 #endif // GAMEOBJECT_HPP
