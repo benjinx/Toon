@@ -10,11 +10,21 @@ class Light : public GameObject
 public:
     Light() = default;
     virtual ~Light() = default;
+
+    void SetColor(glm::vec3 color) { _mColor = color; }
+    void SetColor(float r, float g, float b) {  _mColor.r = r;
+                                                _mColor.g = g;
+                                                _mColor.b = b; }
+    glm::vec3 GetColor() { return _mColor; }
+    
+private:
+    glm::vec3 _mColor;
 };
 
 class DirectionalLight : public Light
 {
 public:
+    DirectionalLight() {};
     DirectionalLight(glm::vec3 direction);
 
     void SetDirection(glm::vec3 direction);
@@ -24,6 +34,7 @@ public:
 class PointLight : public Light
 {
 public:
+    PointLight() {};
     PointLight(glm::vec3 position, float constant, float linear, float quadratic);
 
     void SetConstant(float constant);
@@ -43,6 +54,7 @@ private:
 class SpotLight : public Light
 {
 public:
+    SpotLight() {};
     SpotLight(glm::vec3 position, glm::vec3 direction, float cutoff, float outerCutoff);
 
     void SetDirection(glm::vec3 direction);

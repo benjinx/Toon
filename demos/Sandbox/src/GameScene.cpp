@@ -20,13 +20,18 @@ void GameScene::Start()
     App::Inst()->SetCurrentCamera(camera);
 
     // Scene Objs
-    Load("models/TestScene.glb");
+    //Load("models/testSceneLight.glb");
+    Load("models/untitled2.glb");
+    //Load("models/TestScene.glb");
     Load("models/DamagedHelm.glb");
 
     // Initialize Objs
     auto helmet = GetGameObject("node_damagedHelmet_-6514");
-    helmet->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
-    helmet->SetRotation(glm::angleAxis(glm::radians(60.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
+    helmet->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    helmet->SetRotation(glm::rotate(glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+
+    auto sun = GetGameObject("Sun");
+    auto cube = GetGameObject("Cube");
 
     // Shaders
     printf("\nLoading Shaders\n");
@@ -43,9 +48,16 @@ void GameScene::Start()
     app->AddShader("normalMapping", new Shader({
         "shaders/normalMapping.vert",
         "shaders/normalMapping.frag" }));
+
+    app->AddShader("lightCasters", new Shader({
+        "shaders/lightCasters.vert",
+        "shaders/lightCasters.frag"
+        }));
     
     // Setup Shaders
-    helmet->SetShader(app->GetShader("normalMapping"));
+    helmet->SetShader(app->GetShader("lightCasters"));
+    sun->SetShader(app->GetShader("lightCasters"));
+    cube->SetShader(app->GetShader("lightCasters"));
 
     // UI
     DevUI::Start();
@@ -109,20 +121,52 @@ void GameScene::Update(float dt)
     // Get reference to each shader
     Shader* passThru = app->GetShader("passThru");
     Shader* normalMapping = app->GetShader("normalMapping");
+    Shader* lightCasters = app->GetShader("lightCasters");
 
     passThru->Use();
     glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     passThru->SetVec3("passColor", lightColor);
 
+    auto sun = GetGameObject("Sun");
+
     // Set Light Position
     normalMapping->Use();
 
     normalMapping->SetVec3("lightColor", lightColor);
-    normalMapping->SetVec4("lightPos", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    //normalMapping->SetVec4("lightPos", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    normalMapping->SetVec4("lightPos", glm::vec4(sun->GetWorldPosition(), 1.0f));
 
     glm::vec3 camPos = App::Inst()->GetCurrentCamera()->GetPosition();
     glm::vec4 eyePos = glm::vec4(camPos.x, camPos.y, camPos.z, 1.0f);
     normalMapping->SetVec4("eyePos", eyePos);
+
+    lightCasters->Use();
+    lightCasters->SetVec4("eyePos", eyePos);
+
+    if (_mDirLight)
+    {
+        auto cube = GetGameObject("Cube");
+        auto rot = GetGameObject("Sun")->GetRotation();
+        lightCasters->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        //auto newRot = glm::eulerAngles(sunRot) * 2;
+        //newRot -= 1;
+        //auto norm = glm::normalize(newRot);
+
+        //auto test = glm::vec3(-0.2f, -1.0f, -0.3f) * 2;
+        //test -= 1.0f;
+
+        //auto norm = glm::normalize(test);
+        //LogInfo("Norm: %f, %f, %f\n", norm.x, norm.y, norm.z);
+        auto sunRot = glm::rotate(rot, glm::vec3(0.0f, 0.0f, -1.0f));
+        lightCasters->SetBool("lightCheck.Directional", true);
+        lightCasters->SetVec4("dirLight.direction", glm::vec4(sunRot.x, sunRot.y, sunRot.z, 0.0f));
+        //LogInfo("sunrot %f, %f, %f\n", sunRot.x, sunRot.y, sunRot.z);
+    }
+    else
+        lightCasters->SetBool("lightCheck.Directional", false);
+
+    lightCasters->SetBool("lightCheck.Point", false);
+    lightCasters->SetBool("lightCheck.Spot", false);
 }
 
 void GameScene::Render()

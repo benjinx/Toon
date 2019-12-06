@@ -2,6 +2,7 @@
 
 #include <App.hpp>
 #include <Camera.hpp>
+#include <Light.hpp>
 #include <Log.hpp>
 #include <Material.hpp>
 #include <Model.hpp>
@@ -89,7 +90,6 @@ bool GameObject::Load(std::string filename)
     LogVerbose("Model Generator %s\n", model.asset.generator);
 
     bool loadedTextures = processTextures();
-
     bool loadedMaterials = processMaterials();
 
     const auto& scene = _mLoadedModel->scenes[_mLoadedModel->defaultScene];
@@ -265,10 +265,77 @@ std::unique_ptr<GameObject> GameObject::processNode(tinygltf::Node& node)
             }
         }
     }
+    else if (node.extensions.size() > 0)
+    {
+        LogInfo("We have an extension.\n");
+        for (auto ext : node.extensions)
+        {
+            if (ext.first == "KHR_lights_punctual")
+            {
+                LogInfo("KHR_lights_punctual\n");
+                int lightExt = ext.second.Get("light").GetNumberAsInt();
+                auto light = _mLoadedModel->lights[lightExt];
+
+                for (auto color : light.color)
+                    LogInfo("light.color = %f\n", color);
+
+                LogInfo("light.intensity = %f\n", light.intensity);
+                LogInfo("light.name = %s\n", light.name);
+                LogInfo("light.range = %f\n", light.range);
+                LogInfo("light.spot.innerConeAngle = %f\n", light.spot.innerConeAngle);
+                LogInfo("light.spot.outerConeAngle = %f\n", light.spot.outerConeAngle);
+                LogInfo("light.type = %s\n\n", light.type);
+
+                if (light.type == "directional")
+                {
+                    DirectionalLight* dirLight = new DirectionalLight();
+                    dirLight->SetColor(glm::make_vec3(light.color.data()));
+                    
+                    if (node.rotation.data() != 0)
+                    {
+                        const auto& rot = node.rotation;
+                        glm::quat dirQuat = glm::quat(rot[3], rot[0], rot[1], rot[2]);
+                        LogInfo("Quat: %f, %f, %f, %f\n", dirQuat.w, dirQuat.x, dirQuat.y, dirQuat.z);
+                        //glm::vec3 direction = glm::rotate(dirQuat, glm::vec3(0.0f, 0.0f, -1.0f));
+                        //dirLight->SetDirection(direction);
+                    }
+                    else
+                        dirLight->SetDirection(glm::vec3(0.0f, 0.0f, 0.0f));
+
+                    LogInfo("Directional Light.\n");
+                    for (auto color : light.color)
+                        LogInfo("light.color = %f\n", color);
+                    //LogInfo("direction = %f, %f, %f\n\n", dirLight->GetDirection().x, dirLight->GetDirection().y, dirLight->GetDirection().z);
+                    
+                    gobj = dirLight;
+                }
+                else if (light.type == "point")
+                {
+                    PointLight* pointLight = new PointLight();
+
+                    pointLight->SetColor(glm::make_vec3(light.color.data()));
+                    //pointLight->
+                    //light
+
+                    gobj = pointLight;
+                }
+                else if (light.type == "spot")
+                {
+                    SpotLight* spotLight = new SpotLight();
+
+                    gobj = spotLight;
+                }
+            }
+            else
+            {
+                gobj = new GameObject();
+            }
+        }
+    }
     else
     {
         gobj = new GameObject();
-    }
+    }    
 
     // Check if we have a mesh
     if (node.mesh >= 0)
