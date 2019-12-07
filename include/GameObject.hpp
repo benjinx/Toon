@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+#include <assimp/Importer.hpp>
+
 class Shader;
 class Material;
 class Model;

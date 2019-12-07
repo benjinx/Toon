@@ -1,0 +1,11 @@
+
+# Allow PROJECT() to manage versions
+IF(POLICY CMP0048)
+    CMAKE_POLICY(SET CMP0048 NEW)
+ENDIF()
+
+# Allow TARGET_SOURCES() to store absolute paths for INTERFACE_SOURCES and 
+# sources outside the CMAKE_CURRENT_SOURCE_DIR
+IF(POLICY CMP0076)
+    CMAKE_POLICY(SET CMP0076 NEW)
+ENDIF()

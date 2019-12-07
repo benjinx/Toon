@@ -1,11 +1,14 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12 FATAL_ERROR)
+
+LIST(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
+INCLUDE(Policies)
 
 # Initialize Projects
 PROJECT(Temporality)
 
-LIST(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-INCLUDE("cmake/Macros.cmake")
-INCLUDE("cmake/Compiler.cmake")
+INCLUDE(Macros)
+INCLUDE(Compiler)
 
 # Allow for custom organization of files in VisualStudio
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -37,6 +40,7 @@ IF(BUILD_THIRDPARTY)
 
     SET(GLM_ROOT_DIR        "${CMAKE_BINARY_DIR}/thirdparty/glm")
     SET(GLFW3_ROOT_DIR      "${CMAKE_BINARY_DIR}/thirdparty/glfw3")
+    LIST(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/thirdparty/assimp)
 
     EXECUTE_PROCESS(
         COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${CMAKE_SOURCE_DIR}/thirdparty"
@@ -67,6 +71,23 @@ ENDIF()
 
 FIND_PACKAGE(GLM REQUIRED)
 FIND_PACKAGE(GLFW3 REQUIRED)
+FIND_PACKAGE(assimp CONFIG 5.0 REQUIRED)
+
+IF(TARGET assimp::assimp)
+    # Extract release-specific configuration
+    GET_TARGET_PROPERTY(soname      assimp::assimp IMPORTED_SONAME_RELEASE)
+    GET_TARGET_PROPERTY(implib      assimp::assimp IMPORTED_IMPLIB_RELEASE)
+    GET_TARGET_PROPERTY(location    assimp::assimp IMPORTED_LOCATION_RELEASE)
+
+    # Set build type agnostic configuration
+    SET_TARGET_PROPERTIES(
+        assimp::assimp 
+        PROPERTIES
+            IMPORTED_SONAME     "${soname}"
+            IMPORTED_IMPLIB     "${implib}"
+            IMPORTED_LOCATION   "${location}"
+    )
+ENDIF()
 
 # Allow VS to find .dll's
 SET(CMAKE_MSVCIDE_RUN_PATH 
@@ -145,6 +166,7 @@ TARGET_LINK_LIBRARIES(
     ${PROJECT_NAME}
     GLM::GLM
     GLFW3::GLFW3
+    assimp::assimp
 )
 
 # Add Demos Sub
