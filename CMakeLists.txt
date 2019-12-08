@@ -1,109 +1,138 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12 FATAL_ERROR)
 
+# Allow for custom CMake modules
 LIST(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 INCLUDE(Policies)
 
-# Initialize Projects
+###
+### Project
+###
+
 PROJECT(Temporality)
 
-INCLUDE(Macros)
-INCLUDE(Compiler)
+###
+### Options
+###
 
-# Allow for custom organization of files in VisualStudio
-SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+OPTION(BUILD_DEMOS      "Build Demo Projects"                               ON)
+OPTION(BUILD_THIRDPARTY "Build Missing ThirdParty Dependencies"             ON)
+OPTION(BUILD_PACKAGES   "Build Packages"                                    OFF)
 
-# Get Git revision
-INCLUDE(GetGitRevisionDescription)
-GET_GIT_HEAD_REVISION(GIT_REFSPEC PROJECT_VERSION_GIT_HASH)
-STRING(SUBSTRING "${PROJECT_VERSION_GIT_HASH}" 0 8 PROJECT_VERSION_GIT_HASH)
-
-GIT_DESCRIBE(VERSION --tags)
-STRING(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
-STRING(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
-STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
-SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-
-# Allow verbose logging
 OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
 IF(VERBOSE_LOGGING)
     ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
 ENDIF()
 
+###
+### Configuration
+###
 
-# Third Party Dependencies
+INCLUDE(Macros)
+INCLUDE(Compiler)
+INCLUDE(Version)
 
-OPTION(BUILD_THIRDPARTY "Build Dusk ThirdParty Dependencies" ON)
+# Allow for custom organization of files in VisualStudio
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Don't use the install RPATH when building
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# Limit Configuration Types
+IF(CMAKE_CONFIGURATION_TYPES)
+    SET(CMAKE_CONFIGURATION_TYPES Debug Release)
+ENDIF()
+
+###
+### Third Party Dependencies
+###
 
 IF(BUILD_THIRDPARTY)
-    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty")
+    SET(THIRDPARTY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
+    SET(THIRDPARTY_BINARY_DIR ${CMAKE_BINARY_DIR}/thirdparty)
 
-    SET(GLM_ROOT_DIR        "${CMAKE_BINARY_DIR}/thirdparty/glm")
-    SET(GLFW3_ROOT_DIR      "${CMAKE_BINARY_DIR}/thirdparty/glfw3")
-    LIST(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/thirdparty/assimp)
+    FILE(MAKE_DIRECTORY ${THIRDPARTY_BINARY_DIR})
 
+    SET(glm_ROOT            ${THIRDPARTY_BINARY_DIR}/glm)
+    SET(glfw3_ROOT          ${THIRDPARTY_BINARY_DIR}/glfw3)
+    SET(assimp_ROOT         ${THIRDPARTY_BINARY_DIR}/assimp)
+    
     EXECUTE_PROCESS(
-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${CMAKE_SOURCE_DIR}/thirdparty"
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty"
-        RESULT_VARIABLE result
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" 
+            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            ${THIRDPARTY_SOURCE_DIR}
+            WORKING_DIRECTORY ${THIRDPARTY_BINARY_DIR}
+        RESULT_VARIABLE _result
     )
-    IF(result)
-        MESSAGE("${result}")
+    IF(_result)
+        MESSAGE("${_result}")
         MESSAGE(FATAL_ERROR "Failed to configure thirdparty projects")
     ENDIF()
 
-    SET(BUILD_COMMAND ${CMAKE_COMMAND} --build . )
-    IF("${CMAKE_GENERATOR}" STREQUAL "Unix Makefiles")
-        SET(BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -l )
+    SET(_THIRDPARTY_BUILD_COMMAND ${CMAKE_COMMAND} --build . )
+    IF(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+        SET(_THIRDPARTY_BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -l )
     ENDIF()
 
     EXECUTE_PROCESS(
-        COMMAND ${BUILD_COMMAND}
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty"
-        RESULT_VARIABLE result
+        COMMAND ${_THIRDPARTY_BUILD_COMMAND}
+        WORKING_DIRECTORY ${THIRDPARTY_BINARY_DIR}
+        RESULT_VARIABLE _result
     )
 
-    IF(result)
-        MESSAGE("${result}")
+    IF(_result)
+        MESSAGE("${_result}")
         MESSAGE(FATAL_ERROR "Failed to build thirdparty projects")
     ENDIF()
 ENDIF()
 
-FIND_PACKAGE(GLM REQUIRED)
-FIND_PACKAGE(GLFW3 REQUIRED)
+FIND_PACKAGE(glm CONFIG REQUIRED)
+FIND_PACKAGE(glfw3 CONFIG REQUIRED)
 FIND_PACKAGE(assimp CONFIG 5.0 REQUIRED)
 
-IF(TARGET assimp::assimp)
-    # Extract release-specific configuration
-    GET_TARGET_PROPERTY(soname      assimp::assimp IMPORTED_SONAME_RELEASE)
-    GET_TARGET_PROPERTY(implib      assimp::assimp IMPORTED_IMPLIB_RELEASE)
-    GET_TARGET_PROPERTY(location    assimp::assimp IMPORTED_LOCATION_RELEASE)
+GET_TARGET_PROPERTY(_location glfw IMPORTED_LOCATION_RELEASE)
+GET_FILENAME_COMPONENT(glfw_RUNTIME_DIR ${_location} DIRECTORY)
 
-    # Set build type agnostic configuration
-    SET_TARGET_PROPERTIES(
-        assimp::assimp 
-        PROPERTIES
-            IMPORTED_SONAME     "${soname}"
-            IMPORTED_IMPLIB     "${implib}"
-            IMPORTED_LOCATION   "${location}"
-    )
-ENDIF()
+# Extract release-specific configuration
+GET_TARGET_PROPERTY(_soname   assimp::assimp IMPORTED_SONAME_RELEASE)
+GET_TARGET_PROPERTY(_implib   assimp::assimp IMPORTED_IMPLIB_RELEASE)
+GET_TARGET_PROPERTY(_location assimp::assimp IMPORTED_LOCATION_RELEASE)
+
+GET_FILENAME_COMPONENT(assimp_RUNTIME_DIR ${_location} DIRECTORY)
+
+# Set build type agnostic configuration for assimp
+SET_TARGET_PROPERTIES(
+    assimp::assimp 
+    PROPERTIES
+        IMPORTED_SONAME         ${_soname}
+        IMPORTED_IMPLIB         ${_implib}
+        IMPORTED_LOCATION       ${_location}
+        IMPORTED_SONAME_DEBUG   ${_soname}
+        IMPORTED_IMPLIB_DEBUG   ${_implib}
+        IMPORTED_LOCATION_DEBUG ${_location}
+)
 
 # Allow VS to find .dll's
-SET(CMAKE_MSVCIDE_RUN_PATH 
-    ${GLFW3_RUNTIME_DIR}
+SET(RUNTIME_SEARCH_PATH 
+    ${glfw_RUNTIME_DIR}
+    ${assimp_RUNTIME_DIR}
 )
 
-SET(RUN_PATH 
-	"PATH=%PATH%" ${CMAKE_MSVCIDE_RUN_PATH}
+FILE(RELATIVE_PATH 
+    RESOURCE_PATH 
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/resources
 )
-
-# Configuration
-FILE(RELATIVE_PATH RESOURCE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/resources")
                         
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+###
+### Engine
+###
 
 CONFIGURE_FILE(
     ${CMAKE_SOURCE_DIR}/include/Config.hpp.in
@@ -147,10 +176,10 @@ TARGET_INCLUDE_DIRECTORIES(
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/>
     PRIVATE
-        "${CMAKE_SOURCE_DIR}/include"
-        "${CMAKE_SOURCE_DIR}/include/imgui"
-        "${CMAKE_SOURCE_DIR}/src"
-        "${CMAKE_BINARY_DIR}"
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/include/imgui
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_BINARY_DIR}
 )
 
 # Folders to filters
@@ -164,75 +193,10 @@ ENDFOREACH()
 # Link all libraries
 TARGET_LINK_LIBRARIES(
     ${PROJECT_NAME}
-    GLM::GLM
-    GLFW3::GLFW3
+    glm
+    glfw
     assimp::assimp
 )
-
-# Add Demos Sub
-ADD_SUBDIRECTORY(demos)
-
-SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
-
-# Packaging
-
-FIND_PROGRAM(
-    TAR_EXECUTABLE
-    tar
-)
-
-IF (TAR_EXECUTABLE)
-    SET(_PACKAGE "libtemporality-${PROJECT_VERSION}")
-
-    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${_PACKAGE}")
-    
-    ADD_CUSTOM_COMMAND(
-        OUTPUT "${_PACKAGE}.tgz"
-        DEPENDS ${PROJECT_NAME}
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="" ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E env 
-            DESTDIR="${CMAKE_BINARY_DIR}/${_PACKAGE}" 
-            ${CMAKE_COMMAND} --build . --target install
-        COMMAND ${TAR_EXECUTABLE} -cvzf "${CMAKE_BINARY_DIR}/${_PACKAGE}.tgz" "${CMAKE_BINARY_DIR}/${_PACKAGE}/*"
-    )
-
-    ADD_CUSTOM_TARGET(
-        tgz
-        DEPENDS "${_PACKAGE}.tgz"
-    )
-ENDIF()
-
-FIND_PROGRAM(
-    DPKG_DEB_EXECUTABLE
-    dpkg-deb
-)
-
-IF (DPKG_DEB_EXECUTABLE)
-    SET(_PACKAGE "libtemporality-dev_${PROJECT_VERSION}-1")
-
-    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${_PACKAGE}/DEBIAN")
-
-    CONFIGURE_FILE(
-        "${CMAKE_SOURCE_DIR}/cmake/DEBIAN/control.in"
-        "${CMAKE_BINARY_DIR}/${_PACKAGE}/DEBIAN/control"
-        @ONLY
-    )
-    
-    ADD_CUSTOM_COMMAND(
-        OUTPUT "${_PACKAGE}.deb"
-        DEPENDS ${PROJECT_NAME}
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="/usr/local" ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E env 
-            DESTDIR="${CMAKE_BINARY_DIR}/${_PACKAGE}" 
-            ${CMAKE_COMMAND} --build . --target install
-        COMMAND ${DPKG_DEB_EXECUTABLE} --build "${CMAKE_BINARY_DIR}/${_PACKAGE}"
-    )
-
-    ADD_CUSTOM_TARGET(
-        deb
-        DEPENDS "${_PACKAGE}.deb"
-    )
-ENDIF()
 
 INSTALL(TARGETS ${PROJECT_NAME}
     EXPORT TemporalityTargets
@@ -243,7 +207,7 @@ INSTALL(TARGETS ${PROJECT_NAME}
 
 INCLUDE(CMakePackageConfigHelpers)
 
-WRITE_BASIC_PACKAGE_VERSION_FILE(
+WRITE_BASIC_package_VERSION_FILE(
     "${CMAKE_BINARY_DIR}/TemporalityConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
@@ -255,7 +219,7 @@ INSTALL(EXPORT TemporalityTargets
     DESTINATION lib/cmake/Temporality
 )
 
-CONFIGURE_PACKAGE_CONFIG_FILE(
+CONFIGURE_package_CONFIG_FILE(
     "${CMAKE_SOURCE_DIR}/cmake/TemporalityConfig.cmake.in"
     "${CMAKE_BINARY_DIR}/TemporalityConfig.cmake"
     INSTALL_DESTINATION lib/cmake/Temporality
@@ -271,7 +235,7 @@ INSTALL(FILES
     DESTINATION lib/cmake/Temporality
 )
 
-INCLUDE(FindPkgConfig)
+FIND_PACKAGE(PkgConfig QUIET)
 
 IF(PKG_CONFIG_FOUND)
     CONFIGURE_FILE(
@@ -287,7 +251,29 @@ IF(PKG_CONFIG_FOUND)
 ENDIF()
 
 INSTALL(DIRECTORY
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    "${CMAKE_SOURCE_DIR}/include/"
     DESTINATION include
     PATTERN "*.in" EXCLUDE
 )
+
+
+###
+### Demos
+###
+
+# Allow custom targets to find .dlls
+SET(CMAKE_MSVC_RUN_PATH "${RUNTIME_SEARCH_PATH}")
+
+IF(BUILD_DEMOS)
+    ADD_SUBDIRECTORY(demos)
+
+    SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "HelloWorld")
+ENDIF()
+
+###
+### Packaging
+###
+
+IF(BUILD_PACKAGES)
+    ADD_SUBDIRECTORY(packages)
+ENDIF()
