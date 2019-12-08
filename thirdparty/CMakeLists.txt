@@ -8,40 +8,41 @@ INCLUDE(ExternalProject)
 PROJECT(thirdparty)
 
 # glm
-FIND_PACKAGE(GLM QUIET)
 
-IF (NOT GLM_FOUND)
-    SET(_GLM_DIR "${CMAKE_BINARY_DIR}/glm")
+SET(glm_ROOT       ${CMAKE_BINARY_DIR}/glm)
+SET(glm_SOURCE_DIR ${CMAKE_BINARY_DIR}/glm_src)
 
-    # glm
+FIND_PACKAGE(glm CONFIG QUIET)
+
+IF(NOT glm_FOUND)
     ExternalProject_Add(thirdparty-glm
         GIT_REPOSITORY      "https://github.com/g-truc/glm.git"
         GIT_TAG             "0.9.9.3"
         GIT_SHALLOW         TRUE
-        SOURCE_DIR          "${_GLM_DIR}"
-        CONFIGURE_COMMAND   ""
+        SOURCE_DIR          ${glm_SOURCE_DIR}
+        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${glm_ROOT}
+                            -DGLM_TEST_ENABLE=OFF
         BUILD_COMMAND       ""
         UPDATE_COMMAND      ""
-        INSTALL_COMMAND     ""
-        TEST_COMMAND        ""
     )
 ENDIF()
 
 # glfw
-FIND_PACKAGE(GLFW3 QUIET)
 
-IF (NOT GLFW3_FOUND)
-    SET(_GLFW3_DIR          "${CMAKE_BINARY_DIR}/glfw3")
-    SET(_GLFW3_SOURCE_DIR   "${CMAKE_BINARY_DIR}/glfw3_src")
-    SET(_GLFW3_BINARY_DIR   "${CMAKE_BINARY_DIR}/glfw3_bin")
+SET(glfw3_ROOT         ${CMAKE_BINARY_DIR}/glfw3)
+SET(glfw3_SOURCE_DIR   ${CMAKE_BINARY_DIR}/glfw3_src)
+SET(glfw3_BINARY_DIR   ${CMAKE_BINARY_DIR}/glfw3_bin)
 
+FIND_PACKAGE(glfw3 QUIET)
+
+IF (NOT glfw3_FOUND)
     ExternalProject_Add(thirdparty-glfw
         GIT_REPOSITORY      "https://github.com/glfw/glfw"
         GIT_TAG             "3.2.1"
         GIT_SHALLOW         TRUE
-        SOURCE_DIR          "${_GLFW3_SOURCE_DIR}"
-        BINARY_DIR          "${_GLFW3_BINARY_DIR}"
-        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${_GLFW3_DIR} 
+        SOURCE_DIR          ${glfw3_SOURCE_DIR}
+        BINARY_DIR          ${glfw3_BINARY_DIR}
+        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${glfw3_ROOT} 
                             -DGLFW_BUILD_EXAMPLES=OFF
                             -DGLFW_BUILD_TESTS=OFF
                             -DGLFW_BUILD_DOCS=OFF
@@ -55,9 +56,10 @@ IF (NOT GLFW3_FOUND)
 ENDIF()
 
 # Assimp
-SET(assimp_ROOT         "${CMAKE_BINARY_DIR}/assimp")
-SET(assimp_SOURCE_DIR   "${CMAKE_BINARY_DIR}/assimp_src")
-SET(assimp_BINARY_DIR   "${CMAKE_BINARY_DIR}/assimp_bin")
+
+SET(assimp_ROOT       ${CMAKE_BINARY_DIR}/assimp)
+SET(assimp_SOURCE_DIR ${CMAKE_BINARY_DIR}/assimp_src)
+SET(assimp_BINARY_DIR ${CMAKE_BINARY_DIR}/assimp_bin)
 
 FIND_PACKAGE(assimp 5.0 CONFIG QUIET)
 
@@ -66,9 +68,10 @@ IF(NOT assimp_FOUND)
         GIT_REPOSITORY      "https://github.com/assimp/assimp.git"
         GIT_TAG             "master"
         GIT_SHALLOW         TRUE
-        SOURCE_DIR          "${assimp_SOURCE_DIR}"
-        BINARY_DIR          "${assimp_BINARY_DIR}"
+        SOURCE_DIR          ${assimp_SOURCE_DIR}
+        BINARY_DIR          ${assimp_BINARY_DIR}
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${assimp_ROOT}
+                            -DINJECT_DEBUG_POSTFIX=OFF
                             -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
                             -DASSIMP_BUILD_SAMPLES=OFF
                             -DASSIMP_BUILD_TESTS=OFF
@@ -77,6 +80,5 @@ IF(NOT assimp_FOUND)
         UPDATE_COMMAND      ""
         TEST_COMMAND        ""
         INSTALL_COMMAND     ${CMAKE_COMMAND} --build . --target install --config Release
-        COMMAND             ${CMAKE_COMMAND} --build . --target install --config Debug
     )
 ENDIF()
