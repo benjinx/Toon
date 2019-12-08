@@ -69,6 +69,7 @@ IF(NOT assimp_FOUND)
         SOURCE_DIR          "${assimp_SOURCE_DIR}"
         BINARY_DIR          "${assimp_BINARY_DIR}"
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${assimp_ROOT}
+                            -DINJECT_DEBUG_POSTFIX=OFF
                             -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
                             -DASSIMP_BUILD_SAMPLES=OFF
                             -DASSIMP_BUILD_TESTS=OFF
