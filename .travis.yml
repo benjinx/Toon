@@ -15,8 +15,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "GCC (Debug, System)"
@@ -24,8 +23,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "GCC (Release, ThirdParty)"
@@ -33,8 +31,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "GCC (Release, System)"
@@ -42,8 +39,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "Clang (Debug, ThirdParty)"
@@ -51,8 +47,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: [ 'llvm-toolchain-xenial-6.0', 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "Clang (Debug, System)"
@@ -60,8 +55,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: [ 'llvm-toolchain-xenial-6.0', 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "Clang (Release, ThirdParty)"
@@ -69,8 +63,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: [ 'llvm-toolchain-xenial-6.0', 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "Clang (Release, System)"
@@ -78,20 +71,21 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: [ 'llvm-toolchain-xenial-6.0', 'ubuntu-toolchain-r-test', 'kalakris-cmake' ]
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'cmake', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
 before_install:
+  - wget -O install-cmake.sh https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh
+  - mkdir cmake
+  - bash install-cmake.sh --prefix=$PWD/cmake --skip-license --exclude-subdir
+  - export PATH="$PWD/cmake/bin:$PATH"
+  - cmake --version
   - env
-  - export SRC_DIR="`pwd`"
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; export J=1; fi
-  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
 
 script:
-  - $CXX --version
-  - cmake --version
+  - git describe --tags
+  - mkdir -p "$TRAVIS_BUILD_DIR/build"
   - cd "$TRAVIS_BUILD_DIR/build"
   - pwd
-  - cmake -Dstdlib=libstdc++ -DVERBOSE_LOGGING=ON -G "Unix Makefiles" "$SRC_DIR"
-  - make -j$J
+  - cmake -Dstdlib=libstdc++ -DVERBOSE_LOGGING=ON -G "Unix Makefiles" "$TRAVIS_BUILD_DIR"
+  - make -l
