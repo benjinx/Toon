@@ -15,7 +15,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "GCC (Debug, System)"
@@ -23,7 +23,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "GCC (Release, ThirdParty)"
@@ -31,7 +31,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "GCC (Release, System)"
@@ -39,7 +39,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "Clang (Debug, ThirdParty)"
@@ -47,7 +47,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "Clang (Debug, System)"
@@ -55,7 +55,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "Clang (Release, ThirdParty)"
@@ -63,7 +63,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "Clang (Release, System)"
@@ -71,7 +71,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'ninja-build', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
 before_install:
