@@ -75,10 +75,10 @@ matrix:
       env: CMAKE_BUILD_TYPE=RELEASE
 
 before_install:
-  - wget -O install-cmake.sh https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh
-  - mkdir cmake
-  - bash install-cmake.sh --prefix=$PWD/cmake --skip-license --exclude-subdir
-  - export PATH="$PWD/cmake/bin:$PATH"
+  - mkdir $HOME/cmake
+  - wget -O $HOME/cmake/install.sh https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh
+  - bash $HOME/cmake/install.sh --prefix=$HOME/cmake --skip-license --exclude-subdir
+  - export PATH="$HOME/cmake/bin:$PATH"
   - cmake --version
   - env
 
