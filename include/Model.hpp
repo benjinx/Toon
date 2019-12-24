@@ -4,8 +4,10 @@
 #include <Config.hpp>
 #include <Math.hpp>
 #include <OpenGL.hpp>
+#include <Mesh.hpp>
 
 #include <vector>
+#include <memory>
 
 enum AttributeID : GLint
 {
@@ -18,24 +20,25 @@ enum AttributeID : GLint
 };
 
 class Shader;
-class Mesh;
 
 class Model
 {
 public:
-    Model(std::vector<Mesh*> meshes);
-    ~Model();
+    
+    Model(std::vector<std::unique_ptr<Mesh>> && meshes);
+
+    virtual ~Model() = default;
 
     void Render(Shader* shader, glm::mat4 modelMatrix);
 
-    void AddMesh(Mesh* mesh) { _mMeshes.push_back(mesh); }
-
-    Mesh* GetMesh(int index = 0) { return _mMeshes[index]; }
-    unsigned int GetNumMeshes() { return (unsigned int)_mMeshes.size(); }
+    void AddMesh(std::unique_ptr<Mesh> && mesh) { 
+        _mMeshes.push_back(std::move(mesh));
+    }
 
 private:
+
     // Mesh
-    std::vector<Mesh*> _mMeshes;
+    std::vector<std::unique_ptr<Mesh>> _mMeshes;
 
 };
 

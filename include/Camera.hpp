@@ -25,8 +25,6 @@ public:
         Perspective,
         Orthographic,
     };
-
-    //DISALLOW_COPY_AND_ASSIGN(Camera);
     
     Camera();
 

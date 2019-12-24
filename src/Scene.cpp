@@ -19,18 +19,11 @@
 
 bool Scene::_sShowAxis = false;
 
-Scene::~Scene() {
-    delete _mSceneAxis;
-}
-
-void Scene::Start()
-{
-    _mSceneAxis = new Axis();
-}
-
 void Scene::Update(float dt)
 {
-    // Use default shader
+    GameObject::Update(dt);
+
+    // Use our default shaders and set the color & light position.
     App* app = App::Inst();
     Shader* defaultLighting = app->GetShader("defaultLighting");
 
@@ -40,42 +33,17 @@ void Scene::Update(float dt)
 
     glm::vec4 defaultLightPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     defaultLighting->SetVec4("lightPosition", defaultLightPosition);
-
-    //for (auto& gobj : _mGameObjects)
-    //{
-    //    // Update gobjs
-    //    gobj.second->Update(dt);
-    //}
-
-    for (auto& gobj : GetChildren())
-    {
-        // Need to also update myself?
-        gobj->Update(dt);
-    }
 }
 
 void Scene::Render()
 {
-    //for (auto& gameObject : _mGameObjects)
-    //{
-    //    // Render gobjs
-    //    gameObject.second->Render();
-    //}
-
-    for (auto& gobj : GetChildren())
-    {
-        gobj->Render();
-    }
+    GameObject::Render();
 
     if (_sShowAxis)
     {
-        for (auto& gameObject : GetChildren())
+        for (auto& gameObject : _mChildren)
         {
-            // Render the gobjs axis
-            _mSceneAxis->Render(gameObject->GetWorldTransform());
-
-            // Render the scenes axis
-            _mSceneAxis->Render(_mSceneTransform);
+            RenderAxis();
         }
     }
 }
@@ -90,47 +58,30 @@ bool Scene::Load(std::string filename)
     return false;
 }
 
-void Scene::AddGameObject(std::string name, GameObject* gameObject)
+GameObject* Scene::AddGameObject(std::string name, std::unique_ptr<GameObject> gameObject)
 {
-    if (gameObject)
-    {
-        gameObject->SetName(name);
-        AddChild(gameObject);
-    }
+    gameObject->SetName(name);
+    _mChildren.push_back(std::move(gameObject));
+    return _mChildren.back().get();
 }
 
 GameObject* Scene::AddGameObject()
 {
-    GameObject* tmp = new GameObject();
-    tmp->SetName("tmp" + rand());
-    AddChild(tmp);
-    return GetGameObject(tmp->GetName());
+    _mChildren.push_back(std::make_unique<GameObject>());
+    return _mChildren.back().get();
 }
 
 GameObject* Scene::AddGameObject(std::string name)
 {
-    GameObject* tmp = new GameObject();
-    tmp->SetName(name);
-    AddChild(tmp);
-    return GetGameObject(name);
+    _mChildren.push_back(std::make_unique<GameObject>());
+    _mChildren.back()->SetName(name);
+    return _mChildren.back().get();
 }
 
-void Scene::AddGameObject(GameObject* gobj)
+GameObject* Scene::AddGameObject(std::unique_ptr<GameObject> gobj)
 {
-    AddChild(gobj);
-}
-
-GameObject* Scene::GetGameObject(std::string name)
-{
-    for (auto gobj : GetChildren())
-    {
-        if (gobj->GetName() == name)
-        {
-            return gobj;
-        }
-    }
-
-    return new GameObject();
+    _mChildren.push_back(std::move(gobj));
+    return _mChildren.back().get();
 }
 
 void Scene::Options()

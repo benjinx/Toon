@@ -12,9 +12,8 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Camera
-    auto camera = new Camera();
-    AddGameObject("Camera", camera);
-    GetGameObject("Camera")->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
     // Light Source
@@ -32,10 +31,10 @@ void GameScene::Start()
 
     // Initialize Objs
 
-    auto Plane = GetGameObject("Plane");
-    auto Sphere = GetGameObject("sphere");
-    auto Cube = GetGameObject("cube");
-    auto Torus = GetGameObject("Torus");
+    auto Plane = FindGameObject("Plane");
+    auto Sphere = FindGameObject("sphere");
+    auto Cube = FindGameObject("cube");
+    auto Torus = FindGameObject("Torus");
 
     Plane->SetPosition(glm::vec3(0.0f, -2.5f, 0.0f));
     Plane->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -128,7 +127,7 @@ void GameScene::Update(float dt)
 
     // Point Lighting
     // Set attenuation values
-    PointLight pointLight(GetGameObject("Light")->GetPosition(),
+    PointLight pointLight(FindGameObject("Light")->GetPosition(),
                         1.0f,
                         0.09f,
                         0.032f);
@@ -168,10 +167,10 @@ void GameScene::Update(float dt)
         lightCasters->SetBool("lightCheck.Spot", false);
 
     // Rotate objects
-    GetGameObject("Sphere")->SetRotation(GetGameObject("Sphere")->GetWorldRotation()
+    FindGameObject("Sphere")->SetRotation(FindGameObject("Sphere")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(1.0f, 0.0f, 0.0f)));
-    GetGameObject("cube")->SetRotation(GetGameObject("cube")->GetWorldRotation()
+    FindGameObject("cube")->SetRotation(FindGameObject("cube")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
-    GetGameObject("Torus")->SetRotation(GetGameObject("Torus")->GetWorldRotation()
+    FindGameObject("Torus")->SetRotation(FindGameObject("Torus")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
 }
