@@ -182,6 +182,15 @@ TARGET_INCLUDE_DIRECTORIES(
         ${CMAKE_BINARY_DIR}
 )
 
+TARGET_COMPILE_OPTIONS(
+    ${PROJECT_NAME}
+    PUBLIC
+        # Disable unknown pragmas warning, C++ exceptions
+        $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-unknown-pragmas>
+        $<$<CXX_COMPILER_ID:Clang>:-Wall -Wno-unknown-pragmas>
+        $<$<CXX_COMPILER_ID:MSVC>:/MP /wd4068 /GR->
+)
+
 # Folders to filters
 FOREACH(file IN ITEMS ${_ENGINE_INCLUDES} ${_ENGINE_SOURCES})
     FILE(RELATIVE_PATH file_path ${CMAKE_SOURCE_DIR} ${file})

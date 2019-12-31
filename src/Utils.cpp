@@ -116,7 +116,7 @@ namespace Utils
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        Mesh* m = new Mesh(vao, 0, 0, 0, 0, {});
+        Mesh* m = new Mesh(vao, 0, 0, {});
 
         return m;
         // std::vector<glm::vec3> Vertices, {}, std::vector<glm::vec2> texCoords, {}, {}

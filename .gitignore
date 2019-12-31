@@ -162,3 +162,4 @@ config.h
 *.bin
 vgcore.*
 imgui.ini
+.vscode

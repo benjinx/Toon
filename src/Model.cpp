@@ -15,22 +15,14 @@
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include <tinygltf/tiny_gltf.h>
 
-Model::Model(std::vector<Mesh*> meshes)
+Model::Model(std::vector<std::unique_ptr<Mesh>> && meshes)
 {
-    _mMeshes = meshes;
-}
-
-Model::~Model()
-{
-    for (Mesh* mesh : _mMeshes)
-    {
-        delete mesh;
-    }
+    _mMeshes = std::move(meshes);
 }
 
 void Model::Render(Shader* shader, glm::mat4 modelMatrix)
 {
-    for (Mesh* mesh : _mMeshes)
+    for (auto& mesh : _mMeshes)
     {
         mesh->Render(shader, modelMatrix);
     }

@@ -9,18 +9,18 @@ class Texture
 {
 public:
     Texture() = default;
-    Texture(const std::string& filename/*, Options opts = Options()*/);
-    Texture(const uint8_t* data, glm::ivec2 size, int comp = 4/*, Options opts = Options()*/);
+    Texture(const std::string& filename);
+    Texture(unsigned char* data, glm::ivec2 size, int comp = 4);
     Texture(GLuint&& id, glm::ivec2 size);
     Texture(Texture&& rhs);
 
     ~Texture();
 
     // Load from a file
-    bool Load(const std::string& filename/*, Options opts = Options()*/);
+    bool Load(const std::string& filename);
 
     // Load from a buffer
-    bool Load(const uint8_t* buffer, glm::ivec2 size, int comp = 4/*, Options opts = Options()*/);
+    bool Load(unsigned char* buffer, glm::ivec2 size, int comp = 4);
 
     void Bind();
 

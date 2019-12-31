@@ -25,6 +25,16 @@ FOREACH(demo ${DEMO_LIST})
             run-${demo}
             PROPERTIES FOLDER "Automation"
         )
+        ADD_CUSTOM_TARGET(
+            valgrind-${demo}
+            COMMAND valgrind $<TARGET_FILE:${demo}>
+            DEPENDS ${demo}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+        SET_TARGET_PROPERTIES(
+            valgrind-${demo}
+            PROPERTIES FOLDER "Automation"
+        )
     ENDIF()
     LIST(APPEND RUN_DEMO_LIST "run-${demo}")
 ENDFOREACH()

@@ -10,9 +10,8 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Camera
-    auto camera = new Camera();
-    AddGameObject("Camera", camera);
-    GetGameObject("Camera")->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
     // Light Source
@@ -25,9 +24,9 @@ void GameScene::Start()
     Load("models/moon.glb");
     Load("models/mars.glb");
 
-    auto Earth = GetGameObject("Earth");
-    auto Moon = GetGameObject("Moon");
-    auto Mars = GetGameObject("Mars");
+    auto Earth = FindGameObject("Earth");
+    auto Moon = FindGameObject("Moon");
+    auto Mars = FindGameObject("Mars");
 
     Earth->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));
     Earth->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -81,7 +80,7 @@ void GameScene::Update(float dt)
     normalMapping->Use();
 
     normalMapping->SetVec3("lightColor", lightColor);
-    glm::vec4 lightPos = glm::vec4(GetGameObject("Light")->GetPosition(), 1.0f);
+    glm::vec4 lightPos = glm::vec4(FindGameObject("Light")->GetPosition(), 1.0f);
     normalMapping->SetVec4("lightPos", lightPos);
 
     glm::vec3 camPos = App::Inst()->GetCurrentCamera()->GetPosition();
@@ -89,15 +88,15 @@ void GameScene::Update(float dt)
     normalMapping->SetVec4("eyePos", eyePos);
 
     // Rotate objects
-    GetGameObject("Earth")->SetRotation(GetGameObject("Earth")->GetWorldRotation()
+    FindGameObject("Earth")->SetRotation(FindGameObject("Earth")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
     
-    GetGameObject("Moon")->SetRotation(GetGameObject("Moon")->GetWorldRotation()
+    FindGameObject("Moon")->SetRotation(FindGameObject("Moon")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.5f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-    const auto& earthPos = GetGameObject("Earth")->GetPosition();
-    const auto& moonPos = GetGameObject("Moon")->GetPosition();
-    const auto& marsPos = GetGameObject("Mars")->GetPosition();
+    const auto& earthPos = FindGameObject("Earth")->GetPosition();
+    const auto& moonPos = FindGameObject("Moon")->GetPosition();
+    const auto& marsPos = FindGameObject("Mars")->GetPosition();
 
     _mAngle += 0.5f * dt;
 
@@ -113,7 +112,7 @@ void GameScene::Update(float dt)
 
     glm::vec3 newPos = glm::vec3(x, 0.0f, -z);
     
-    GetGameObject("Moon")->SetPosition(newPos);
+    FindGameObject("Moon")->SetPosition(newPos);
 
     _mMarsAngle += 0.5f * dt;
 

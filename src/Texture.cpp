@@ -7,14 +7,14 @@
 
 #include <stb/stb_image.h>
 
-Texture::Texture(const std::string& filename/*, Options opts = Options()*/)
+Texture::Texture(const std::string& filename)
 {
     Load(filename);
 }
 
-Texture::Texture(const uint8_t* data, glm::ivec2 size, int comp /*=4*//*, Options opts = Options()*/)
+Texture::Texture(unsigned char* data, glm::ivec2 size, int comp)
 {
-    Load(data, size, comp/*,opts*/);
+    Load(data, size, comp);
 }
 
 Texture::Texture(GLuint&& id, glm::ivec2 size)
@@ -42,7 +42,7 @@ Texture::~Texture()
     }
 }
 
-bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
+bool Texture::Load(const std::string& filename)
 {
     // Load img
     int            bpp;
@@ -60,13 +60,7 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
 
         LogLoad("Loaded:  [%s]\n", fullFilename);
 
-        /* Remember to call stbi_image_free(image) after using the image and before another.
-            bpp - bytes per pixel
-            32 = RGBA = 4 * 8
-            24 = RGB = 3 * 8
-        */
-        //stbi_set_flip_vertically_on_load(true);
-
+        stbi_set_flip_vertically_on_load(true);
 
         image = stbi_load_from_file(file, &_mSize.x, &_mSize.y, &bpp, STBI_rgb_alpha);
         fclose(file);
@@ -78,7 +72,7 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
     }
 
     // Load from buffer
-    Load(image, _mSize, bpp/*, opts*/);
+    Load(image, _mSize, bpp);
 
     // Free the Image
     stbi_image_free(image);
@@ -86,7 +80,7 @@ bool Texture::Load(const std::string& filename/*, Options opts = Options()*/)
     return _mLoaded;
 }
 
-bool Texture::Load(const uint8_t* buffer, glm::ivec2 size, int comp /*=4*//*, Options opts = Options()*/)
+bool Texture::Load(unsigned char* buffer, glm::ivec2 size, int comp)
 {
     _mLoaded = false;
 
@@ -104,42 +98,27 @@ bool Texture::Load(const uint8_t* buffer, glm::ivec2 size, int comp /*=4*//*, Op
         return false;
     }
 
-    GLint intfmt;
-    GLenum fmt;
-
-    switch(comp)
-    {
-        case 1:
-        {
-            intfmt = GL_RED;
-            fmt = GL_RED;
-            break;
-        }
-        case 2:
-        {
-            intfmt = GL_RG;
-            fmt = GL_RG;
-            break;
-        }
-        case 3:
-        {
-            intfmt = GL_RGB;
-            fmt = GL_RGB;
-            break;
-        }
-        case 4:
-        default:
-        {
-            intfmt = GL_RGBA;
-            fmt = GL_RGBA;
-            break;
-        }
-    }
-
     glBindTexture(GL_TEXTURE_2D, _mglID);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     LogVerbose("Binding texture to id %u\n", _mglID);
+
+    stbi_set_flip_vertically_on_load(true);
+
+    stbi_uc* image_data = nullptr;
+    if (size.y == 0)
+    {
+        image_data = stbi_load_from_memory(buffer, size.x, &size.x, &size.y, &comp, STBI_rgb_alpha);
+    }
+    else
+    {
+        image_data = stbi_load_from_memory(buffer, size.x * size.y, &size.x, &size.y, &comp, STBI_rgb_alpha);
+    }
+
+    if (!image_data)
+    {
+        LogError("Image not loaded. %s\n", stbi_failure_reason());
+    }
 
     // texture wrapping params
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -150,7 +129,7 @@ bool Texture::Load(const uint8_t* buffer, glm::ivec2 size, int comp /*=4*//*, Op
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Create the image
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Bind texture

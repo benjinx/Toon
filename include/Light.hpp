@@ -24,7 +24,7 @@ private:
 class DirectionalLight : public Light
 {
 public:
-    DirectionalLight() {};
+    DirectionalLight() = default;
     DirectionalLight(glm::vec3 direction);
 
     void SetDirection(glm::vec3 direction);
@@ -34,7 +34,7 @@ public:
 class PointLight : public Light
 {
 public:
-    PointLight() {};
+    PointLight() = default;
     PointLight(glm::vec3 position, float constant, float linear, float quadratic);
 
     void SetConstant(float constant);
@@ -54,7 +54,7 @@ private:
 class SpotLight : public Light
 {
 public:
-    SpotLight() {};
+    SpotLight() = default;
     SpotLight(glm::vec3 position, glm::vec3 direction, float cutoff, float outerCutoff);
 
     void SetDirection(glm::vec3 direction);
