@@ -34,7 +34,7 @@ IF (DPKG_DEB_EXECUTABLE)
     FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_package}/DEBIAN)
 
     CONFIGURE_FILE(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DEBIAN/control.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/DEBIAN/control.in
         ${CMAKE_CURRENT_BINARY_DIR}/${_package}/DEBIAN/control
         @ONLY
     )
