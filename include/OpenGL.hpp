@@ -9,6 +9,6 @@
 #undef near
 #undef far
 
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 
 #endif // OPENGL_HPP

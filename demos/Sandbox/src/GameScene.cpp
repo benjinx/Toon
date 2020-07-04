@@ -6,6 +6,10 @@ void GameScene::Start()
 
     LogTest();
 
+    // Light Source
+    auto Light = AddGameObject("Light");
+    Light->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
+
     // Shaders
     printf("\nLoading Shaders\n");
 
@@ -23,23 +27,29 @@ void GameScene::Start()
         "shaders/lightCasters.frag" }));
 
     // Scene Objs
-    Load("models/DamagedHelm.glb");
-    auto helm = FindGameObject("node_damagedHelmet_-6514");
-    helm->SetPosition(glm::vec3(2.0f, 0.0f, 1.0f));
-    helm->SetShader(app->GetShader("normalMapping"));
+    auto helm = AddGameObject("helm");
+    auto helmMesh = (MeshComponent*)helm->AddComponent(std::make_unique<MeshComponent>());
+    helmMesh->SetShader(app->GetShader("normalMapping"));
 
-    Load("models/defaultScene2.glb");
-    auto cube = FindGameObject("Cube");
-    cube->SetPosition(glm::vec3(-1.0f, -1.0f, -1.0f));
-    cube->SetShader(app->GetShader("passThru"));
+    if (helmMesh->Load("models/DamagedHelm.glb"))
+    {
+        helm->SetPosition(glm::vec3(2.0f, 0.0f, 1.0f));
+        helm->SetRotation(glm::vec3(0.0f, 9.5f, 9.5f));
+    }
+
+    //auto cube = AddGameObject("Cube");
+    //auto cubeMesh = (MeshComponent*)cube->AddComponent(std::make_unique<MeshComponent>());
+    //cubeMesh->SetShader(app->GetShader("passThru"));
+
+    if (!LoadScene("models/defaultSceneLights.glb"))
+    {
+        LogWarn("Could not load scene!");
+    }
 
     // Camera
     Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
-
-    // UI
-    DevUI::Start();
 }
 
 void GameScene::Update(float dt)
@@ -47,25 +57,34 @@ void GameScene::Update(float dt)
     Scene::Update(dt);
 
     App* app = App::Inst();
+
+    //
     auto norm = app->GetShader("normalMapping");
-
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     norm->Use();
-    PointLight* light = (PointLight*)FindGameObject("Light_Orientation");
-    norm->SetVec4("lightPos", glm::vec4(light->GetWorldPosition(), 1.0f));
+    norm->SetVec3("lightColor", lightColor);
+    glm::vec4 lightPos = glm::vec4(FindGameObject("Light")->GetWorldPosition(), 1.0f);
+    norm->SetVec4("lightPos", lightPos);
 
+    //
     auto color = app->GetShader("passThru");
     color->Use();
     color->SetVec3("passColor", glm::vec3(0.0f, 0.0f, 1.0f));
+
+    //
+    auto defaultShader = app->GetShader("defaultLighting");
+    defaultShader->Use();
+    defaultShader->SetVec4("lightVec", lightPos);
 }
 
 void GameScene::LogTest()
 {
     // Log Test
     printf("\n");
-    LogInfo("Info\n");
-    LogWarn("Warning\n");
-    LogError("Error\n");
-    LogPerf("Perf\n");
-    LogVerbose("Verb\n");
-    LogLoad("Load\n");
+    LogInfo("Info");
+    LogWarn("Warning");
+    LogError("Error");
+    LogPerf("Perf");
+    LogVerbose("Verb");
+    LogLoad("Load");
 }

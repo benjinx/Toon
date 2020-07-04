@@ -16,19 +16,25 @@ public:
                                                 _mColor.g = g;
                                                 _mColor.b = b; }
     glm::vec3 GetColor() { return _mColor; }
+
+    void SetIntensity(int intensity) { _mIntensity = intensity; }
+    int GetIntensity() { return _mIntensity; }
     
 private:
     glm::vec3 _mColor;
+    int _mIntensity;
 };
 
 class DirectionalLight : public Light
 {
 public:
     DirectionalLight() = default;
-    DirectionalLight(glm::vec3 direction);
+    /*DirectionalLight(glm::vec3 direction);
 
     void SetDirection(glm::vec3 direction);
-    glm::vec3 GetDirection();
+    glm::vec3 GetDirection();*/
+
+    // getQuat * worldforward = dir
 };
 
 class PointLight : public Light
@@ -55,13 +61,13 @@ class SpotLight : public Light
 {
 public:
     SpotLight() = default;
-    SpotLight(glm::vec3 position, glm::vec3 direction, float cutoff, float outerCutoff);
+    SpotLight(glm::vec3 position, /*glm::vec3 direction,*/ float cutoff, float outerCutoff);
 
-    void SetDirection(glm::vec3 direction);
+    //void SetDirection(glm::vec3 direction);
     void SetCutOff(float cutOff);
     void SetOuterCutOff(float outerCutOff);
 
-    glm::vec3 GetDirection();
+    //glm::vec3 GetDirection();
     float GetCutOff() { return _mCutOff; }
     float GetOuterCutOff() { return _mOuterCutOff; }
 

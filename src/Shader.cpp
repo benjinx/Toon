@@ -41,7 +41,7 @@ void Shader::Load(std::vector<std::string> files)
     for (auto& f : files)
     {
         // Output files loading
-        LogInfo("Loading: [%s]\n", f);
+        LogInfo("Loading: [%s]", f);
 
         // Find shader type
         GLuint shaderType;
@@ -87,7 +87,7 @@ void Shader::Load(std::vector<std::string> files)
 
             if (shaderFile.is_open())
             {
-                LogLoad("Loaded:  [%s]\n", fullFilename);
+                LogLoad("Loaded:  [%s]", fullFilename);
                 loaded = true;
                 break;
             }
@@ -95,7 +95,7 @@ void Shader::Load(std::vector<std::string> files)
 
         if (!loaded)
         {
-            LogError("Failed to load shaders [%s]\n", f);
+            LogError("Failed to load shaders [%s]", f);
             return;
         }
 

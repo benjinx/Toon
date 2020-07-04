@@ -9,7 +9,7 @@ class Cube : public GameObject
 {
 public:
     Cube();
-    ~Cube() = default;
+    virtual ~Cube() = default;
 
     void Update();
 

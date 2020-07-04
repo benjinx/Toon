@@ -13,6 +13,7 @@ public:
 
 private:
     bool _mDirLight, _mPointLight, _mSpotLight;
+
 };
 
 #endif // GAMESCENE_H

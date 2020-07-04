@@ -4,6 +4,7 @@
 #include <Config.hpp>
 #include <Camera.hpp>
 #include <Scene.hpp>
+#include <Input.hpp>
 #include <Window.hpp>
 
 class Shader;
@@ -19,12 +20,9 @@ public:
     App() { _sInst = this; }
     ~App();
 
+    bool Start();
     void Run();
-
-    void HandleGLFWKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-    void HandleGLFWMouseButton(GLFWwindow* window, int button, int action, int mode);
-    void HandleGLFWScroll(GLFWwindow* window, double xoffset, double yoffset);
-    void HandleGLFWMousePos(GLFWwindow* window, double x, double y);
+    void Quit() { _mRunning = false; }
 
     Window * GetWindow() { return _mWindow; }
 
@@ -42,28 +40,29 @@ public:
     
     Camera* GetCurrentCamera() { return _mCurrentCamera; }
 
+    Input* GetInput() { return &_mInput; }
+
 private:
 
     static App* _sInst;
 
-    void Start();
     void Update(float dt);
     void Render();
-    void HandleInput(float dt);
     void OpenGLInfo();
 
+    // Should change window to not be a pointer and have an init
     Window* _mWindow = nullptr;
     Scene* _mCurrentScene = nullptr;
+    Input _mInput;
     
     std::unordered_map<int, bool> _mInputMap;
 
     // List of Shaders
     std::unordered_map<std::string, Shader*> _mShaders;
-    
-    float _mLastMX = -1, 
-          _mLastMY = -1;
 
     Camera* _mCurrentCamera = nullptr;
+
+    bool _mRunning = true;
 };
 
 #endif // APPLICATION_H

@@ -6,6 +6,7 @@
 #include <OpenGL.hpp>
 
 #include <memory>
+#include <vector>
 
 class Material;
 class Shader;
@@ -13,22 +14,41 @@ class Shader;
 class Mesh
 {
 public:
+
+    struct Primitive
+    {
+        GLuint      VAO;
+        GLenum      Mode;
+        GLsizei     Count;
+        GLenum      Type;
+        GLsizei     Offset;
+
+        std::shared_ptr<Material> _Material;
+    };
+
+
+    enum AttributeID : GLint
+    {
+        POSITION = 0,
+        NORMAL = 1,
+        TEXCOORD = 2,
+        TANGENT = 3,
+        BITANGENT = 4,
+        COLOR = 5,
+    };
+
     Mesh() = default;
 
     /* Functions */
-    Mesh(GLuint vao, GLenum mode, GLsizei count, std::shared_ptr<Material> material);
+    Mesh(GLuint vao, GLenum mode, GLsizei count, GLenum type, GLsizei offset, std::shared_ptr<Material> material);
+    Mesh(std::vector<Primitive>&&);
+
+    bool LoadFromData(std::vector<Primitive>&& primitives);
 
     void Render(Shader * shader, glm::mat4 modelMat);
 
-    GLuint GetVAO() { return _mVAO; }
-
 private:
-    /* Render Data */
-    GLuint      _mVAO;
-    GLenum      _mMode;
-    GLsizei     _mCount;
-    
-    std::shared_ptr<Material> _mMaterial = nullptr;
+    std::vector<Primitive> _mPrimitives;
 };
 
 #endif // MESH_H

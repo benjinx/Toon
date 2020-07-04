@@ -2,20 +2,14 @@
 
 #include <App.hpp>
 #include <Camera.hpp>
+#include <glTF2.hpp>
 #include <Log.hpp>
 #include <Material.hpp>
-#include <Model.hpp>
+#include <MeshComponent.hpp>
 #include <Shader.hpp>
 #include <Utils.hpp>
 
 #include <imgui/imgui.h>
-
-#include <nlohmann/json.hpp>
-
-#include <stb/stb_image.h>
-
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#include <tinygltf/tiny_gltf.h>
 
 bool Scene::_sShowAxis = false;
 
@@ -48,26 +42,38 @@ void Scene::Render()
     }
 }
 
-bool Scene::Load(std::string filename)
+bool Scene::LoadScene(std::string filename)
 {
-    bool loaded = GameObject::Load(filename);
+    std::vector<std::unique_ptr<GameObject>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
 
-    if (loaded)
-        return true;
-    
-    return false;
+    for (int i = 0; i < loadedGobjs.size(); ++i)
+    {
+        AddGameObject(std::move(loadedGobjs[i]));
+
+        // This will work if we have names from parsing.
+        //AddGameObject(loadedGobjs[i]->GetName(), std::move(loadedGobjs[i]));
+    }
+
+    if (loadedGobjs.empty())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 GameObject* Scene::AddGameObject(std::string name, std::unique_ptr<GameObject> gameObject)
 {
-    gameObject->SetName(name);
     _mChildren.push_back(std::move(gameObject));
+    _mChildren.back()->SetName(name);
+    _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
 GameObject* Scene::AddGameObject()
 {
     _mChildren.push_back(std::make_unique<GameObject>());
+    _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
@@ -75,16 +81,18 @@ GameObject* Scene::AddGameObject(std::string name)
 {
     _mChildren.push_back(std::make_unique<GameObject>());
     _mChildren.back()->SetName(name);
+    _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
 GameObject* Scene::AddGameObject(std::unique_ptr<GameObject> gobj)
 {
     _mChildren.push_back(std::move(gobj));
+    _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
 void Scene::Options()
 {
-    ImGui::Checkbox("Show GameObject Axis", &_sShowAxis);
+    //ImGui::Checkbox("Show GameObject Axis", &_sShowAxis);
 }

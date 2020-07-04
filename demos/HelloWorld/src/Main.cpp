@@ -2,7 +2,7 @@
 
 #include "GameScene.hpp"
 
-int main()
+int main(int argc, char * argv[])
 {
     Utils::SetAssetPath(RESOURCE_PATH);
     const auto& paths = Utils::GetResourcePaths();
@@ -10,16 +10,14 @@ int main()
     App app;
     Scene* gameScene = new GameScene();
 
-    try
+    app.SetCurrentScene(gameScene);
+
+    if (!app.Start())
     {
-        app.SetCurrentScene(gameScene);
-        app.Run();
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
+
+    app.Run();
 
     delete gameScene;
 

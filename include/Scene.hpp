@@ -23,7 +23,7 @@ public:
     virtual void Update(float dt);
     virtual void Render();
 
-    bool Load(std::string filename);
+    bool LoadScene(std::string filename);
 
     // Ui Options.
     static void Options();

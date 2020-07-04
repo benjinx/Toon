@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 
 #include <App.hpp>
+#include <Log.hpp>
 #include <Utils.hpp>
 #include <Window.hpp>
 
@@ -144,35 +145,24 @@ void Camera::SetAutoResize(bool autoResize)
     _mAutoResize = autoResize;
 }
 
-void Camera::HandleMovement(Direction dir, float dt)
+void Camera::SetDirection(glm::vec3 dir)
+{
+    _mDirection = dir;
+}
+
+void Camera::HandleMovement(float dt)
 {
     float velocity = _mMovementSpeed * dt;
-
+    
     glm::vec3 right = glm::normalize(glm::cross(_mUp, GetForward()));
 
-    switch (dir)
-    {
-    case FORWARD:
-        SetPosition(GetPosition() + (GetForward() * velocity));
-        break;
-    case BACKWARD:
-        SetPosition(GetPosition() - (GetForward() * velocity));
-        break;
-    case LEFT:
-        SetPosition(GetPosition() - (glm::normalize(glm::cross(GetForward(), _mUp)) * velocity));
-        break;
-    case RIGHT:
-        SetPosition(GetPosition() + (glm::normalize(glm::cross(GetForward(), _mUp)) * velocity));
-        break;
-    case UP:
-        SetPosition(GetPosition() + (glm::normalize(glm::cross(GetForward(), right)) * velocity));
-        break;
-    case DOWN:
-        SetPosition(GetPosition() - (glm::normalize(glm::cross(GetForward(), right)) * velocity));
-        break;
-    default:
-        break;
-    }
+    auto pos = GetPosition();
+
+    pos += glm::normalize(glm::cross(GetForward(), _mUp)) * velocity * _mDirection.x;
+    pos += glm::normalize(glm::cross(GetForward(), right)) * velocity * _mDirection.y;
+    pos += GetForward() * velocity * _mDirection.z;
+
+    SetPosition(pos);
 }
 
 void Camera::HandleRotation(float xoffset, float yoffset)

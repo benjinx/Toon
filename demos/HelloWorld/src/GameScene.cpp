@@ -22,17 +22,16 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Scene Objs
-    if (Load("models/logo/logo.glb"))
+    auto logo = AddGameObject("Logo");
+    auto comp = (MeshComponent*)logo->AddComponent(std::make_unique<MeshComponent>());
+    comp->SetShader(app->GetShader("passThru"));
+
+    if (comp->Load("models/logo/logo.glb"))
     {
         // Initialize Objs
-        auto logo = FindGameObject("Logo");
         logo->SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
         logo->SetRotation(glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
-        logo->SetShader(app->GetShader("passThru"));
     }
-
-    // UI
-    DevUI::Start();
 }
 
 void GameScene::Update(float dt)

@@ -21,6 +21,7 @@ OPTION(BUILD_PACKAGES   "Build Packages"                                    OFF)
 
 OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
 IF(VERBOSE_LOGGING)
+    MESSAGE(STATUS "Verbose On.")
     ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
 ENDIF()
 
@@ -55,8 +56,8 @@ IF(BUILD_THIRDPARTY)
     FILE(MAKE_DIRECTORY ${THIRDPARTY_BINARY_DIR})
 
     SET(glm_ROOT            ${THIRDPARTY_BINARY_DIR}/glm)
-    SET(glfw3_ROOT          ${THIRDPARTY_BINARY_DIR}/glfw3)
-    SET(assimp_ROOT         ${THIRDPARTY_BINARY_DIR}/assimp)
+    SET(nlohmann_json_ROOT  ${THIRDPARTY_BINARY_DIR}/nlohmann_json)
+    SET(SDL2_ROOT           ${THIRDPARTY_BINARY_DIR}/SDL2)
     
     EXECUTE_PROCESS(
         COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" 
@@ -89,35 +90,15 @@ IF(BUILD_THIRDPARTY)
 ENDIF()
 
 FIND_PACKAGE(glm CONFIG REQUIRED)
-FIND_PACKAGE(glfw3 CONFIG REQUIRED)
-FIND_PACKAGE(assimp CONFIG 5.0 REQUIRED)
+FIND_PACKAGE(nlohmann_json CONFIG REQUIRED)
+FIND_PACKAGE(SDL2 2.0.6 CONFIG)
 
-GET_TARGET_PROPERTY(_location glfw IMPORTED_LOCATION_RELEASE)
-GET_FILENAME_COMPONENT(glfw_RUNTIME_DIR ${_location} DIRECTORY)
-
-# Extract release-specific configuration
-GET_TARGET_PROPERTY(_soname   assimp::assimp IMPORTED_SONAME_RELEASE)
-GET_TARGET_PROPERTY(_implib   assimp::assimp IMPORTED_IMPLIB_RELEASE)
-GET_TARGET_PROPERTY(_location assimp::assimp IMPORTED_LOCATION_RELEASE)
-
-GET_FILENAME_COMPONENT(assimp_RUNTIME_DIR ${_location} DIRECTORY)
-
-# Set build type agnostic configuration for assimp
-SET_TARGET_PROPERTIES(
-    assimp::assimp 
-    PROPERTIES
-        IMPORTED_SONAME         ${_soname}
-        IMPORTED_IMPLIB         ${_implib}
-        IMPORTED_LOCATION       ${_location}
-        IMPORTED_SONAME_DEBUG   ${_soname}
-        IMPORTED_IMPLIB_DEBUG   ${_implib}
-        IMPORTED_LOCATION_DEBUG ${_location}
-)
+GET_TARGET_PROPERTY(_location SDL2::SDL2 IMPORTED_LOCATION_RELEASE)
+GET_FILENAME_COMPONENT(SDL2_RUNTIME_DIR ${_location} DIRECTORY)
 
 # Allow VS to find .dll's
 SET(RUNTIME_SEARCH_PATH 
-    ${glfw_RUNTIME_DIR}
-    ${assimp_RUNTIME_DIR}
+    ${SDL2_RUNTIME_DIR}
 )
 
 FILE(RELATIVE_PATH 
@@ -188,7 +169,7 @@ TARGET_COMPILE_OPTIONS(
         # Disable unknown pragmas warning, C++ exceptions
         $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-unknown-pragmas>
         $<$<CXX_COMPILER_ID:Clang>:-Wall -Wno-unknown-pragmas>
-        $<$<CXX_COMPILER_ID:MSVC>:/MP /wd4068 /GR->
+        $<$<CXX_COMPILER_ID:MSVC>:/MP /wd4068 /GR- /std:c++17>
 )
 
 # Folders to filters
@@ -203,9 +184,16 @@ ENDFOREACH()
 TARGET_LINK_LIBRARIES(
     ${PROJECT_NAME}
     glm
-    glfw
-    assimp::assimp
+    nlohmann_json::nlohmann_json
+    SDL2::SDL2
 )
+
+IF(TARGET SDL2::SDL2main)
+    TARGET_LINK_LIBRARIES(
+        ${PROJECT_NAME}
+        SDL2::SDL2main
+    )
+ENDIF()
 
 INSTALL(TARGETS ${PROJECT_NAME}
     EXPORT TemporalityTargets

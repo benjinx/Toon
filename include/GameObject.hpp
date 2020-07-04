@@ -5,34 +5,28 @@
 #include <Config.hpp>
 #include <Math.hpp>
 #include <OpenGL.hpp>
-#include <Model.hpp>
+#include <Component.hpp>
 #include <Shader.hpp>
 #include <Material.hpp>
+#include <Component.hpp>
+#include <Macros.hpp>
 
 #include <vector>
 #include <memory>
-
-struct aiScene;
-struct aiNode;
-struct aiMesh;
-struct aiMaterial;
-struct aiString;
 
 //
 class GameObject
 {
 public:
 
+    DISALLOW_COPY_AND_ASSIGN(GameObject)
+
     GameObject();
     GameObject(glm::vec3 position);
     virtual ~GameObject();
 
     virtual void Update(const float dt);
-    void Render();
-
-    void SetShader(Shader * shader) {
-        _mShader = std::move(shader);
-    }
+    virtual void Render();
 
     void SetParent(GameObject* parent) { 
         _mParent = parent;
@@ -51,9 +45,7 @@ public:
     void SetName(std::string name) { _mName = name; }
     std::string GetName() { return _mName; }
 
-    void SetModel(std::unique_ptr<Model> model) { _mModel = std::move(model); }
-
-    bool Load(std::string filename);
+    //bool Load(std::string filename);
 
     // Local Transform
     void SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale);
@@ -84,43 +76,30 @@ public:
     glm::quat GetWorldRotation() const;
     glm::vec3 GetWorldScale() const;
 
+    // Component
+    Component* AddComponent(std::unique_ptr<Component> component);
+
 protected:
 
     // Children
     std::vector<std::unique_ptr<GameObject>> _mChildren;
     
 private:
+    // Object name
+    std::string _mName;
+
+    // Parent
+    GameObject* _mParent = nullptr;
+
+    // Axis of the object
+    Axis* _mSceneAxis = nullptr;
+
     // Pos, rot, scale
     glm::vec3 _mPosition = glm::vec3(0.0f),
               _mScale = glm::vec3(1.0f);
     glm::quat _mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-    // Axis of the object
-    Axis* _mSceneAxis = nullptr;
-
-    // Gobjs Shader
-    Shader * _mShader;
-
-    // Model
-    std::unique_ptr<Model> _mModel = nullptr;
-
-    // Parent
-    GameObject* _mParent = nullptr;
-
-    // Object name
-    std::string _mName;
-
-    // Load Materials
-    std::unique_ptr<Material> processMaterial(const aiScene * scene, std::string dir, aiMaterial* material);
-
-    // Part of loading function
-    std::unique_ptr<GameObject> processNode(const aiScene * scene, std::string dir, aiNode* node, std::unordered_map<std::string, std::unique_ptr<GameObject>>& mapOfLights, std::unordered_map<std::string, std::unique_ptr<GameObject>>& mapOfCameras);
-
-    // Load Mesh
-    std::unique_ptr<Mesh> processMesh(const aiScene * scene, std::string dir, aiMesh* mesh);
-
-    // process textures
-    std::unique_ptr<Texture> processTexture(const aiScene * scene, std::string dir, const aiString& filename);
-
+    // Components
+    std::vector<std::unique_ptr<Component>> _mComponents;
 };
 #endif // GAMEOBJECT_HPP

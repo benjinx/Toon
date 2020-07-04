@@ -32,6 +32,7 @@ public:
         METALNESS = 14,
         DIFFUSE_ROUGHNESS = 15,
         AMBIENT_OCCLUSION = 16,
+        METALLIC_ROUGHNESS = 17,
     };
 
     Material() = default;
@@ -39,14 +40,32 @@ public:
 
     void Bind(Shader* shader);
 
-    void SetDiffuse(glm::vec3 value) { _mDiffuse = value; }
-    void SetSpecular(glm::vec3 value) { _mSpecular = value; }
-    void SetAmbient(glm::vec3 value) { _mAmbient = value; }
-    void SetEmissive(glm::vec3 value) { _mEmissive = value; }
-    void SetTransparent(glm::vec3 value) { _mTransparent = value; }
-    void SetReflective(glm::vec3 value) { _mReflective = value; }
+    void SetDiffuse(glm::vec3 value)        { _mDiffuse = value; }
+    void SetSpecular(glm::vec3 value)       { _mSpecular = value; }
+    void SetAmbient(glm::vec3 value)        { _mAmbient = value; }
+    void SetEmissive(glm::vec3 value)       { _mEmissive = value; }
+    void SetTransparent(glm::vec3 value)    { _mTransparent = value; }
+    void SetReflective(glm::vec3 value)     { _mReflective = value; }
 
-    void SetMap(Material::TextureID id, std::unique_ptr<Texture> texture) {
+    glm::vec3 GetDiffuse()                  { return _mDiffuse; }
+    glm::vec3 GetSpecular()                 { return _mSpecular; }
+    glm::vec3 GetAmbient()                  { return _mAmbient; }
+    glm::vec3 GetEmissive()                 { return _mEmissive; }
+    glm::vec3 GetTransparent()              { return _mTransparent; }
+    glm::vec3 GetReflective()               { return _mReflective; }
+
+    void SetMetallicFactor(float value)     { _mMetallicFactor = value; }
+    void SetRoughnessFactor(float value)    { _mRoughnessFactor = value; }
+    void SetOcclusionStrength(float value)  { _mOcclusionStrength = value; }
+    void SetNormalScale(float value)        { _mNormalScale = value; }
+
+    void SetBaseColorFactor(glm::vec4 value) { _mBaseColorFactor = value; }
+    void SetEmissiveFactor(glm::vec3 value) { _mEmissiveFactor = value; }
+
+    glm::vec4 GetBaseColorFactor() { return _mBaseColorFactor; }
+    glm::vec3 GetEmissiveFactor() { return _mEmissiveFactor; }
+
+    void SetMap(Material::TextureID id, std::shared_ptr<Texture> texture) {
         _mTextures.emplace(id, std::move(texture));
     }
 
@@ -58,7 +77,15 @@ private:
                 _mTransparent = glm::vec3(0),
                 _mReflective = glm::vec3(0);
 
-    std::unordered_map<Material::TextureID, std::unique_ptr<Texture>> _mTextures;
+    glm::vec4 _mBaseColorFactor = glm::vec4(1.0f);
+    glm::vec3 _mEmissiveFactor = glm::vec3(1.0f);
+
+    float       _mMetallicFactor = 1.0f,
+                _mRoughnessFactor = 1.0f,
+                _mOcclusionStrength = 1.0f,
+                _mNormalScale = 1.0f;
+
+    std::unordered_map<Material::TextureID, std::shared_ptr<Texture>> _mTextures;
 
     static std::string GetMapVariableName(Material::TextureID id);
     static std::string GetHasMapVariableName(Material::TextureID id);

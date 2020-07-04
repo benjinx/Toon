@@ -3,6 +3,7 @@
 
 #include <Config.hpp>
 #include <Utils.hpp>
+#include <nlohmann/json.hpp>
 
 #include <cstdio> // for printf, vsnprintf
 
@@ -43,10 +44,17 @@ static auto LogWrap(const T& v) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 
-    template <> 
-    auto LogWrap<std::string>(const std::string& v) {
-        return v.c_str();
-    }
+template <> 
+auto LogWrap<std::string>(const std::string& v) {
+    return v.c_str();
+}
+
+template <>
+inline auto LogWrap<nlohmann::json>(const nlohmann::json& v) {
+    static std::string str;
+    str = v.get<std::string>();
+    return str.c_str();
+}
     
 #pragma clang diagnostic pop
 
@@ -135,22 +143,22 @@ static inline void Log(LogLevel level, const char * format, Args... args)
 #   define LogVerbose(M, ...)  do { } while(0)
 #else
 #   define LogVerbose(M, ...) \
-        do { Log(LogLevel::LOG_VERBOSE, "[VERB](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+        do { Log(LogLevel::LOG_VERBOSE, "[VERB](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 #endif
 
 #define LogInfo(M, ...) \
-    do { Log(LogLevel::LOG_INFO, "[INFO](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_INFO, "[INFO](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogWarn(M, ...) \
-    do { Log(LogLevel::LOG_WARN, "[WARN](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_WARN, "[WARN](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogError(M, ...) \
-    do { Log(LogLevel::LOG_ERROR, "[ERRO](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_ERROR, "[ERRO](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogPerf(M, ...) \
-    do { Log(LogLevel::LOG_PERF, "[PERF](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_PERF, "[PERF](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogLoad(M, ...) \
-    do { Log(LogLevel::LOG_LOAD, "[LOAD](%s:%d) " M, Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
+    do { Log(LogLevel::LOG_LOAD, "[LOAD](%s:%d) " M "\n", Utils::GetBasename(__FILE__).c_str(), __LINE__, ##__VA_ARGS__); } while (0)
 
 #endif //LOG_HPP

@@ -4,7 +4,7 @@
 #include <Config.hpp>
 #include <OpenGL.hpp>
 
-struct GLFWwindow;
+#include <glm/glm.hpp>
 
 class Window
 {
@@ -15,18 +15,19 @@ public:
 
     void Clear();
     void Present();
+    void OnWindowResize(glm::vec2 size);
 
-    GLFWwindow* GetGLFWWindow() { return _mWindow; }
+    SDL_Window* GetSDLWindow() { return _mWindow; }
+    SDL_GLContext GetGLContext() { return _mGLContext; }
 
     int GetWidth() { return _mWidth; }
     int GetHeight() { return _mHeight; }
 
-    bool ShouldClose() { return glfwWindowShouldClose(_mWindow); }
-
 private:
 
-    GLFWwindow* _mWindow;
-    int         _mWidth, _mHeight;
+    SDL_Window* _mWindow;
+    SDL_GLContext _mGLContext;
+    int _mWidth, _mHeight;
 
 };
 

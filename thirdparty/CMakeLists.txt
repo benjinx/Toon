@@ -7,6 +7,27 @@ INCLUDE(ExternalProject)
 
 PROJECT(thirdparty)
 
+# nlohmann_json
+
+SET(nlohmann_json_ROOT       ${CMAKE_BINARY_DIR}/nlohmann_json)
+SET(nlohmann_json_SOURCE_DIR ${CMAKE_BINARY_DIR}/nlohmann_json_src)
+
+FIND_PACKAGE(nlohmann_json CONFIG QUIET)
+
+IF(NOT nlohmann_json_FOUND)
+    ExternalProject_Add(
+        thirdparty-nlohmann_json
+        GIT_REPOSITORY      "https://github.com/nlohmann/json.git"
+        GIT_TAG             "master"
+        GIT_SHALLOW         TRUE
+        SOURCE_DIR          ${nlohmann_json_SOURCE_DIR}
+        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${nlohmann_json_ROOT}
+                            -DJSON_BuildTests=OFF
+        BUILD_COMMAND       ""
+        UPDATE_COMMAND      ""
+    )
+ENDIF()
+
 # glm
 
 SET(glm_ROOT       ${CMAKE_BINARY_DIR}/glm)
@@ -15,7 +36,8 @@ SET(glm_SOURCE_DIR ${CMAKE_BINARY_DIR}/glm_src)
 FIND_PACKAGE(glm CONFIG QUIET)
 
 IF(NOT glm_FOUND)
-    ExternalProject_Add(thirdparty-glm
+    ExternalProject_Add(
+        thirdparty-glm
         GIT_REPOSITORY      "https://github.com/g-truc/glm.git"
         GIT_TAG             "0.9.9.3"
         GIT_SHALLOW         TRUE
@@ -27,58 +49,26 @@ IF(NOT glm_FOUND)
     )
 ENDIF()
 
-# glfw
+# SDL2
 
-SET(glfw3_ROOT         ${CMAKE_BINARY_DIR}/glfw3)
-SET(glfw3_SOURCE_DIR   ${CMAKE_BINARY_DIR}/glfw3_src)
-SET(glfw3_BINARY_DIR   ${CMAKE_BINARY_DIR}/glfw3_bin)
+SET(SDL2_ROOT         ${CMAKE_BINARY_DIR}/SDL2)
+SET(SDL2_SOURCE_DIR   ${CMAKE_BINARY_DIR}/SDL2_src)
+SET(SDL2_BINARY_DIR   ${CMAKE_BINARY_DIR}/SDL2_bin)
 
-FIND_PACKAGE(glfw3 QUIET)
+FIND_PACKAGE(SDL2 QUIET)
 
-IF (NOT glfw3_FOUND)
-    ExternalProject_Add(thirdparty-glfw
-        GIT_REPOSITORY      "https://github.com/glfw/glfw"
-        GIT_TAG             "3.2.1"
-        GIT_SHALLOW         TRUE
-        SOURCE_DIR          ${glfw3_SOURCE_DIR}
-        BINARY_DIR          ${glfw3_BINARY_DIR}
-        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${glfw3_ROOT} 
-                            -DGLFW_BUILD_EXAMPLES=OFF
-                            -DGLFW_BUILD_TESTS=OFF
-                            -DGLFW_BUILD_DOCS=OFF
-                            -DGLFW_INSTALL=ON
+IF (NOT SDL2_FOUND)
+    ExternalProject_Add(
+        thirdparty-SDL2
+        HG_REPOSITORY      "http://hg.libsdl.org/SDL"
+        HG_TAG             "release-2.0.12"
+        SOURCE_DIR          ${SDL2_SOURCE_DIR}
+        BINARY_DIR          ${SDL2_BINARY_DIR}
+        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${SDL2_ROOT}
                             -DBUILD_SHARED_LIBS=ON
         UPDATE_COMMAND      ""
         BUILD_COMMAND       ""
         INSTALL_COMMAND     ${CMAKE_COMMAND} --build . --target install --config Release
         TEST_COMMAND        ""
-    )
-ENDIF()
-
-# Assimp
-
-SET(assimp_ROOT       ${CMAKE_BINARY_DIR}/assimp)
-SET(assimp_SOURCE_DIR ${CMAKE_BINARY_DIR}/assimp_src)
-SET(assimp_BINARY_DIR ${CMAKE_BINARY_DIR}/assimp_bin)
-
-FIND_PACKAGE(assimp 5.0 CONFIG QUIET)
-
-IF(NOT assimp_FOUND)
-    ExternalProject_Add(thirdparty_assimp
-        GIT_REPOSITORY      "https://github.com/assimp/assimp.git"
-        GIT_TAG             "master"
-        GIT_SHALLOW         TRUE
-        SOURCE_DIR          ${assimp_SOURCE_DIR}
-        BINARY_DIR          ${assimp_BINARY_DIR}
-        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${assimp_ROOT}
-                            -DINJECT_DEBUG_POSTFIX=OFF
-                            -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-                            -DASSIMP_BUILD_SAMPLES=OFF
-                            -DASSIMP_BUILD_TESTS=OFF
-                            -DBUILD_DOCS=OFF
-        BUILD_COMMAND       ""
-        UPDATE_COMMAND      ""
-        TEST_COMMAND        ""
-        INSTALL_COMMAND     ${CMAKE_COMMAND} --build . --target install --config Release
     )
 ENDIF()
