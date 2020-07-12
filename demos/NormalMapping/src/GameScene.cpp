@@ -31,15 +31,15 @@ void GameScene::Start()
 
     // Initialize Objs
     auto Earth = AddGameObject("Earth");
-    auto EarthMesh = (MeshComponent*)Earth->AddComponent(std::make_unique<MeshComponent>());
+    MeshComponent* EarthMesh = Earth->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
     EarthMesh->SetShader(app->GetShader("normalMapping"));
 
     auto Moon = AddGameObject("Moon");
-    auto MoonMesh = (MeshComponent*)Moon->AddComponent(std::make_unique<MeshComponent>());
+    MeshComponent* MoonMesh = Moon->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
     MoonMesh->SetShader(app->GetShader("normalMapping"));
 
     auto Mars = AddGameObject("Mars");
-    auto MarsMesh = (MeshComponent*)Mars->AddComponent(std::make_unique<MeshComponent>());
+    MeshComponent* MarsMesh = Mars->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
     MarsMesh->SetShader(app->GetShader("normalMapping"));
 
     // Scene Objs

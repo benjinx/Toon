@@ -22,5 +22,5 @@ out vertexData
 void main()
 {
     gl_Position = mvp * position;
-    pass.texCoords = vec2(texCoords.x, 1.0 - texCoords.y);
+    pass.texCoords = vec2(texCoords.x, texCoords.y);
 }

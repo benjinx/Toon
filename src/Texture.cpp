@@ -60,8 +60,6 @@ bool Texture::Load(const std::string& filename, Options opts /*= Options()*/)
 
         LogLoad("Loaded:  [%s]\n", fullFilename);
 
-        stbi_set_flip_vertically_on_load(true);
-
         image = stbi_load_from_file(file, &_mSize.x, &_mSize.y, &bpp, STBI_rgb_alpha);
         fclose(file);
     }
