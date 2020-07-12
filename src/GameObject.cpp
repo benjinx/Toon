@@ -5,6 +5,7 @@
 #include <Light.hpp>
 #include <Log.hpp>
 #include <Mesh.hpp>
+#include <MeshComponent.hpp>
 #include <Utils.hpp>
 
 GameObject::GameObject()
@@ -24,6 +25,12 @@ GameObject::~GameObject()
 
 void GameObject::Update(const float dt)
 {
+    // Check if enabled
+    if (!_mEnabled)
+    {
+        return;
+    }
+
     // Update
     for (const auto& comp : _mComponents)
     {
@@ -39,6 +46,12 @@ void GameObject::Update(const float dt)
 
 void GameObject::Render()
 {
+    // Check for visibility
+    if (!_mVisibility)
+    {
+        return;
+    }
+
     // Render
     for (const auto& comp : _mComponents)
     {
@@ -55,7 +68,9 @@ void GameObject::Render()
 void GameObject::RenderAxis()
 {
     if (_mSceneAxis == nullptr)
+    {
         _mSceneAxis = new Axis();
+    }
 
     // Render the gobjs axis
     _mSceneAxis->Render(GetWorldTransform());
@@ -148,10 +163,4 @@ glm::vec3 GameObject::GetWorldScale() const
     }
 
     return GetScale();
-}
-
-Component* GameObject::AddComponent(std::unique_ptr<Component> component) {
-    _mComponents.push_back(std::move(component));
-    _mComponents.back()->SetGameObject(this);
-    return _mComponents.back().get();
 }

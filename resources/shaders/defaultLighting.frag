@@ -43,11 +43,16 @@ void main()
     vec3 diffuse = diff * material.diffuse;
     
     // specular
-    float specularStrength = 0.5;
-    vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec3 specular = specularStrength * spec * lightColor;
+    vec3 specular = vec3(0.0, 0.0, 0.0);
+
+    // We dot the normal and lightDir to make sure it won't 'leak'
+    if (dot(norm, lightDir) >= 0.0f) {
+        float specularStrength = 0.5;
+        vec3 viewDir = normalize(eyePos.xyz - pass.fragPos);
+        vec3 reflectDir = reflect(-lightDir, norm);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+        specular = specularStrength * spec * lightColor;
+    }
 
     vec3 result = (ambient + diffuse + specular) * material.diffuse;
     fragColor = vec4(result, 1.0);

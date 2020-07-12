@@ -73,6 +73,7 @@ void App::Run()
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     _mWindow->OnWindowResize({ event.window.data1, event.window.data2 });
+                    _mCurrentCamera->SetAspect({ event.window.data1, event.window.data2 });
                 }
             }
             break;
@@ -142,6 +143,10 @@ bool App::Start()
         "shaders/defaultLighting.vert",
         "shaders/defaultLighting.frag" }));
 
+    AddShader("skybox", new Shader({
+        "shaders/skybox.vert",
+        "shaders/skybox.frag" }));
+
     // Clear Window
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
@@ -205,6 +210,10 @@ void App::OpenGLInfo()
     glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &tmp);
     LogInfo("Max UBO Size: %d", tmp);
 
+    // Max Vertex Attributes
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &tmp);
+    LogInfo("Max Vertex Attributes: %d\n", tmp);
+    
     // Max Vertex UBOs
     glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &tmp);
     LogInfo("Max Vertex UBOs: %d", tmp);

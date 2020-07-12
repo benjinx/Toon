@@ -31,8 +31,10 @@ Axis::Axis()
             0.0f, 0.0f, 1.0f,
         };
 
+        GLuint indexes[] = { 0, 1, 2, 3, 4, 5 };
+
         GLuint vbos[3];
-        glGenBuffers(2, vbos);
+        glGenBuffers(3, vbos);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
@@ -44,14 +46,18 @@ Axis::Axis()
         glVertexAttribPointer(Mesh::AttributeID::COLOR, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray(Mesh::AttributeID::COLOR);
 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos[2]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
+
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        glDeleteBuffers(2, vbos);
+        glDeleteBuffers(3, vbos);
 
-        GLsizei count = sizeof(position) / sizeof(position[0]);
+        GLsizei count = sizeof(indexes) / sizeof(indexes[0]);
 
-        _mMesh = std::make_shared<Mesh>(
+        _mMesh = std::make_unique<Mesh>(
             vao,
             (GLenum)GL_LINES,
             (GLsizei)count,
@@ -65,6 +71,7 @@ Axis::Axis()
 void Axis::Render(glm::mat4 transform)
 {
     Shader* shader = App::Inst()->GetShader("axis");
-    glClear(GL_DEPTH_BUFFER_BIT);
+
     _mMesh->Render(shader, transform);
+    //glClear(GL_DEPTH_BUFFER_BIT);
 }

@@ -2,6 +2,7 @@
 
 #include <App.hpp>
 #include <Camera.hpp>
+#include <DevUI.hpp>
 #include <glTF2.hpp>
 #include <Log.hpp>
 #include <Material.hpp>
@@ -10,8 +11,6 @@
 #include <Utils.hpp>
 
 #include <imgui/imgui.h>
-
-bool Scene::_sShowAxis = false;
 
 void Scene::Update(float dt)
 {
@@ -33,8 +32,16 @@ void Scene::Render()
 {
     GameObject::Render();
 
-    if (_sShowAxis)
+    if (_mSkybox != nullptr)
     {
+        _mSkybox->Render();
+    }
+
+    if (DevUI::showAxis)
+    {
+        RenderAxis();
+
+        // Render the childrens
         for (auto& gameObject : _mChildren)
         {
             RenderAxis();
@@ -46,12 +53,9 @@ bool Scene::LoadScene(std::string filename)
 {
     std::vector<std::unique_ptr<GameObject>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
 
-    for (int i = 0; i < loadedGobjs.size(); ++i)
+    for (unsigned int i = 0; i < loadedGobjs.size(); ++i)
     {
         AddGameObject(std::move(loadedGobjs[i]));
-
-        // This will work if we have names from parsing.
-        //AddGameObject(loadedGobjs[i]->GetName(), std::move(loadedGobjs[i]));
     }
 
     if (loadedGobjs.empty())
@@ -92,7 +96,14 @@ GameObject* Scene::AddGameObject(std::unique_ptr<GameObject> gobj)
     return _mChildren.back().get();
 }
 
+void Scene::CreateSkybox(std::vector<std::string> faces)
+{
+    _mSkybox = std::make_unique<Skybox>();
+
+    _mSkybox->LoadCubemap(faces);
+}
+
 void Scene::Options()
 {
-    //ImGui::Checkbox("Show GameObject Axis", &_sShowAxis);
+    ImGui::Checkbox("Show GameObject Axis", &DevUI::showAxis);
 }

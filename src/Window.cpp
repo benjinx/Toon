@@ -78,5 +78,5 @@ void Window::OnWindowResize(glm::vec2 size)
 {
     _mWidth = (int)size.x;
     _mHeight = (int)size.y;
-    glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
+    glViewport(0, 0, (GLsizei)_mWidth, (GLsizei)_mHeight);
 }

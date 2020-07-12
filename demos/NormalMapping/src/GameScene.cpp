@@ -94,10 +94,10 @@ void GameScene::Update(float dt)
 
     // Rotate objects
     FindGameObject("Earth")->SetRotation(FindGameObject("Earth")->GetWorldRotation()
-        * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
+        * glm::angleAxis(glm::radians(-0.5f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
     
     FindGameObject("Moon")->SetRotation(FindGameObject("Moon")->GetWorldRotation()
-        * glm::angleAxis(glm::radians(-0.5f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
+        * glm::angleAxis(glm::radians(-0.185f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
 
     const auto& earthPos = FindGameObject("Earth")->GetPosition();
     const auto& moonPos = FindGameObject("Moon")->GetPosition();
@@ -133,5 +133,5 @@ void GameScene::Update(float dt)
 
     glm::vec3 newMarsPos = glm::vec3(marsX, 0.0f, -marsZ);
 
-    //GetGameObject("Mars")->SetPosition(newMarsPos);
+    //FindGameObject("Mars")->SetPosition(newMarsPos);
 }

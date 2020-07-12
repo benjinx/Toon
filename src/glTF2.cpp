@@ -814,7 +814,7 @@ namespace glTF2 {
 			int meshIndex = data.value("mesh", -1);
 			if (meshIndex >= 0) {
 				LogVerbose("Adding MeshComponent");
-                gobj->AddComponent(std::make_unique<MeshComponent>(meshes[meshIndex]));
+                gobj->AddComponent<MeshComponent>(std::make_unique<MeshComponent>(meshes[meshIndex]));
 			}
 
 			it = data.find("translation");

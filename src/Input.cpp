@@ -54,7 +54,9 @@ void Input::ProcessEvent(SDL_Event* event)
     if (event->type == SDL_KEYDOWN) //|| event->type == SDL_KEYUP)
     {
         // Handle Keyboard
-        auto key = SDLKeyToMyKey(event->key.keysym.sym);
+        SDL_Keycode key = SDLKeyToMyKey(event->key.keysym.sym);
+
+        int mod = event->key.keysym.mod;
 
         auto camera = App::Inst()->GetCurrentCamera();
         auto dir = camera->GetDirection();
@@ -302,7 +304,9 @@ void Input::ProcessEvent(SDL_Event* event)
     else if (event->type == SDL_KEYUP)
     {
         // Handle Keyboard
-        auto key = SDLKeyToMyKey(event->key.keysym.sym);
+        SDL_Keycode key = SDLKeyToMyKey(event->key.keysym.sym);
+
+        int mod = event->key.keysym.mod;
 
         auto camera = App::Inst()->GetCurrentCamera();
         auto dir = camera->GetDirection();
@@ -453,6 +457,10 @@ void Input::ProcessEvent(SDL_Event* event)
             camera->SetDirection({ dir.x, dir.y, 0 });
             break;
         case KEY_X:
+            if (mod & KMOD_CTRL)
+            {
+                DevUI::showAxis = !DevUI::showAxis;
+            }
             break;
         case KEY_Y:
             break;
