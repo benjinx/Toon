@@ -28,7 +28,7 @@ void GameScene::Start()
 
     // Scene Objs
     auto helm = AddGameObject("helm");
-    auto helmMesh = (MeshComponent*)helm->AddComponent(std::make_unique<MeshComponent>());
+    MeshComponent* helmMesh = helm->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
     helmMesh->SetShader(app->GetShader("normalMapping"));
 
     if (helmMesh->Load("models/DamagedHelm.glb"))
