@@ -7,6 +7,8 @@ INCLUDE(ExternalProject)
 
 PROJECT(thirdparty)
 
+FIND_PACKAGE(patch REQUIRED)
+
 # nlohmann_json
 
 SET(nlohmann_json_ROOT       ${CMAKE_BINARY_DIR}/nlohmann_json)
@@ -17,9 +19,8 @@ FIND_PACKAGE(nlohmann_json CONFIG QUIET)
 IF(NOT nlohmann_json_FOUND)
     ExternalProject_Add(
         thirdparty-nlohmann_json
-        GIT_REPOSITORY      "https://github.com/nlohmann/json.git"
-        GIT_TAG             "master"
-        GIT_SHALLOW         TRUE
+        URL                 "https://github.com/nlohmann/json/archive/v3.9.1.tar.gz"
+        URL_HASH            MD5=e386222fb57dd2fcb8a7879fc016d037
         SOURCE_DIR          ${nlohmann_json_SOURCE_DIR}
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${nlohmann_json_ROOT}
                             -DJSON_BuildTests=OFF
@@ -55,20 +56,26 @@ SET(SDL2_ROOT         ${CMAKE_BINARY_DIR}/SDL2)
 SET(SDL2_SOURCE_DIR   ${CMAKE_BINARY_DIR}/SDL2_src)
 SET(SDL2_BINARY_DIR   ${CMAKE_BINARY_DIR}/SDL2_bin)
 
-FIND_PACKAGE(SDL2 QUIET)
+FIND_PACKAGE(SDL2 2.0.6 CONFIG QUIET)
+
+IF(CMAKE_GENERATOR STREQUAL "Visual Studio 16 2019")
+    SET(_SDL2_PATCH_COMMAND ${patch_COMMAND} ${SDL2_SOURCE_DIR}/CMakeLists.txt -i ${CMAKE_SOURCE_DIR}/SDL2_vcruntime.patch )
+ENDIF()
 
 IF (NOT SDL2_FOUND)
     ExternalProject_Add(
         thirdparty-SDL2
-        HG_REPOSITORY      "http://hg.libsdl.org/SDL"
-        HG_TAG             "release-2.0.12"
+        URL                 "https://www.libsdl.org/release/SDL2-2.0.12.tar.gz"
+        URL_HASH            MD5=783b6f2df8ff02b19bb5ce492b99c8ff
         SOURCE_DIR          ${SDL2_SOURCE_DIR}
         BINARY_DIR          ${SDL2_BINARY_DIR}
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${SDL2_ROOT}
                             -DBUILD_SHARED_LIBS=ON
         UPDATE_COMMAND      ""
         BUILD_COMMAND       ""
-        INSTALL_COMMAND     ${CMAKE_COMMAND} --build . --target install --config Release
         TEST_COMMAND        ""
+        INSTALL_COMMAND     ${CMAKE_COMMAND} --build . --target install --config Release
+        COMMAND             ${CMAKE_COMMAND} --build . --target install --config Debug
+        PATCH_COMMAND       ${_SDL2_PATCH_COMMAND}
     )
 ENDIF()
