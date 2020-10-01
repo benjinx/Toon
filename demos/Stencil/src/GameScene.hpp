@@ -11,13 +11,16 @@ public:
     void Start() override;
     void Update(float dt) override;
     void Render() override;
-    void LogTest();
 
 private:
-    MeshComponent* _mHelmMesh;
-    MeshComponent* _mCubeMesh;
-    GameObject* _mHelm;
+    GameObject* _mPlane;
+    GameObject* _mSphere;
     GameObject* _mCube;
+    GameObject* _mTorus;
+    MeshComponent* _mPlaneMesh;
+    MeshComponent* _mSphereMesh;
+    MeshComponent* _mCubeMesh;
+    MeshComponent* _mTorusMesh;
 };
 
 #endif // GAMESCENE_H
