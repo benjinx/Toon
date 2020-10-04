@@ -10,7 +10,8 @@
 #include <Camera.hpp>
 #include <Log.hpp>
 #include <glm/glm.hpp>
-#include <MeshComponent.hpp>
+#include <StaticMeshComponent.hpp>
+#include <RiggedMeshComponent.hpp>
 #include <Light.hpp>
 
 #include <cstdint>
@@ -814,7 +815,7 @@ namespace glTF2 {
 			int meshIndex = data.value("mesh", -1);
 			if (meshIndex >= 0) {
 				LogVerbose("Adding MeshComponent");
-                gobj->AddComponent<MeshComponent>(std::make_unique<MeshComponent>(meshes[meshIndex]));
+                gobj->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>(meshes[meshIndex]));
 			}
 
 			it = data.find("translation");

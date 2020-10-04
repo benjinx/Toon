@@ -5,7 +5,7 @@
 #include <Light.hpp>
 #include <Log.hpp>
 #include <Mesh.hpp>
-#include <MeshComponent.hpp>
+#include <StaticMeshComponent.hpp>
 #include <Utils.hpp>
 
 GameObject::GameObject()

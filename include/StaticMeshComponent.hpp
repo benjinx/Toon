@@ -1,5 +1,5 @@
-#ifndef MESH_COMPONENT_HPP
-#define MESH_COMPONENT_HPP
+#ifndef STATIC_MESH_COMPONENT_HPP
+#define STATIC_MESH_COMPONENT_HPP
 
 #include <Config.hpp>
 #include <Math.hpp>
@@ -12,14 +12,14 @@
 
 class Shader;
 
-class MeshComponent : public Component
+class StaticMeshComponent : public Component
 {
 public:
-    MeshComponent() = default;
-    MeshComponent(std::shared_ptr<Mesh> mesh);
-    MeshComponent(std::vector<std::shared_ptr<Mesh>> meshes);
+    StaticMeshComponent() = default;
+    StaticMeshComponent(std::shared_ptr<Mesh> mesh);
+    StaticMeshComponent(std::vector<std::shared_ptr<Mesh>> meshes);
 
-    virtual ~MeshComponent() = default;
+    virtual ~StaticMeshComponent() = default;
 
     void Render() override;
 
@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif //MESH_COMPONENT_HPP
+#endif // STATIC_MESH_COMPONENT_HPP

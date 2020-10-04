@@ -32,7 +32,7 @@ void GameScene::Start()
 
     // Scene Objs
     _mHelm = AddGameObject("helm");
-    _mHelmMesh = _mHelm->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mHelmMesh = _mHelm->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mHelmMesh->SetShader(app->GetShader("normalMapping"));
 
     if (_mHelmMesh->Load("models/DamagedHelm.glb"))
@@ -42,7 +42,7 @@ void GameScene::Start()
     }
 
     _mCube = AddGameObject("Cube");
-    _mCubeMesh = _mCube->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mCubeMesh->SetShader(app->GetShader("advLighting"));
 
     if (_mCubeMesh->Load("models/Primitives/pCube.glb"))

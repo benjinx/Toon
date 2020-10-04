@@ -26,7 +26,7 @@ public:
         std::shared_ptr<Material> _Material;
     };
 
-
+    
     enum AttributeID : GLint
     {
         POSITION = 0,

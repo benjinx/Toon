@@ -14,8 +14,8 @@ public:
     void LogTest();
 
 private:
-    MeshComponent* _mHelmMesh;
-    MeshComponent* _mCubeMesh;
+    StaticMeshComponent* _mHelmMesh;
+    StaticMeshComponent* _mCubeMesh;
     GameObject* _mHelm;
     GameObject* _mCube;
 };
