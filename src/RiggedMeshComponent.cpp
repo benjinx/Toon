@@ -29,7 +29,10 @@ RiggedMeshComponent::RiggedMeshComponent(std::vector<std::shared_ptr<Mesh>> mesh
 
 void RiggedMeshComponent::Update(const float dt)
 {
-    _mAnimator.Update(dt);
+    for (auto& mesh : _mMeshes)
+    {
+        mesh->Update(dt);
+    }
 }
 
 void RiggedMeshComponent::Render()
@@ -52,15 +55,4 @@ bool RiggedMeshComponent::Load(const std::string& filename)
     _mMeshes.push_back(std::make_unique<Mesh>(std::move(meshPrims)));
 
     return true;
-}
-
-glm::mat4 RiggedMeshComponent::GetJointTransforms()
-{
-    //glm::mat4 jointMatrices[] = { glm::mat4() };
-    //addJointsToArray(_mRootJoint, jointMatrices);
-}
-
-void RiggedMeshComponent::AddJointsToArray()
-{
-
 }

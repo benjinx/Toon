@@ -45,7 +45,8 @@ void GameScene::Start()
     _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mCubeMesh->SetShader(app->GetShader("advLighting"));
 
-    if (_mCubeMesh->Load("models/Primitives/pCube.glb"))
+    //if (_mCubeMesh->Load("models/Primitives/pCube.glb"))
+    if (_mCubeMesh->Load("models/LowPolyMale_Rigging_AnimationStomp.glb"))
     {
         _mCube->SetPosition(glm::vec3(-2.0f, 0.0f, 1.0f));
     }

@@ -3,14 +3,14 @@
 
 #include <vector>
 
-#include <GameObject.hpp>
+#include <Math.hpp>
 
 class Joint //: public GameObject
 {
 public:
-	Joint() {};
+	Joint() = default;
 	Joint(int index, std::string name, glm::mat4 localBindTransform);
-	~Joint();
+	~Joint() = default;
 
 	void AddChild(Joint child);
 
@@ -19,10 +19,14 @@ public:
 
 	glm::mat4 GetInverseBindTransform() { return _mInverseBindTransform; }
 
-private:
 	// This is called ONCE in setup and is called on the ROOT parent joint
 	void CalcInverseBindTransform(glm::mat4 parentBindTransform);
 
+	int GetIndex() { return _mIndex; }
+
+	std::vector<Joint>& GetChildren() { return _mChildren; }
+
+private:
 	int _mIndex;
 	std::string _mName;
 	std::vector<Joint> _mChildren;

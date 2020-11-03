@@ -17,10 +17,10 @@ private:
     GameObject* _mSphere;
     GameObject* _mCube;
     GameObject* _mTorus;
-    MeshComponent* _mPlaneMesh;
-    MeshComponent* _mSphereMesh;
-    MeshComponent* _mCubeMesh;
-    MeshComponent* _mTorusMesh;
+    StaticMeshComponent* _mPlaneMesh;
+    StaticMeshComponent* _mSphereMesh;
+    StaticMeshComponent* _mCubeMesh;
+    StaticMeshComponent* _mTorusMesh;
 };
 
 #endif // GAMESCENE_H

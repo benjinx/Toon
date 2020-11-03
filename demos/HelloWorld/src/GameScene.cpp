@@ -23,7 +23,7 @@ void GameScene::Start()
 
     // Scene Objs
     auto logo = AddGameObject("Logo");
-    MeshComponent* logoMesh = logo->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    StaticMeshComponent* logoMesh = logo->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     logoMesh->SetShader(app->GetShader("passThru"));
 
     if (logoMesh->Load("models/logo/logo.glb"))

@@ -3,13 +3,25 @@
 
 #include <Animation.hpp>
 
+#include <memory>
+
+class Mesh;
+
 class Animator
 {
 public:
-	Animator();
-	~Animator();
+	Animator() = default;
+	Animator(std::shared_ptr<Mesh> mesh);
+	~Animator() = default;
+
+	void DoAnimation(Animation animation);
+
+	void Update(const float dt);
 
 private:
+	// Need to have access to the mesh
+	Mesh* _mMesh;
+
 	Animation _mCurrentAnim;
 	float _mAnimationTime;
 };

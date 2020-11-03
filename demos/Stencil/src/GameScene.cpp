@@ -20,19 +20,19 @@ void GameScene::Start()
 
     // Scene Objs
     _mPlane = AddGameObject("Plane");
-    _mPlaneMesh = _mPlane->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mPlaneMesh = _mPlane->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mPlaneMesh->SetShader(app->GetShader("defaultLighting"));
 
     _mSphere = AddGameObject("Sphere");
-    _mSphereMesh = _mSphere->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mSphereMesh = _mSphere->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mSphereMesh->SetShader(app->GetShader("defaultLighting"));
 
     _mCube = AddGameObject("Cube");
-    _mCubeMesh = _mCube->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mCubeMesh->SetShader(app->GetShader("defaultLighting"));
 
     _mTorus = AddGameObject("Torus");
-    _mTorusMesh = _mTorus->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    _mTorusMesh = _mTorus->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mTorusMesh->SetShader(app->GetShader("defaultLighting"));
 
     // Scene Objs

@@ -1,11 +1,7 @@
 #include <Animation.hpp>
 
-Animation::Animation()
+Animation::Animation(float length, std::vector<KeyFrame> keyFrames)
 {
-
-}
-
-Animation::~Animation()
-{
-
+	_mLength = length;
+	_mKeyFrames = keyFrames;
 }

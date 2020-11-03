@@ -1,11 +1,7 @@
 #include <KeyFrame.hpp>
 
-KeyFrame::KeyFrame()
+KeyFrame::KeyFrame(float timestamp, std::unordered_map<std::string, glm::mat4> poses)
 {
-
-}
-
-KeyFrame::~KeyFrame()
-{
-
+	_mTimestamp = timestamp;
+	_mPoses = poses;
 }

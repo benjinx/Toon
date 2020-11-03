@@ -6,6 +6,7 @@
 #include <OpenGL.hpp>
 
 #include <memory>
+#include <Math.hpp>
 
 class Shader;
 

@@ -9,6 +9,14 @@ Mesh::Mesh(GLuint vao, GLenum mode, GLsizei count, GLenum type, GLsizei offset, 
     _mPrimitives.push_back(Primitive { vao, mode, count, type, offset, material });
 }
 
+Mesh::Mesh(GLuint vao, GLenum mode, GLsizei count, GLenum type, GLsizei offset, std::shared_ptr<Material> material, Joint rootJoint, int jointCount)
+{
+    _mPrimitives.push_back(Primitive { vao, mode, count, type, offset, material });
+    _mRootJoint = rootJoint;
+    _mJointCount = jointCount;
+    _mRootJoint.CalcInverseBindTransform(glm::mat4());
+}
+
 Mesh::Mesh(std::vector<Primitive>&& primitives)
 {
     LoadFromData(std::move(primitives));
@@ -21,6 +29,37 @@ bool Mesh::LoadFromData(std::vector<Primitive>&& primitives)
     }
 
     return true;
+}
+
+void Mesh::Update(const float dt)
+{
+    _mAnimator.Update(dt);
+}
+
+std::vector<glm::mat4> Mesh::GetJointTransforms()
+{
+    // Create a new vector 
+    // vector needs the size of _mJointCount
+    // we then pass the vector and root joint to AddJointsToArray
+
+    std::vector<glm::mat4> jointMatrices;
+    AddJointsToArray(_mRootJoint, jointMatrices);
+    return jointMatrices;
+}
+
+void Mesh::AddJointsToArray(Joint headJoint, std::vector<glm::mat4> jointMatrices)
+{
+    // we have the transforms and we need to stick them in the corrosponding indexes.
+    // video #2 7:33
+
+    jointMatrices[headJoint.GetIndex()] = headJoint.GetTransform();
+
+    for (Joint& childJoint : headJoint.GetChildren())
+    {
+        AddJointsToArray(childJoint, jointMatrices);
+    }
+
+    return;
 }
 
 void Mesh::Render(Shader * shader, glm::mat4 modelMat)

@@ -1,9 +1,7 @@
 #ifndef RIGGED_MESH_COMPONENT_HPP
 #define RIGGED_MESH_COMPONENT_HPP
 
-#include <Animator.hpp>
 #include <Config.hpp>
-#include <Joint.hpp>
 #include <Math.hpp>
 #include <OpenGL.hpp>
 #include <Mesh.hpp>
@@ -32,25 +30,12 @@ public:
 
     bool Load(const std::string& filename);
 
-    void doAnimation(Animation animation) { _mAnimator.doAnimation(animation); }
-
     void SetShader(Shader* value) { _mShader = value; }
-
-    Joint GetRootJoint() { return _mRootJoint; }
-
-    glm::mat4 GetJointTransforms();
-
-    void AddJointsToArray();
 
 private:
 
     // Meshes
     std::vector<std::shared_ptr<Mesh>> _mMeshes;
-
-    // Skeleton/Animation
-    Joint _mRootJoint;
-    int _mJointCount;
-    Animator _mAnimator;
 
     // Shader
     Shader* _mShader = nullptr;
