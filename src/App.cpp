@@ -61,13 +61,11 @@ void App::Run()
 
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-            {
-                _mRunning = false;
-            }
-
             switch (event.type)
             {
+            case SDL_QUIT:
+                _mRunning = false;
+                break;
             case SDL_WINDOWEVENT:
             {
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED)
@@ -90,7 +88,6 @@ void App::Run()
         // Update
         Update(dt);
 
-
         // Render
         frameElap += elapsed;
         if (frameDelay <= frameElap)
@@ -99,7 +96,6 @@ void App::Run()
             ++frames;
 
             Render();
-
         }
 
         // Display FPS
@@ -110,8 +106,11 @@ void App::Run()
             float fps = (float)(frames / fpsElap.count()) * 1000.f;
             sprintf(buffer, "Temporality ~ BC/DC Games - FPS: %0.2f", fps);
             SDL_SetWindowTitle(_mWindow->GetSDLWindow(), buffer);
-        }
 
+            // These are important unless you want to go sanic mode.
+            fpsElap = 0ms;
+            frames = 0;
+        }
     }
 }
 

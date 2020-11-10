@@ -31,30 +31,35 @@ void GameScene::Start()
         "shaders/stencil.frag" }));
 
     // Scene Objs
-    _mHelm = AddGameObject("helm");
-    _mHelmMesh = _mHelm->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
-    _mHelmMesh->SetShader(app->GetShader("normalMapping"));
+    // _mHelm = AddGameObject("helm");
+    // _mHelmMesh = _mHelm->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
+    // _mHelmMesh->SetShader(app->GetShader("normalMapping"));
 
-    if (_mHelmMesh->Load("models/DamagedHelm.glb"))
+    // if (_mHelmMesh->Load("models/DamagedHelm.glb"))
+    // {
+    //     _mHelm->SetPosition(glm::vec3(2.0f, 0.0f, 1.0f));
+    //     _mHelm->SetRotation(glm::vec3(0.0f, 9.5f, 9.5f));
+    // }
+
+    // _mCube = AddGameObject("Cube");
+    // _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
+    // _mCubeMesh->SetShader(app->GetShader("advLighting"));
+
+    // //if (_mCubeMesh->Load("models/Primitives/pCube.glb"))
+    // if (_mCubeMesh->Load("models/LowPolyMale_Rigging_AnimationStomp.glb"))
+    // {
+    //     _mCube->SetPosition(glm::vec3(-2.0f, 0.0f, 1.0f));
+    // }
+
+    if (!LoadScene("models/LowPolyMale_Rigging_AnimationStomp.glb"))
     {
-        _mHelm->SetPosition(glm::vec3(2.0f, 0.0f, 1.0f));
-        _mHelm->SetRotation(glm::vec3(0.0f, 9.5f, 9.5f));
+       LogWarn("Could not load scene!");
     }
 
-    _mCube = AddGameObject("Cube");
-    _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
-    _mCubeMesh->SetShader(app->GetShader("advLighting"));
-
-    //if (_mCubeMesh->Load("models/Primitives/pCube.glb"))
-    if (_mCubeMesh->Load("models/LowPolyMale_Rigging_AnimationStomp.glb"))
+    /*if (!LoadScene("models/defaultScene.glb"))
     {
-        _mCube->SetPosition(glm::vec3(-2.0f, 0.0f, 1.0f));
-    }
-
-    //if (!LoadScene("models/defaultSceneLights.glb"))
-    //{
-    //    LogWarn("Could not load scene!");
-    //}
+        LogWarn("Could not load scene!");
+    }*/
 
     // Camera
     Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
@@ -94,7 +99,7 @@ void GameScene::Render()
 {
     auto app = App::Inst();
 
-    glClear(GL_STENCIL_BUFFER_BIT);
+    /*glClear(GL_STENCIL_BUFFER_BIT);
 
     glStencilMask(0x00);
     // Render normal stuff here.
@@ -119,7 +124,7 @@ void GameScene::Render()
 
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);*/
 
     //glStencilMask(0xFF); // each bit is written to the stencil buffer as is 
     //glStencilMask(0x00); // each bit ends up as 0 in the stencil buffer (disabling writes)

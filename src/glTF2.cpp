@@ -14,6 +14,7 @@
 #include <RiggedMeshComponent.hpp>
 #include <Light.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <memory>
@@ -350,10 +351,30 @@ namespace glTF2 {
         float outerConeAngle;
     };
 
+	struct skeleton_t {
+		std::string name;
+		std::vector<int> joints;
+	};
+
     std::vector<light_t> loadLights(const json& data)
     {
         std::vector<light_t> lights;
-        const auto& lightData = data["extensions"]["KHR_lights_punctual"]["lights"];
+
+		nlohmann::json lightData;
+
+		auto it = data.find("extensions");
+		if (it != data.cend())
+		{
+			auto it2 = it.value().find("KHR_lights_punctual");
+			if (it2 != it.value().cend())
+			{
+				auto it3 = it2.value().find("lights");
+				if (it3 != it2.value().cend())
+				{
+					lightData = it3.value();
+				}
+			}
+		}
 
         if (lightData.is_array())
         {
@@ -625,15 +646,12 @@ namespace glTF2 {
 									else if (attrib == "TEXCOORD_0") {
 										vaa = Mesh::AttributeID::TEXCOORD;
 									}
-									//We'll need to extract this.
-									/*
 									else if (attrib == "JOINTS_0") {
-										vaa = Mesh::AttributeID::JOINTS;
+										vaa = Mesh::AttributeID::JOINTS_0;
 									}
 									else if (attrib == "WEIGHTS_0") {
-										vaa = Mesh::AttributeID::WEIGHTS;
+										vaa = Mesh::AttributeID::WEIGHTS_0;
 									}
-									*/
 
 									if (vaa > -1) {
 										glEnableVertexAttribArray(vaa);
@@ -734,114 +752,46 @@ namespace glTF2 {
 		return meshes;
 	}
 
-	std::shared_ptr<Skeleton> loadSkeleton(const json& data)
+	std::vector<skeleton_t> loadSkeletons(const json& data)
 	{
-
 		// Create Skeleton
-		std::shared_ptr<Skeleton> skele(new Skeleton());
+		std::vector<skeleton_t> skeletons;
 
 		// Open up the skin data
-		if (auto it = data.find("skins"); it != data.end())
-		{
-			const auto& object = it.value();
+		auto it = data.find("skins");
+		if (it != data.cend()) {
+			const auto& array = it.value();
+			for (const auto& object : array) {
+				if (object.is_object()) {
+					skeletons.push_back(skeleton_t{});
+					auto& skeleton = skeletons.back();
 
-			if (object.is_array())
-			{
-				auto objectArray = object[0];
-
-				// Get the name from the skins data
-				if (auto objectIt = objectArray.find("name"); objectIt != objectArray.end())
-				{
-					skele->SetName(objectIt.value());
-				}
-
-				// Get the inverseBindMatrices count from the skins data
-				if (auto objectIt = objectArray.find("inverseBindMatrices"); objectIt != objectArray.end())
-				{
-					skele->SetInverseBindMatrices(objectIt.value());
-				}
-
-				////////////////////////////////////////////////////////////////////////////////////
-
-				// Create a vector for the joints
-				// This can probably be moved to the end
-				std::vector<Joint> joints;
-
-				// Get the joint locations from the skins data
-				if (auto objectIt = objectArray.find("joints"); objectIt != objectArray.end())
-				{
-					std::vector<int> rootJointIndex = objectIt.value().get<std::vector<int>>();
-
-					// Access the nodes to then dig out our needed joint info from the locations obtained above.
-					if (auto nodeIt = data.find("nodes"); nodeIt != data.end())
-					{
-						// Grab the node array
-						const auto& nodeObj = nodeIt.value();
-
-						if (nodeObj.is_array())
-						{
-							/*std::function<std::unique_ptr<GameObject>(const json&, const json&)>
-							loadNode = [&](const json& nodes, const json& data)
-							-> std::unique_ptr<GameObject>
-							{
-
-							};*/
-							// Now we need to create a loop to check children and grab all of that data as well by the children.
-							auto loadJoint = [nodeObj](int jointIndex)
-							{
-								// Grab the data from the supplied joint. (We have to cast to an int)
-								auto nodeObjArray = nodeObj[jointIndex];
-
-								if (nodeObjArray.is_object())
-								{
-									// Grab and store data here.
-									auto jointName = nodeObjArray.value("name","");
-
-									if (auto translationNode = nodeObjArray.find("translation"); translationNode != nodeObjArray.end())
-									{
-										std::vector<float> translation = translationNode.value().get<std::vector<float>>();
-									}
-
-									if (auto rotationNode = nodeObjArray.find("rotation"); rotationNode != nodeObjArray.end())
-									{
-										std::vector<float> rotation = rotationNode.value().get<std::vector<float>>();
-									}
-
-									if (auto scaleNode = nodeObjArray.find("scale"); scaleNode != nodeObjArray.end())
-									{
-										std::vector<float> scale = scaleNode.value().get<std::vector<float>>();
-									}
-
-									if (auto childrenNode = nodeObjArray.find("children"); childrenNode != nodeObjArray.end())
-									{
-										std::vector<int> children = childrenNode.value().get<std::vector<int>>();
-									}
-								}
-
-								// We have to recall this function again.
-
-								return std::unique_ptr<Joint>();
-							};
-
-							// This would start it? but how do we do this the right way for a loop.
-							loadJoint(rootJointIndex[0]);
-
-						}
+					auto valIt = object.find("name");
+					if (valIt != object.end()) {
+						const auto& value = valIt.value();
+						skeleton.name = value;
 					}
+
+					valIt = object.find("joints");
+					if (valIt != object.end()) {
+					    const auto& value = valIt.value();
+						skeleton.joints = value.get<std::vector<int>>();
+                    }
+
 				}
-
-
 			}
 		}
 
-		return std::shared_ptr<Skeleton>();
+		return skeletons;
 	}
 
 	std::vector<std::unique_ptr<GameObject>> loadNodes(
 		const json& data,
 		const std::vector<camera_t>& cameras,
         const std::vector<light_t>& lights,
-		const std::vector<std::shared_ptr<Mesh>>& meshes)
+		const std::vector<std::shared_ptr<Mesh>>& meshes,
+		const std::vector<skeleton_t>& skeletons
+		)
 	{
 		std::vector<std::unique_ptr<GameObject>> gobjs;
 
@@ -974,6 +924,20 @@ namespace glTF2 {
 			if (array.is_array()) {
 				for (int index : sceneNodeIndexes) {
 					const auto& object = array[index];
+
+					bool isJoint = false;
+					for (const auto& skeleton : skeletons)
+					{
+						auto it = std::find(skeleton.joints.begin(), skeleton.joints.end(), index);
+						if (it != skeleton.joints.end()) {
+							isJoint = true;
+						}
+					}
+
+					if (isJoint) {
+						LogInfo("RollingJoint#420BlazeItMyD00d");
+						continue;
+					}
 
 					if (object.is_object()) {
 						LogVerbose("glTF node %s", object.value("name", ""));
@@ -1144,8 +1108,8 @@ namespace glTF2 {
 		const auto& materials = loadMaterials(data, textures);
 		const auto& meshes = loadMeshes(data, bufferViews, buffers, accessors, materials);
         const auto& lights = loadLights(data);
-		const auto& skeleton = loadSkeleton(data);
-		auto gobjs = loadNodes(data, cameras, lights, meshes);
+		const auto& skeletons = loadSkeletons(data);
+		auto gobjs = loadNodes(data, cameras, lights, meshes, skeletons);
 
 		//DuskBenchEnd("glTF2::LoadSceneFromFile");
 		return gobjs;
@@ -1165,7 +1129,6 @@ namespace glTF2 {
 		const auto& samplers = loadSamplers(data);
 		const auto& textures = loadTextures(data, images, samplers);
 		const auto& materials = loadMaterials(data, textures);
-		const auto& skeleton = loadSkeleton(data);
 		auto primitives = loadAllPrimitives(data, bufferViews, buffers, accessors, materials);
 
 		//DuskBenchEnd("glTF2::LoadMeshFromFile");

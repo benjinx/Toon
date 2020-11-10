@@ -35,8 +35,10 @@ public:
         NORMAL = 1,
         TEXCOORD = 2,
         TANGENT = 3,
-        BITANGENT = 4,
-        COLOR = 5,
+        JOINTS_0 = 4,
+        WEIGHTS_0 = 5,
+        COLOR = 6,
+
     };
 
     Mesh() = default;

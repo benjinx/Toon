@@ -17,8 +17,6 @@ public:
 	glm::mat4 GetTransform() { return _mTransform; }
 	void SetTransform(glm::mat4 transform) { _mTransform = transform; }
 
-	glm::mat4 GetInverseBindTransform() { return _mInverseBindTransform; }
-
 	// This is called ONCE in setup and is called on the ROOT parent joint
 	void CalcInverseBindTransform(glm::mat4 parentBindTransform);
 
@@ -35,9 +33,6 @@ private:
 	// normal transforms passed in so we can manipulate 
 	// them in the shader.
 	glm::mat4 _mTransform;
-
-	// Original transform in local space of the parent.
-	glm::mat4 _mLocalBindTransform;
 
 	// Original transform in model space, but inversed.
 	glm::mat4 _mInverseBindTransform = glm::mat4();
