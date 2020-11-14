@@ -39,13 +39,12 @@ FIND_PACKAGE(glm CONFIG QUIET)
 IF(NOT glm_FOUND)
     ExternalProject_Add(
         thirdparty-glm
-        GIT_REPOSITORY      "https://github.com/g-truc/glm.git"
-        GIT_TAG             "0.9.9.3"
-        GIT_SHALLOW         TRUE
+        URL                 "https://github.com/g-truc/glm/releases/download/0.9.9.8/glm-0.9.9.8.zip"
+        URL_HASH            MD5=69895110052f0d711c9c54fbf385f6f5
         SOURCE_DIR          ${glm_SOURCE_DIR}
-        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${glm_ROOT}
-                            -DGLM_TEST_ENABLE=OFF
+        CONFIGURE_COMMAND   ""
         BUILD_COMMAND       ""
+        INSTALL_COMMAND     ""
         UPDATE_COMMAND      ""
     )
 ENDIF()

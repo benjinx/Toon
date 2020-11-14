@@ -183,7 +183,7 @@ ENDFOREACH()
 # Link all libraries
 TARGET_LINK_LIBRARIES(
     ${PROJECT_NAME}
-    glm
+    glm::glm
     nlohmann_json::nlohmann_json
     SDL2::SDL2
 )
