@@ -31,12 +31,12 @@ ENDIF()
 
 # glm
 
-SET(glm_ROOT       ${CMAKE_BINARY_DIR}/glm)
-SET(glm_SOURCE_DIR ${CMAKE_BINARY_DIR}/glm_src)
+SET(glm_ROOT       ${CMAKE_BINARY_DIR}/glm/cmake)
+SET(glm_SOURCE_DIR ${CMAKE_BINARY_DIR}/glm)
 
 FIND_PACKAGE(glm CONFIG QUIET)
 
-IF(NOT glm_FOUND)
+IF(NOT glm_FOUND OR NOT TARGET glm::glm)
     ExternalProject_Add(
         thirdparty-glm
         URL                 "https://github.com/g-truc/glm/releases/download/0.9.9.8/glm-0.9.9.8.zip"
