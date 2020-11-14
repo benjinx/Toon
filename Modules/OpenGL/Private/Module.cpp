@@ -11,7 +11,7 @@ void ModuleTerm() {
     SetGraphicsDriver(nullptr);
 }
 
-extern "C" struct TemporalityModule _TemporalityModule = {
+TEMPORALITY_MODULE() {
     "OpenGL",
     ModuleInit,
     ModuleTerm,

@@ -7,6 +7,8 @@ PROJECT(Temporality)
 
 OPTION(BUILD_THIRDPARTY "Build Missing ThirdParty Dependencies"             ON)
 
+INCLUDE(Compiler)
+
 ###
 ### Third Party Dependencies
 ###
@@ -75,11 +77,6 @@ FILE(RELATIVE_PATH
     ${CMAKE_BINARY_DIR} 
     ${CMAKE_SOURCE_DIR}/resources
 )
-                        
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
 
 ##NEW
 

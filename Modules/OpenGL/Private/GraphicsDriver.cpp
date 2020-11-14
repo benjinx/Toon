@@ -1,6 +1,6 @@
 #include <Temporality/OpenGL/GraphicsDriver.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Temporality::OpenGL {
 
@@ -50,7 +50,11 @@ GraphicsDriver::GraphicsDriver()
 
     //LogLoad("SDL2 GL Context created successfully.\n");
 
-    gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+    if (!gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress)) {
+        //LogError("Failed to initialize OpenGL context");
+        return;
+    }
+
     glViewport(0, 0, 600, 800);
 
     // Makes an icon

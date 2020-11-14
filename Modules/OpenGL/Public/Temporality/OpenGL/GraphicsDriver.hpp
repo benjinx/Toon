@@ -1,13 +1,15 @@
 #ifndef TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 #define TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 
+#include <Temporality/OpenGL/Config.hpp>
+
 #include <Temporality/Graphics/GraphicsDriver.hpp>
 
 #include <SDL.h>
 
 namespace Temporality::OpenGL {
 
-class GraphicsDriver : public Temporality::GraphicsDriver
+class TEMPORALITY_OPENGL_API GraphicsDriver : public Temporality::GraphicsDriver
 {
 public:
     explicit GraphicsDriver();

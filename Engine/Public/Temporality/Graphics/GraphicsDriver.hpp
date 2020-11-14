@@ -1,13 +1,15 @@
 #ifndef TEMPORALITY_GRAPHICS_DRIVER_HPP
 #define TEMPORALITY_GRAPHICS_DRIVER_HPP
 
+#include <Temporality/Config.hpp>
+
 #include <string>
 #include <memory>
 #include <glm/glm.hpp>
 
 namespace Temporality {
 
-class GraphicsDriver
+class TEMPORALITY_ENGINE_API GraphicsDriver
 {
 public:
     explicit GraphicsDriver() = default;
@@ -27,8 +29,10 @@ public:
     virtual void SwapBuffers() = 0;
 };
 
+TEMPORALITY_ENGINE_API
 void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver);
 
+TEMPORALITY_ENGINE_API
 GraphicsDriver* GetGraphicsDriver();
 
 }

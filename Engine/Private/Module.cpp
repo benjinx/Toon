@@ -10,21 +10,34 @@
 
 #include <vector>
 
+namespace Temporality {
+
 std::vector<ModuleHandle> _gModules;
 
 bool LoadModule(const std::string& name)
 {
     ModuleHandle module = nullptr;
     
-    std::string filename = "lib" + name + ".so";
-    
-    module = dlopen(filename.c_str(), RTLD_GLOBAL | RTLD_NOW);
-    if (!module) {
-        fprintf(stderr, "Failed to load module. %s : %s\n", filename.c_str(), dlerror());
-        return false;
-    }
+    #if defined(_WIN32)
+        module = LoadLibraryA(name.c_str());
+        if (!module) {
+            fprintf(stderr, "Failed to load module. %s\n", name.c_str());
+            return false;
+        }
 
-    TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
+        TemporalityModule * def = (TemporalityModule *)GetProcAddress(module, "_TemporalityModule");
+
+    #else
+        std::string filename = "lib" + name + ".so";
+        module = dlopen(filename.c_str(), RTLD_GLOBAL | RTLD_NOW);
+        if (!module) {
+            fprintf(stderr, "Failed to load module. %s : %s\n", filename.c_str(), dlerror());
+            return false;
+        }
+
+        TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
+    #endif
+
     if (!def) {
         fprintf(stderr, "Failed to find _TemporalityModule.\n");
         return false;
@@ -41,15 +54,27 @@ bool LoadModule(const std::string& name)
 
 void FreeModules()
 {
+
     for (auto module : _gModules) {
-        TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
+
+        #if defined(_WIN32)
+            TemporalityModule * def = (TemporalityModule *)GetProcAddress(module, "_TemporalityModule");
+        #else
+            TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
+        #endif
 
         if (def && def->Term) {
             def->Term();
         }
 
-        dlclose(module);
+        #if defined(_WIN32)
+            FreeLibrary(module);
+        #else
+            dlclose(module);
+        #endif
     }
 
     _gModules.clear();
+}
+
 }

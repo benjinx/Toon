@@ -4,7 +4,7 @@
 
 int main(int argc, char ** argv)
 {
-    LoadModule("TemporalityOpenGL");
+    Temporality::LoadModule("TemporalityOpenGL");
 
     auto gfx = Temporality::GetGraphicsDriver();
     if (gfx) {
