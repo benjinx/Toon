@@ -37,7 +37,7 @@ void GameScene::Start()
     CreateSkybox(faces);
 
     GameObject* Cube = AddGameObject("Cube");
-    MeshComponent* CubeMesh = Cube->AddComponent<MeshComponent>(std::make_unique<MeshComponent>());
+    StaticMeshComponent* CubeMesh = Cube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
 
     CubeMesh->SetShader(app->GetShader("reflection"));
 

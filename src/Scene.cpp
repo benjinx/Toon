@@ -6,7 +6,7 @@
 #include <glTF2.hpp>
 #include <Log.hpp>
 #include <Material.hpp>
-#include <MeshComponent.hpp>
+#include <StaticMeshComponent.hpp>
 #include <Shader.hpp>
 #include <Utils.hpp>
 

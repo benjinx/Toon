@@ -1,7 +1,7 @@
 #include "Axis.hpp"
 
 #include <App.hpp>
-#include <MeshComponent.hpp>
+#include <StaticMeshComponent.hpp>
 #include <Shader.hpp>
 
 Axis::Axis()

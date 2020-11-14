@@ -12,7 +12,8 @@
 #include <Log.hpp>
 #include <Material.hpp>
 #include <Mesh.hpp>
-#include <MeshComponent.hpp>
+#include <StaticMeshComponent.hpp>
+#include <RiggedMeshComponent.hpp>
 #include <Scene.hpp>
 #include <ScriptHost.hpp>
 #include <Shader.hpp>

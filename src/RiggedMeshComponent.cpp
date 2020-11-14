@@ -1,4 +1,4 @@
-#include "MeshComponent.hpp"
+#include "RiggedMeshComponent.hpp"
 
 #include <App.hpp>
 #include <Camera.hpp>
@@ -11,7 +11,7 @@
 #include <Utils.hpp>
 
 
-MeshComponent::MeshComponent(std::shared_ptr<Mesh> mesh)
+RiggedMeshComponent::RiggedMeshComponent(std::shared_ptr<Mesh> mesh)
 {
     _mMeshes.push_back(mesh);
 
@@ -19,7 +19,7 @@ MeshComponent::MeshComponent(std::shared_ptr<Mesh> mesh)
     _mShader = App::Inst()->GetShader("defaultLighting");
 }
 
-MeshComponent::MeshComponent(std::vector<std::shared_ptr<Mesh>> meshes)
+RiggedMeshComponent::RiggedMeshComponent(std::vector<std::shared_ptr<Mesh>> meshes)
 {
     _mMeshes = meshes;
 
@@ -27,7 +27,15 @@ MeshComponent::MeshComponent(std::vector<std::shared_ptr<Mesh>> meshes)
     _mShader = App::Inst()->GetShader("defaultLighting");
 }
 
-void MeshComponent::Render()
+void RiggedMeshComponent::Update(const float dt)
+{
+    for (auto& mesh : _mMeshes)
+    {
+        mesh->Update(dt);
+    }
+}
+
+void RiggedMeshComponent::Render()
 {
     for (auto& mesh : _mMeshes)
     {
@@ -35,7 +43,7 @@ void MeshComponent::Render()
     }
 }
 
-bool MeshComponent::Load(const std::string& filename)
+bool RiggedMeshComponent::Load(const std::string& filename)
 {
     auto meshPrims = glTF2::LoadPrimitivesFromFile(filename);
 

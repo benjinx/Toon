@@ -4,15 +4,17 @@
 #include <Utils.hpp>
 #include <nlohmann/json.hpp>
 #include <Material.hpp>
-//#include <Mesh.hpp>
 #include <Texture.hpp>
-//#include <GameObject.hpp>
 #include <Camera.hpp>
 #include <Log.hpp>
 #include <glm/glm.hpp>
-#include <MeshComponent.hpp>
+#include <Skin.hpp>
+#include <Joint.hpp>
+#include <StaticMeshComponent.hpp>
+#include <RiggedMeshComponent.hpp>
 #include <Light.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <memory>
@@ -349,10 +351,30 @@ namespace glTF2 {
         float outerConeAngle;
     };
 
+	struct skin_t {
+		std::string name;
+		std::vector<int> joints;
+	};
+
     std::vector<light_t> loadLights(const json& data)
     {
         std::vector<light_t> lights;
-        const auto& lightData = data["extensions"]["KHR_lights_punctual"]["lights"];
+
+		nlohmann::json lightData;
+
+		auto it = data.find("extensions");
+		if (it != data.cend())
+		{
+			auto it2 = it.value().find("KHR_lights_punctual");
+			if (it2 != it.value().cend())
+			{
+				auto it3 = it2.value().find("lights");
+				if (it3 != it2.value().cend())
+				{
+					lightData = it3.value();
+				}
+			}
+		}
 
         if (lightData.is_array())
         {
@@ -583,7 +605,7 @@ namespace glTF2 {
 									auto& accessor = accessors[accessorIndex];
 									auto& bufferView = bufferViews[accessor.bufferView];
 									auto& buffer = buffers[bufferView.buffer];
-									int byteStride = bufferView.byteStride;
+									int byteStride = (int)bufferView.byteStride;
 
 									LogVerbose("glTF attribute %s", attrib);
 
@@ -618,11 +640,17 @@ namespace glTF2 {
 									else if (attrib == "NORMAL") {
 										vaa = Mesh::AttributeID::NORMAL;
 									}
+									else if (attrib == "TANGENT") {
+										vaa = Mesh::AttributeID::TANGENT;
+									}
 									else if (attrib == "TEXCOORD_0") {
 										vaa = Mesh::AttributeID::TEXCOORD;
 									}
-									else if (attrib == "TANGENT") {
-										vaa = Mesh::AttributeID::TANGENT;
+									else if (attrib == "JOINTS_0") {
+										vaa = Mesh::AttributeID::JOINTS_0;
+									}
+									else if (attrib == "WEIGHTS_0") {
+										vaa = Mesh::AttributeID::WEIGHTS_0;
 									}
 
 									if (vaa > -1) {
@@ -724,11 +752,46 @@ namespace glTF2 {
 		return meshes;
 	}
 
+	std::vector<skin_t> loadSkins(const json& data)
+	{
+		// Create Skeleton
+		std::vector<skin_t> skins;
+
+		// Open up the skin data
+		auto it = data.find("skins");
+		if (it != data.cend()) {
+			const auto& array = it.value();
+			for (const auto& object : array) {
+				if (object.is_object()) {
+					skins.push_back(skin_t{});
+					auto& skeleton = skins.back();
+
+					auto valIt = object.find("name");
+					if (valIt != object.end()) {
+						const auto& value = valIt.value();
+						skeleton.name = value;
+					}
+
+					valIt = object.find("joints");
+					if (valIt != object.end()) {
+					    const auto& value = valIt.value();
+						skeleton.joints = value.get<std::vector<int>>();
+                    }
+
+				}
+			}
+		}
+
+		return skins;
+	}
+
 	std::vector<std::unique_ptr<GameObject>> loadNodes(
 		const json& data,
 		const std::vector<camera_t>& cameras,
         const std::vector<light_t>& lights,
-		const std::vector<std::shared_ptr<Mesh>>& meshes)
+		const std::vector<std::shared_ptr<Mesh>>& meshes,
+		const std::vector<skin_t>& skins
+		)
 	{
 		std::vector<std::unique_ptr<GameObject>> gobjs;
 
@@ -814,28 +877,64 @@ namespace glTF2 {
 			int meshIndex = data.value("mesh", -1);
 			if (meshIndex >= 0) {
 				LogVerbose("Adding MeshComponent");
-                gobj->AddComponent<MeshComponent>(std::make_unique<MeshComponent>(meshes[meshIndex]));
+                gobj->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>(meshes[meshIndex]));
+			}
+
+			it = data.find("name");
+			if (it != data.end()) {
+				gobj->SetName(it.value());
+				LogWarn("Name: %s", gobj->GetName());
+				if (it.value() == "Armature")
+				{
+					LogError("Armature");
+				}
+				//if (it.value() == "Hair")
+				//{
+				//	LogError("Hair");
+				//}
+				//if (it.value() == "Character")
+				//{
+				//	LogError("Character");
+				//}
 			}
 
 			it = data.find("translation");
 			if (it != data.end()) {
 				gobj->SetPosition(parseVec3(it.value(), gobj->GetPosition()));
+				LogWarn("Position: %f, %f, %f", gobj->GetPosition().x, gobj->GetPosition().y, gobj->GetPosition().z);
 			}
 
 			it = data.find("rotation");
 			if (it != data.end()) {
 				gobj->SetRotation(parseQuat(it.value(), gobj->GetRotation()));
+				LogWarn("Rotation: %f, %f, %f", gobj->GetRotation().x, gobj->GetRotation().y, gobj->GetRotation().z);
 			}
 
 			it = data.find("scale");
 			if (it != data.end()) {
 				gobj->SetScale(parseVec3(it.value(), gobj->GetScale()));
+				LogWarn("Scale: %f, %f, %f", gobj->GetScale().x, gobj->GetScale().y, gobj->GetScale().z);
 			}
 
             it = data.find("children");
             if (it != data.end()) {
                 for (const auto& child : it.value())
                 {
+					bool isJoint = false;
+					for (const auto& skin : skins)
+					{
+						auto itr = std::find(skin.joints.begin(), skin.joints.end(), child.get<int>());
+						if (itr != skin.joints.end()) {
+							isJoint = true;
+						}
+					}
+
+					if (isJoint) {
+						LogVerbose("Skipping childnode due to being joint.");
+						continue;
+					}
+
+					LogInfo("Parent: %s", gobj->GetName());
                     gobj->AddChild(loadNode(nodes, nodes[child.get<int>()]));
                 }
             }
@@ -861,6 +960,20 @@ namespace glTF2 {
 			if (array.is_array()) {
 				for (int index : sceneNodeIndexes) {
 					const auto& object = array[index];
+
+					bool isJoint = false;
+					for (const auto& skin : skins)
+					{
+						auto it = std::find(skin.joints.begin(), skin.joints.end(), index);
+						if (it != skin.joints.end()) {
+							isJoint = true;
+						}
+					}
+
+					if (isJoint) {
+						LogVerbose("Skipping node due to being a joint.");
+						continue;
+					}
 
 					if (object.is_object()) {
 						LogVerbose("glTF node %s", object.value("name", ""));
@@ -1031,7 +1144,8 @@ namespace glTF2 {
 		const auto& materials = loadMaterials(data, textures);
 		const auto& meshes = loadMeshes(data, bufferViews, buffers, accessors, materials);
         const auto& lights = loadLights(data);
-		auto gobjs = loadNodes(data, cameras, lights, meshes);
+		const auto& skins = loadSkins(data);
+		auto gobjs = loadNodes(data, cameras, lights, meshes, skins);
 
 		//DuskBenchEnd("glTF2::LoadSceneFromFile");
 		return gobjs;

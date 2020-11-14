@@ -627,7 +627,7 @@ void Input::ProcessEvent(SDL_Event* event)
     }
     else if (event->type == SDL_CONTROLLERDEVICEADDED)
     {
-        InitControllers(event->cdevice.which);
+        //InitControllers(event->cdevice.which);
     }
     else if (event->type == SDL_CONTROLLERDEVICEREMOVED)
     {
