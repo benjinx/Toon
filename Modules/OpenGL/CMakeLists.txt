@@ -41,6 +41,14 @@ TARGET_LINK_LIBRARIES(
         SDL2::SDL2
 )
 
+IF(TARGET SDL2::SDL2main)
+    TARGET_LINK_LIBRARIES(
+        TemporalityOpenGL
+        PUBLIC
+            SDL2::SDL2main
+    )
+ENDIF()
+
 IF(MSVC)
     LIST(APPEND RUNTIME_SEARCH_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(Configuration)")
 ELSE()

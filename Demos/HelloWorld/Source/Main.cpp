@@ -16,5 +16,7 @@ int main(int argc, char ** argv)
         }
     }
 
+    Temporality::FreeModules();
+
     return 0;
 }

@@ -34,6 +34,7 @@ GraphicsDriver::GraphicsDriver()
     {
         //LogError("Failed to create SDL2 Window.");
         // I need to quit my project here
+        return;
     }
 
     //LogLoad("SDL2 Window created successfully.");
@@ -46,6 +47,7 @@ GraphicsDriver::GraphicsDriver()
     {
         //LogError("Failed to create SDL2 GL Context.");
         // I need to quit my project here
+        return;
     }
 
     //LogLoad("SDL2 GL Context created successfully.\n");
@@ -67,9 +69,14 @@ GraphicsDriver::GraphicsDriver()
 
 GraphicsDriver::~GraphicsDriver()
 {
-    SDL_GL_DeleteContext(_mGLContext);
-    SDL_DestroyWindow(_mWindow);
-    _mWindow = nullptr;
+    if (_mGLContext) {
+        SDL_GL_DeleteContext(_mGLContext);
+        _mGLContext = nullptr;
+    }
+    if (_mWindow) {
+        SDL_DestroyWindow(_mWindow);
+        _mWindow = nullptr;
+    }
 
     SDL_Quit();
 }
