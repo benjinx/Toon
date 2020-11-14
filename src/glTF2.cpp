@@ -8,7 +8,7 @@
 #include <Camera.hpp>
 #include <Log.hpp>
 #include <glm/glm.hpp>
-#include <Skeleton.hpp>
+#include <Skin.hpp>
 #include <Joint.hpp>
 #include <StaticMeshComponent.hpp>
 #include <RiggedMeshComponent.hpp>
@@ -351,7 +351,7 @@ namespace glTF2 {
         float outerConeAngle;
     };
 
-	struct skeleton_t {
+	struct skin_t {
 		std::string name;
 		std::vector<int> joints;
 	};
@@ -605,7 +605,7 @@ namespace glTF2 {
 									auto& accessor = accessors[accessorIndex];
 									auto& bufferView = bufferViews[accessor.bufferView];
 									auto& buffer = buffers[bufferView.buffer];
-									int byteStride = bufferView.byteStride;
+									int byteStride = (int)bufferView.byteStride;
 
 									LogVerbose("glTF attribute %s", attrib);
 
@@ -752,10 +752,10 @@ namespace glTF2 {
 		return meshes;
 	}
 
-	std::vector<skeleton_t> loadSkeletons(const json& data)
+	std::vector<skin_t> loadSkins(const json& data)
 	{
 		// Create Skeleton
-		std::vector<skeleton_t> skeletons;
+		std::vector<skin_t> skins;
 
 		// Open up the skin data
 		auto it = data.find("skins");
@@ -763,8 +763,8 @@ namespace glTF2 {
 			const auto& array = it.value();
 			for (const auto& object : array) {
 				if (object.is_object()) {
-					skeletons.push_back(skeleton_t{});
-					auto& skeleton = skeletons.back();
+					skins.push_back(skin_t{});
+					auto& skeleton = skins.back();
 
 					auto valIt = object.find("name");
 					if (valIt != object.end()) {
@@ -782,7 +782,7 @@ namespace glTF2 {
 			}
 		}
 
-		return skeletons;
+		return skins;
 	}
 
 	std::vector<std::unique_ptr<GameObject>> loadNodes(
@@ -790,7 +790,7 @@ namespace glTF2 {
 		const std::vector<camera_t>& cameras,
         const std::vector<light_t>& lights,
 		const std::vector<std::shared_ptr<Mesh>>& meshes,
-		const std::vector<skeleton_t>& skeletons
+		const std::vector<skin_t>& skins
 		)
 	{
 		std::vector<std::unique_ptr<GameObject>> gobjs;
@@ -880,25 +880,61 @@ namespace glTF2 {
                 gobj->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>(meshes[meshIndex]));
 			}
 
+			it = data.find("name");
+			if (it != data.end()) {
+				gobj->SetName(it.value());
+				LogWarn("Name: %s", gobj->GetName());
+				if (it.value() == "Armature")
+				{
+					LogError("Armature");
+				}
+				//if (it.value() == "Hair")
+				//{
+				//	LogError("Hair");
+				//}
+				//if (it.value() == "Character")
+				//{
+				//	LogError("Character");
+				//}
+			}
+
 			it = data.find("translation");
 			if (it != data.end()) {
 				gobj->SetPosition(parseVec3(it.value(), gobj->GetPosition()));
+				LogWarn("Position: %f, %f, %f", gobj->GetPosition().x, gobj->GetPosition().y, gobj->GetPosition().z);
 			}
 
 			it = data.find("rotation");
 			if (it != data.end()) {
 				gobj->SetRotation(parseQuat(it.value(), gobj->GetRotation()));
+				LogWarn("Rotation: %f, %f, %f", gobj->GetRotation().x, gobj->GetRotation().y, gobj->GetRotation().z);
 			}
 
 			it = data.find("scale");
 			if (it != data.end()) {
 				gobj->SetScale(parseVec3(it.value(), gobj->GetScale()));
+				LogWarn("Scale: %f, %f, %f", gobj->GetScale().x, gobj->GetScale().y, gobj->GetScale().z);
 			}
 
             it = data.find("children");
             if (it != data.end()) {
                 for (const auto& child : it.value())
                 {
+					bool isJoint = false;
+					for (const auto& skin : skins)
+					{
+						auto itr = std::find(skin.joints.begin(), skin.joints.end(), child.get<int>());
+						if (itr != skin.joints.end()) {
+							isJoint = true;
+						}
+					}
+
+					if (isJoint) {
+						LogVerbose("Skipping childnode due to being joint.");
+						continue;
+					}
+
+					LogInfo("Parent: %s", gobj->GetName());
                     gobj->AddChild(loadNode(nodes, nodes[child.get<int>()]));
                 }
             }
@@ -926,16 +962,16 @@ namespace glTF2 {
 					const auto& object = array[index];
 
 					bool isJoint = false;
-					for (const auto& skeleton : skeletons)
+					for (const auto& skin : skins)
 					{
-						auto it = std::find(skeleton.joints.begin(), skeleton.joints.end(), index);
-						if (it != skeleton.joints.end()) {
+						auto it = std::find(skin.joints.begin(), skin.joints.end(), index);
+						if (it != skin.joints.end()) {
 							isJoint = true;
 						}
 					}
 
 					if (isJoint) {
-						LogInfo("RollingJoint#420BlazeItMyD00d");
+						LogVerbose("Skipping node due to being a joint.");
 						continue;
 					}
 
@@ -1108,8 +1144,8 @@ namespace glTF2 {
 		const auto& materials = loadMaterials(data, textures);
 		const auto& meshes = loadMeshes(data, bufferViews, buffers, accessors, materials);
         const auto& lights = loadLights(data);
-		const auto& skeletons = loadSkeletons(data);
-		auto gobjs = loadNodes(data, cameras, lights, meshes, skeletons);
+		const auto& skins = loadSkins(data);
+		auto gobjs = loadNodes(data, cameras, lights, meshes, skins);
 
 		//DuskBenchEnd("glTF2::LoadSceneFromFile");
 		return gobjs;

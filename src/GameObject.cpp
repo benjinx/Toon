@@ -10,6 +10,7 @@
 
 GameObject::GameObject()
 {
+    SetTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1));
 }
 
 GameObject::GameObject(glm::vec3 position)
