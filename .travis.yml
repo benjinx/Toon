@@ -27,7 +27,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "GCC (Release, ThirdParty)"
@@ -47,7 +47,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
+          packages: [ 'g++-7', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev']
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - name: "Clang (Debug, ThirdParty)"
@@ -67,7 +67,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - name: "Clang (Release, ThirdParty)"
@@ -87,7 +87,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev', 'libglm-dev' ]
+          packages: [ 'clang-6.0', 'libstdc++-7-dev', 'xorg-dev', 'libglu1-mesa-dev', 'libglfw3-dev' ]
       env: CMAKE_BUILD_TYPE=RELEASE
 
 before_install:
