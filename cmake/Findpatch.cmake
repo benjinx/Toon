@@ -7,7 +7,7 @@
 # This will define the following variables
 #
 #   patch_FOUND
-#   patch_COMMANd
+#   patch_COMMAND
 #
 
 FIND_PROGRAM(

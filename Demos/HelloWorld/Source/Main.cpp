@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 
     auto gfx = Temporality::GetGraphicsDriver();
     if (gfx) {
-        gfx->SetWindowTitle("HelloWorld");
+        //gfx->SetWindowTitle("HelloWorld");
         gfx->SetWindowSize({ 1024, 768 });
         for (int i = 0; i < 100; ++i) {
             gfx->ProcessEvents();

@@ -24,10 +24,10 @@ GraphicsDriver::GraphicsDriver()
     //LogInfo("Creating SDL2 Window.");
 
     _mWindow = SDL_CreateWindow(
-        "Temporality ~ BC/DC Games", 
+        "Temporality", 
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        600,
         800,
+        600,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!_mWindow)
@@ -57,7 +57,7 @@ GraphicsDriver::GraphicsDriver()
         return;
     }
 
-    glViewport(0, 0, 600, 800);
+    glViewport(0, 0, 800, 600);
 
     // Makes an icon
     Uint16 pixels[16 * 16] = { 0xFFFF };

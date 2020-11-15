@@ -1,3 +1,10 @@
+
+INCLUDE(Module)
+
+###
+### Include Modules
+###
+
 ADD_SUBDIRECTORY(OpenGL)
 ADD_SUBDIRECTORY(STBI)
 

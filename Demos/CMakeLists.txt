@@ -1,1 +1,10 @@
+INCLUDE(Demo)
+
+#Add Demos Here
 ADD_SUBDIRECTORY(HelloWorld)
+
+SET_PROPERTY(
+    DIRECTORY ${CMAKE_SOURCE_DIR}
+    PROPERTY
+        VS_STARTUP_PROJECT "HelloWorld"
+)

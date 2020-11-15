@@ -1,10 +1,9 @@
-ADD_EXECUTABLE(HelloWorld Source/Main.cpp)
 
-TARGET_LINK_LIBRARIES(HelloWorld Temporality)
+SET(_target HelloWorld)
 
-SET_TARGET_PROPERTIES(
-    HelloWorld
-    PROPERTIES 
-        VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${RUNTIME_SEARCH_PATH}"
+DEMO(${_target})
+
+ADD_DEPENDENCIES(
+    ${_target}
+    TemporalityOpenGL
 )
