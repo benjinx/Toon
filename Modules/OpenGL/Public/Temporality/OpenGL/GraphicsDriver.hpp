@@ -2,7 +2,6 @@
 #define TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 
 #include <Temporality/OpenGL/Config.hpp>
-
 #include <Temporality/Graphics/GraphicsDriver.hpp>
 
 #include <SDL.h>
@@ -12,6 +11,9 @@ namespace Temporality::OpenGL {
 class TEMPORALITY_OPENGL_API GraphicsDriver : public Temporality::GraphicsDriver
 {
 public:
+
+    DISALLOW_COPY_AND_ASSIGN(GraphicsDriver)
+
     explicit GraphicsDriver();
 
     virtual ~GraphicsDriver();

@@ -12,6 +12,9 @@ namespace Temporality {
 class TEMPORALITY_ENGINE_API GraphicsDriver
 {
 public:
+
+    DISALLOW_COPY_AND_ASSIGN(GraphicsDriver)
+    
     explicit GraphicsDriver() = default;
 
     virtual ~GraphicsDriver() = default;

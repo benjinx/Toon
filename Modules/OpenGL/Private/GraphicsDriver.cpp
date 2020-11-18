@@ -4,6 +4,7 @@
 
 namespace Temporality::OpenGL {
 
+TEMPORALITY_OPENGL_API
 GraphicsDriver::GraphicsDriver()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -67,6 +68,7 @@ GraphicsDriver::GraphicsDriver()
     SDL_FreeSurface(surface);
 }
 
+TEMPORALITY_OPENGL_API
 GraphicsDriver::~GraphicsDriver()
 {
     if (_mGLContext) {
@@ -81,22 +83,26 @@ GraphicsDriver::~GraphicsDriver()
     SDL_Quit();
 }
 
+TEMPORALITY_OPENGL_API
 void GraphicsDriver::SetWindowTitle(const std::string& title)
 {
     SDL_SetWindowTitle(_mWindow, title.c_str());
 }
 
+TEMPORALITY_OPENGL_API
 std::string GraphicsDriver::GetWindowTitle()
 {
     return (std::string)SDL_GetWindowTitle(_mWindow);
 }
 
+TEMPORALITY_OPENGL_API
 void GraphicsDriver::SetWindowSize(const glm::ivec2& size)
 {
     SDL_SetWindowSize(_mWindow, size.x, size.y);
     glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 }
 
+TEMPORALITY_OPENGL_API
 glm::ivec2 GraphicsDriver::GetWindowSize()
 {
     glm::ivec2 size;
@@ -104,6 +110,7 @@ glm::ivec2 GraphicsDriver::GetWindowSize()
     return size;
 }
 
+TEMPORALITY_OPENGL_API
 void GraphicsDriver::ProcessEvents()
 {
     SDL_Event event;
@@ -129,6 +136,7 @@ void GraphicsDriver::ProcessEvents()
     }
 }
 
+TEMPORALITY_OPENGL_API
 void GraphicsDriver::SwapBuffers()
 {
     SDL_GL_SwapWindow(_mWindow);

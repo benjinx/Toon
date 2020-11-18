@@ -17,4 +17,6 @@
     #define TEMPORALITY_ENGINE_API TEMPORALITY_API_IMPORT
 #endif
 
+#include <Temporality/Macros.hpp>
+
 #endif // TEMPORALITY_CONFIG_HPP
