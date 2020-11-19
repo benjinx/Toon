@@ -51,11 +51,15 @@ MACRO(DEMO _target)
             ${CMAKE_CURRENT_SOURCE_DIR}/Source
     )
 
+    STRING(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_LENGTH)
+
     TARGET_COMPILE_DEFINITIONS(
         ${_target}
         PUBLIC
-        # Disable VS "not secure" warnings
-        $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
+            # Disable VS "not secure" warnings
+            $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
+        PRIVATE
+            TEMPORALITY_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
     )
 
     TARGET_COMPILE_OPTIONS(

@@ -65,13 +65,15 @@ MACRO(MODULE _target _prefix)
             ${CMAKE_CURRENT_SOURCE_DIR}/Private
     )
 
+    STRING(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_LENGTH)
+
     TARGET_COMPILE_DEFINITIONS(
         ${_target}
         PUBLIC
             # Disable VS "not secure" warnings
             $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
         PRIVATE
-            TEMPORALITY_${_prefix}_EXPORT
+            TEMPORALITY_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
     )
 
     TARGET_COMPILE_OPTIONS(
@@ -92,6 +94,7 @@ MACRO(MODULE _target _prefix)
             CXX_STANDARD 17
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
+            DEFINE_SYMBOL "TEMPORALITY_${_prefix}_EXPORT"
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")
