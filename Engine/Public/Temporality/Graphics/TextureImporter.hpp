@@ -6,6 +6,8 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace Temporality {
 
@@ -42,6 +44,19 @@ public:
     virtual std::unique_ptr<TextureData> LoadFromFile(const std::string& filename) = 0;
 
     virtual std::unique_ptr<TextureData> LoadFromMemory(uint8_t * buffer, size_t length) = 0;
+
+    static void Register(const std::string& id, std::unique_ptr<TextureImporter> importer);
+
+    static void Unregister(const std::string& id);
+
+    static const std::vector<TextureImporter*>& GetAll();
+
+private:
+    static void UpdateList();
+
+    static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _msTextureImporters;
+
+    static std::vector<TextureImporter *> _msTextureImporterList;
 };
 
 } // namespace Temporality

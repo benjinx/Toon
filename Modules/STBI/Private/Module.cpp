@@ -1,15 +1,15 @@
 #include <Temporality/Module.hpp>
 
-#include <stdio.h>
+#include <Temporality/STBI/TextureImporter.hpp>
 
 namespace Temporality::STBI {
 
 void ModuleInit() {
-    printf("Init\n");
+    TextureImporter::Register("STBI", std::unique_ptr<Temporality::TextureImporter>(new TextureImporter()));
 }
 
 void ModuleTerm() {
-    printf("Term\n");
+    TextureImporter::Unregister("STBI");
 }
 
 TEMPORALITY_MODULE() {

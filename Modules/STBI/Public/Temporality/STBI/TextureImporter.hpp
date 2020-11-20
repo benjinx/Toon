@@ -46,6 +46,8 @@ class TEMPORALITY_STBI_API TextureImporter : public Temporality::TextureImporter
 public:
 
     DISALLOW_COPY_AND_ASSIGN(TextureImporter)
+
+    TextureImporter() = default;
     
     virtual std::unique_ptr<Temporality::TextureData> LoadFromFile(const std::string& filename);
 

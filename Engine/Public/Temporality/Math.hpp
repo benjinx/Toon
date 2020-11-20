@@ -7,4 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#undef near
+#undef far
+
 #endif // MATH_HPP
