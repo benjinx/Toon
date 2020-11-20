@@ -150,28 +150,28 @@ namespace Temporality {
 #   define LogVerbose(M, ...)  do { } while(0)
 #else
 #   define LogVerbose(M, ...) \
-        do { Log(LogLevel::LOG_VERBOSE, "[VERB](%s:%d) " M "\n", \
+        do { Log(Temporality::LogLevel::LOG_VERBOSE, "[VERB](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 #endif
 
 #define LogInfo(M, ...) \
-    do { Log(LogLevel::LOG_INFO, "[INFO](%s:%d) " M "\n", \
+    do { Log(Temporality::LogLevel::LOG_INFO, "[INFO](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogWarn(M, ...) \
-    do { Log(LogLevel::LOG_WARN, "[WARN](%s:%d) " M "\n", \
+    do { Log(Temporality::LogLevel::LOG_WARN, "[WARN](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogError(M, ...) \
-    do { Log(LogLevel::LOG_ERROR, "[ERRO](%s:%d) " M "\n", \
+    do { Log(Temporality::LogLevel::LOG_ERROR, "[ERRO](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogPerf(M, ...) \
-    do { Log(LogLevel::LOG_PERF, "[PERF](%s:%d) " M "\n", \
+    do { Log(Temporality::LogLevel::LOG_PERF, "[PERF](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
 #define LogLoad(M, ...) \
-    do { Log(LogLevel::LOG_LOAD, "[LOAD](%s:%d) " M "\n", \
+    do { Log(Temporality::LogLevel::LOG_LOAD, "[LOAD](%s:%d) " M "\n", \
         TEMPORALITY_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
 } // namespace Temporality

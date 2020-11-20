@@ -1,11 +1,15 @@
 #include <cstdio>
 #include <Temporality/Module.hpp>
 #include <Temporality/Graphics/GraphicsDriver.hpp>
+#include <Temporality/Graphics/TextureImporter.hpp>
+#include <Temporality/Log.hpp>
 
 int main(int argc, char ** argv)
 {
     Temporality::LoadModule("TemporalityOpenGL");
     Temporality::LoadModule("TemporalitySTBI");
+
+    LogInfo("%d", Temporality::TextureImporter::GetAll().size());
 
     auto gfx = Temporality::GetGraphicsDriver();
     if (gfx) {
