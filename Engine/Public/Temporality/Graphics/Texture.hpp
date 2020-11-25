@@ -19,7 +19,7 @@ public:
     virtual bool Load(const TextureData * data) = 0;
 
     virtual void Bind() = 0;
-};
+}; // class Texture
 
 } // namespace Temporality
 

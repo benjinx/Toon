@@ -2,6 +2,8 @@
 #define TEMPORALITY_GRAPHICS_DRIVER_HPP
 
 #include <Temporality/Config.hpp>
+#include <Temporality/Graphics/Texture.hpp>
+#include <Temporality/Graphics/Mesh.hpp>
 
 #include <string>
 #include <memory>
@@ -30,7 +32,7 @@ public:
     virtual void ProcessEvents() = 0;
 
     virtual void SwapBuffers() = 0;
-};
+}; // class GraphicsDriver
 
 TEMPORALITY_ENGINE_API
 void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver);

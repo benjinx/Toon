@@ -17,10 +17,10 @@
 #define BenchmarkStart() \
     auto benchClockStart = std::chrono::high_resolution_clock::now();
 
-#define BenchmarkEnd(funcName)                                                        \
-    LogPerf("Function: %s took %.3f millis\n", funcName,                    \
-        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(        \
-            std::chrono::high_resolution_clock::now() - benchClockStart    \
+#define BenchmarkEnd(funcName)                                                  \
+    LogPerf("Function: %s took %.3f millis\n", funcName,                        \
+        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(  \
+            std::chrono::high_resolution_clock::now() - benchClockStart         \
         ).count());
 
 /// End Benchmark

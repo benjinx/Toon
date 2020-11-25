@@ -9,6 +9,7 @@ TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC
         glm::glm
+        GSL::GSL
         nlohmann_json::nlohmann_json
         ${CMAKE_DL_LIBS}
 )

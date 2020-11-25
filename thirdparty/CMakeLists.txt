@@ -49,6 +49,26 @@ IF(NOT glm_FOUND OR NOT TARGET glm::glm)
     )
 ENDIF()
 
+# GSL
+
+SET(GSL_ROOT       ${CMAKE_BINARY_DIR}/GSL)
+SET(GSL_SOURCE_DIR ${CMAKE_BINARY_DIR}/GSL_src)
+
+FIND_PACKAGE(GSL QUIET)
+
+IF(NOT GSL_FOUND)
+    ExternalProject_Add(
+        ThirdParty_GSL
+        URL                 "https://github.com/microsoft/GSL/archive/v3.1.0.tar.gz"
+        URL_HASH            MD5=b6910c54113f921b03dc06642cf7f11c
+        SOURCE_DIR          ${GSL_SOURCE_DIR}
+        CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${GSL_ROOT}
+                            -DGSL_TEST=OFF
+        BUILD_COMMAND       ""
+        UPDATE_COMMAND      ""
+    )
+ENDIF()
+
 # SDL2
 
 SET(SDL2_ROOT         ${CMAKE_BINARY_DIR}/SDL2)

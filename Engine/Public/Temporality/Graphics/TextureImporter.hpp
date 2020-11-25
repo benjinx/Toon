@@ -29,7 +29,7 @@ public:
 
     // Number of components(R, RG, RGB, RGBA)
     virtual int GetComponents() const = 0;
-};
+}; // class TextureData
 
 class TEMPORALITY_ENGINE_API TextureImporter
 {
@@ -57,7 +57,7 @@ private:
     static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _msTextureImporters;
 
     static std::vector<TextureImporter *> _msTextureImporterList;
-};
+}; // class TextureImporter
 
 } // namespace Temporality
 
