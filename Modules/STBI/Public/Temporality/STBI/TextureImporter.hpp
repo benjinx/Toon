@@ -51,7 +51,7 @@ public:
     
     virtual std::unique_ptr<Temporality::TextureData> LoadFromFile(const std::string& filename);
 
-    virtual std::unique_ptr<Temporality::TextureData> LoadFromMemory(uint8_t * buffer, size_t length);
+    virtual std::unique_ptr<Temporality::TextureData> LoadFromMemory(const uint8_t * buffer, size_t length);
 };
 
 } // namespace Temporality::STBI

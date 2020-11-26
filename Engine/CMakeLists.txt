@@ -13,3 +13,9 @@ TARGET_LINK_LIBRARIES(
         nlohmann_json::nlohmann_json
         ${CMAKE_DL_LIBS}
 )
+
+LIST(APPEND ASSET_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/Assets/
+)
+
+SET(ASSET_PATH ${ASSET_PATH} PARENT_SCOPE)

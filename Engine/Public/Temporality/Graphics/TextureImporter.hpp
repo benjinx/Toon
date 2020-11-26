@@ -17,7 +17,7 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(TextureData)
 
-    explicit TextureData() = default;
+    TextureData() = default;
 
     virtual ~TextureData() = default;
 
@@ -37,27 +37,24 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(TextureImporter)
 
-    explicit TextureImporter() = default;
+    TextureImporter() = default;
 
     virtual ~TextureImporter() = default;
 
     virtual std::unique_ptr<TextureData> LoadFromFile(const std::string& filename) = 0;
 
-    virtual std::unique_ptr<TextureData> LoadFromMemory(uint8_t * buffer, size_t length) = 0;
+    virtual std::unique_ptr<TextureData> LoadFromMemory(const uint8_t * buffer, size_t length) = 0;
 
-    static void Register(const std::string& id, std::unique_ptr<TextureImporter> importer);
-
-    static void Unregister(const std::string& id);
-
-    static const std::vector<TextureImporter*>& GetAll();
-
-private:
-    static void UpdateList();
-
-    static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _msTextureImporters;
-
-    static std::vector<TextureImporter *> _msTextureImporterList;
 }; // class TextureImporter
+
+TEMPORALITY_ENGINE_API
+void AddTextureImporter(const std::string& id, std::unique_ptr<TextureImporter> importer);
+
+TEMPORALITY_ENGINE_API
+void RemoveTextureImporter(const std::string& id);
+
+TEMPORALITY_ENGINE_API
+const std::vector<TextureImporter *>& GetAllTextureImporters();
 
 } // namespace Temporality
 

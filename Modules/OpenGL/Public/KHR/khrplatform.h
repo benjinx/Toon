@@ -119,7 +119,7 @@
  * This follows the return type of the function  and precedes the function
  * name in the function prototype.
  */
-#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
+#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(KHRONOS_STATIC)
     /* Win32 but not WinCE */
 #   define KHRONOS_APIENTRY __stdcall
 #else

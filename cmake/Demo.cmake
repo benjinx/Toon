@@ -19,6 +19,10 @@ MACRO(DEMO _target)
         Assets/*
     )
 
+    LIST(INSERT ASSET_PATH 0
+        ${CMAKE_CURRENT_SOURCE_DIR}/Assets/
+    )
+
     # Stop VS from trying to "build" our .obj model files
     SET_SOURCE_FILES_PROPERTIES(
         ${_assets}
@@ -86,19 +90,17 @@ MACRO(DEMO _target)
             FOLDER "${folder}"
     )
 
-    
-
     IF(MSVC)
         SET_TARGET_PROPERTIES(
             ${_target}
             PROPERTIES
                 VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%"
+                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%\nTEMPORALITY_ASSET_PATH=${ASSET_PATH}"
         )
 
         ADD_CUSTOM_TARGET(
             run-${_target} VERBATIM
-            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%" $<TARGET_FILE:${_target}>
+            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
             DEPENDS ${_target}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
@@ -109,7 +111,7 @@ MACRO(DEMO _target)
 
         ADD_CUSTOM_TARGET(
             run-${_target}
-            COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" $<TARGET_FILE:${_target}>
+            COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
             DEPENDS ${_target}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
@@ -123,7 +125,7 @@ MACRO(DEMO _target)
         IF(gdb_COMMAND)
             ADD_CUSTOM_TARGET(
                 gdb-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" gdb --args $<TARGET_FILE:${_target}>
+                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" gdb --args $<TARGET_FILE:${_target}>
                 DEPENDS ${_target}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
@@ -138,7 +140,7 @@ MACRO(DEMO _target)
         IF(valgrind_COMMAND)
             ADD_CUSTOM_TARGET(
                 valgrind-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" valgrind $<TARGET_FILE:${_target}>
+                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" valgrind $<TARGET_FILE:${_target}>
                 DEPENDS ${_target}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )

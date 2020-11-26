@@ -6,13 +6,13 @@
 namespace Temporality::STBI {
 
 void ModuleInit() {
-    TextureImporter::Register("STBI", std::unique_ptr<Temporality::TextureImporter>(new TextureImporter()));
-    LogInfo("STBI Init!");
+    AddTextureImporter("STBI", std::unique_ptr<Temporality::TextureImporter>(new TextureImporter()));
+    LogInfo("Init");
 }
 
 void ModuleTerm() {
-    TextureImporter::Unregister("STBI");
-    LogInfo("STBI Term!");
+    RemoveTextureImporter("STBI");
+    LogInfo("Term()");
 }
 
 TEMPORALITY_MODULE() {

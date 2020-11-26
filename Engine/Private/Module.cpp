@@ -1,6 +1,6 @@
 #include <Temporality/Module.hpp>
 
-#if defined(_WIN32)
+#if defined(TEMPORALITY_OS_WINDOWS)
     #include <Windows.h>
     typedef HMODULE ModuleHandle;
 #else
@@ -18,7 +18,7 @@ bool LoadModule(const std::string& name)
 {
     ModuleHandle module = nullptr;
     
-    #if defined(_WIN32)
+    #if defined(TEMPORALITY_OS_WINDOWS)
         module = LoadLibraryA(name.c_str());
         if (!module) {
             fprintf(stderr, "Failed to load module. %s\n", name.c_str());
@@ -57,7 +57,7 @@ void FreeModules()
 
     for (auto module : _gModules) {
 
-        #if defined(_WIN32)
+        #if defined(TEMPORALITY_OS_WINDOWS)
             TemporalityModule * def = (TemporalityModule *)GetProcAddress(module, "_TemporalityModule");
         #else
             TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
@@ -67,7 +67,7 @@ void FreeModules()
             def->Term();
         }
 
-        #if defined(_WIN32)
+        #if defined(TEMPORALITY_OS_WINDOWS)
             FreeLibrary(module);
         #else
             dlclose(module);

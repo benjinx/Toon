@@ -12,11 +12,15 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(Texture)
     
-    explicit Texture() = default;
+    Texture() = default;
 
-    virtual ~Texture();
+    virtual ~Texture() = default;
 
     virtual bool Load(const TextureData * data) = 0;
+
+    virtual bool LoadFromFile(const std::string& filename);
+
+    virtual bool LoadFromMemory(const uint8_t* buffer, size_t length);
 
     virtual void Bind() = 0;
 }; // class Texture

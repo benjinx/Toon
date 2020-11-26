@@ -4,6 +4,7 @@
 #include <Temporality/Config.hpp>
 #include <Temporality/Graphics/Texture.hpp>
 #include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Graphics/Shader.hpp>
 
 #include <string>
 #include <memory>
@@ -17,7 +18,7 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(GraphicsDriver)
     
-    explicit GraphicsDriver() = default;
+    GraphicsDriver() = default;
 
     virtual ~GraphicsDriver() = default;
 
@@ -32,6 +33,12 @@ public:
     virtual void ProcessEvents() = 0;
 
     virtual void SwapBuffers() = 0;
+
+    virtual std::shared_ptr<Texture> CreateTexture() = 0;
+
+    virtual std::shared_ptr<Shader> CreateShader() = 0;
+
+    virtual std::shared_ptr<Mesh> CreateMesh() = 0;
 }; // class GraphicsDriver
 
 TEMPORALITY_ENGINE_API
@@ -40,6 +47,6 @@ void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver);
 TEMPORALITY_ENGINE_API
 GraphicsDriver* GetGraphicsDriver();
 
-}
+} // namespace Temporality
 
 #endif // TEMPORALITY_GRAPHICS_DRIVER_HPP

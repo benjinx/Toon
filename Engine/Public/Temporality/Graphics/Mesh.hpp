@@ -51,7 +51,7 @@ class TEMPORALITY_ENGINE_API Mesh
 public:
     DISALLOW_COPY_AND_ASSIGN(Mesh)
 
-    explicit Mesh() = default;
+    Mesh() = default;
 
     virtual ~Mesh() = default;
 

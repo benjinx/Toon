@@ -19,7 +19,6 @@ bool Texture::Load(const TextureData * data)
     }
 
     glGenTextures(1, &_mGLid);
-
     if (!_mGLid)
     {
         LogError("Failed to create GL Texture");
@@ -46,7 +45,7 @@ bool Texture::Load(const TextureData * data)
         glGenerateMipmap(GL_TEXTURE_2D);
     }*/
 
-    LogVerbose(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return true;
 }

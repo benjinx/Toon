@@ -2,42 +2,40 @@
 
 namespace Temporality {
 
-std::unordered_map<std::string, std::unique_ptr<TextureImporter>> TextureImporter::_msTextureImporters;
+static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _TextureImporters;
 
-std::vector<TextureImporter *> TextureImporter::_msTextureImporterList;
+static std::vector<TextureImporter *> _TextureImporterList;
 
-void TextureImporter::UpdateList()
+void updateTextureImporterList()
 {
-    _msTextureImporterList.clear();
-    for (const auto& it : _msTextureImporters) {
-        _msTextureImporterList.push_back(it.second.get());
+    _TextureImporterList.clear();
+    for (const auto& it : _TextureImporters) {
+        _TextureImporterList.push_back(it.second.get());
     }
 }
 
-void TextureImporter::Register(const std::string& id, std::unique_ptr<TextureImporter> importer)
+TEMPORALITY_ENGINE_API
+void AddTextureImporter(const std::string& id, std::unique_ptr<TextureImporter> importer)
 {
-    _msTextureImporters[id] = std::move(importer);
-    UpdateList();
+    _TextureImporters[id] = std::move(importer);
+    updateTextureImporterList();
 }
 
-void TextureImporter::Unregister(const std::string& id)
+TEMPORALITY_ENGINE_API
+void RemoveTextureImporter(const std::string& id)
 {
-    auto it = _msTextureImporters.find(id);
-    if (it != _msTextureImporters.end()) {
-        _msTextureImporters.erase(it);
+    auto it = _TextureImporters.find(id);
+    if (it != _TextureImporters.end()) {
+        _TextureImporters.erase(it);
     }
-
-    UpdateList();
+    
+    updateTextureImporterList();
 }
 
-const std::vector<TextureImporter*>& TextureImporter::GetAll()
+TEMPORALITY_ENGINE_API
+const std::vector<TextureImporter *>& GetAllTextureImporters()
 {
-    return _msTextureImporterList;
+    return _TextureImporterList;
 }
 
-
-
-
-
-
-}
+} // namespace Temporality

@@ -4,29 +4,49 @@
 #include <Temporality/Config.hpp>
 
 #include <string>
+#include <vector>
 
 namespace Temporality {
 
-inline void CleanSlashes(std::string& path)
+inline std::string GetDirname(std::string path)
 {
-    for (unsigned int i = 0; i < path.size(); ++i)
-    {
-        if (path[i] == '\\')
-        {
-            path[i] = '/';
-        }
+    size_t pivot = path.find_last_of('/');
+    if (pivot == std::string::npos) {
+        pivot = path.find_last_of('\\');
     }
+    return (
+        pivot == std::string::npos
+        ? path
+        : path.substr(0, pivot)
+    );
 }
 
 inline std::string GetBasename(std::string path)
 {
-    CleanSlashes(path);
-        size_t pivot = path.find_last_of('/');
-        return (pivot == std::string::npos
-            ? std::string()
-            : path.substr(pivot + 1));
+    size_t pivot = path.find_last_of('/');
+    if (pivot == std::string::npos) {
+        pivot = path.find_last_of('\\');
+    }
+    return (
+        pivot == std::string::npos
+        ? path
+        : path.substr(pivot + 1)
+    );
 }
 
+inline std::string GetExtension(std::string path)
+{
+    size_t pivot = path.find_last_of('.');
+    return (
+        pivot == std::string::npos
+        ? std::string()
+        : path.substr(pivot + 1)
+    );
 }
+
+TEMPORALITY_ENGINE_API
+std::vector<std::string> GetAssetPaths();
+
+} // namespace Temporality
 
 #endif // UTILS_HPP

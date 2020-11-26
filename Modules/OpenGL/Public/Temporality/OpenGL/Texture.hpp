@@ -12,6 +12,8 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(Texture)
 
+    Texture() = default;
+
     virtual ~Texture();
 
     bool Load(const TextureData * data) override;

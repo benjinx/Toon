@@ -1,6 +1,11 @@
 #include <Temporality/OpenGL/GraphicsDriver.hpp>
+#include <Temporality/Log.hpp>
 
 #include <glad/gl.h>
+
+#include <Temporality/OpenGL/Mesh.hpp>
+#include <Temporality/OpenGL/Shader.hpp>
+#include <Temporality/OpenGL/Texture.hpp>
 
 namespace Temporality::OpenGL {
 
@@ -8,7 +13,7 @@ TEMPORALITY_OPENGL_API
 GraphicsDriver::GraphicsDriver()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        printf("Yo you dun goofed: %s\n", SDL_GetError());
+        LogInfo("Unable to initialize SDL");
         return;
     }
 
@@ -22,7 +27,7 @@ GraphicsDriver::GraphicsDriver()
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-    //LogInfo("Creating SDL2 Window.");
+    LogInfo("Creating SDL2 Window.");
 
     _mWindow = SDL_CreateWindow(
         "Temporality", 
@@ -33,28 +38,28 @@ GraphicsDriver::GraphicsDriver()
 
     if (!_mWindow)
     {
-        //LogError("Failed to create SDL2 Window.");
+        LogError("Failed to create SDL2 Window.");
         // I need to quit my project here
         return;
     }
 
-    //LogLoad("SDL2 Window created successfully.");
+    LogLoad("SDL2 Window created successfully.");
 
-    //LogInfo("Creating SDL2 GL Context.");
+    LogInfo("Creating SDL2 GL Context.");
 
     _mGLContext = SDL_GL_CreateContext(_mWindow);
 
     if (!_mGLContext)
     {
-        //LogError("Failed to create SDL2 GL Context.");
+        LogError("Failed to create SDL2 GL Context.");
         // I need to quit my project here
         return;
     }
 
-    //LogLoad("SDL2 GL Context created successfully.\n");
+    LogLoad("SDL2 GL Context created successfully.\n");
 
     if (!gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress)) {
-        //LogError("Failed to initialize OpenGL context");
+        LogError("Failed to initialize OpenGL context");
         return;
     }
 
@@ -140,6 +145,24 @@ TEMPORALITY_OPENGL_API
 void GraphicsDriver::SwapBuffers()
 {
     SDL_GL_SwapWindow(_mWindow);
+}
+
+TEMPORALITY_OPENGL_API
+std::shared_ptr<Temporality::Texture> GraphicsDriver::CreateTexture()
+{
+    return std::make_shared<Texture>();
+}
+
+TEMPORALITY_OPENGL_API
+std::shared_ptr<Temporality::Shader> GraphicsDriver::CreateShader()
+{
+    return std::make_shared<Shader>();
+}
+
+TEMPORALITY_OPENGL_API
+std::shared_ptr<Temporality::Mesh> GraphicsDriver::CreateMesh()
+{
+    return std::make_shared<Mesh>();
 }
 
 }
