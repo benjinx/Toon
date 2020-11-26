@@ -105,6 +105,11 @@ MACRO(DEMO _target)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
 
+        SET_TARGET_PROPERTIES(
+            run-${_target}
+            PROPERTIES 
+                FOLDER "Automation"
+        )
     ELSE()
 
         STRING(JOIN ":" LD_LIBRARY_PATH ${RUNTIME_SEARCH_PATH})
