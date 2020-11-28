@@ -157,7 +157,7 @@ UpgradeLog*.htm
 flatbuffers_common_*.h
 
 ### Custom ###
-build
+[Bb]uild
 config.h
 *.bin
 vgcore.*

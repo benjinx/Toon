@@ -113,6 +113,7 @@ MACRO(DEMO _target)
     ELSE()
 
         STRING(JOIN ":" LD_LIBRARY_PATH ${RUNTIME_SEARCH_PATH})
+        STRING(JOIN ":" ASSET_PATH ${ASSET_PATH})
 
         ADD_CUSTOM_TARGET(
             run-${_target}
