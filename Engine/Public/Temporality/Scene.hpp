@@ -4,7 +4,7 @@
 #include <Temporality/Axis.hpp>
 #include <Temporality/Config.hpp>
 #include <Temporality/GameObject.hpp>
-#include <Temporality/Mesh.hpp>
+#include <Temporality/Graphics/Mesh.hpp>
 #include <Temporality/Skybox.hpp>
 //#include <Temporality/Shader.hpp>
 

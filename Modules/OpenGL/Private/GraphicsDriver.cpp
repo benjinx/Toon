@@ -3,6 +3,7 @@
 
 #include <glad/gl.h>
 
+#include <Temporality/Temporality.hpp>
 #include <Temporality/OpenGL/Mesh.hpp>
 #include <Temporality/OpenGL/Shader.hpp>
 #include <Temporality/OpenGL/Texture.hpp>
@@ -71,6 +72,9 @@ GraphicsDriver::GraphicsDriver()
         0x0f00, 0x00f0, 0x000f, 0xf000);
     SDL_SetWindowIcon(_mWindow, surface);
     SDL_FreeSurface(surface);
+
+
+    glClearColor(0.2, 0.2, 0.2, 1.0);
 }
 
 TEMPORALITY_OPENGL_API
@@ -125,7 +129,7 @@ void GraphicsDriver::ProcessEvents()
         switch (event.type)
         {
         case SDL_QUIT:
-            //_mRunning = false;
+            SetRunning(false);
             break;
         case SDL_WINDOWEVENT:
             if (event.window.event == SDL_WINDOWEVENT_RESIZED)
@@ -139,6 +143,8 @@ void GraphicsDriver::ProcessEvents()
         // Input
         //_mInput.ProcessEvent(&event);
     }
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 TEMPORALITY_OPENGL_API
