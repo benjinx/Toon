@@ -22,13 +22,13 @@ public:
 
     inline gsl::span<const float> GetVertices() const 
     {
-        const float vertices[] = {
+        static const float vertices[] = {
             -1.0f, -1.0f, 0.0f, 1.0f,
              1.0f, -1.0f, 0.0f, 1.0f,
              0.0f,  1.0f, 0.0f, 1.0f,
         };
 
-        return gsl::span(vertices, sizeof(vertices) / sizeof(float));
+        return gsl::span<const float>(vertices, sizeof(vertices) / sizeof(float));
     }
 
     inline gsl::span<const float> GetNormals() const 
