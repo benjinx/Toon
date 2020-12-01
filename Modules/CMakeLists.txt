@@ -7,6 +7,7 @@ INCLUDE(Module)
 
 ADD_SUBDIRECTORY(OpenGL)
 ADD_SUBDIRECTORY(STBI)
+ADD_SUBDIRECTORY(TinyOBJ)
 
 # Update the global RUNTIME_SEARCH_PATH to include paths to the
 # module's .dll's

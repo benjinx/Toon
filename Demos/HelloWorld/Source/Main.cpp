@@ -84,7 +84,7 @@ int main(int argc, char ** argv)
         auto mesh = gfx->CreateMesh();
         mesh->Load((Temporality::MeshData*)&meshdata);
 
-        //gfx->SetWindowTitle("HelloWorld");
+        gfx->SetWindowTitle("HelloWorld ~ Temporality");
         gfx->SetWindowSize({ 1024, 768 });
         while (Temporality::IsRunning()) {
             gfx->ProcessEvents();

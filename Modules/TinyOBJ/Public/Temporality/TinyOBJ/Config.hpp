@@ -1,0 +1,14 @@
+#ifndef TEMPORALITY_TINYOBJ_CONFIG_HPP
+#define TEMPORALITY_TINYOBJ_CONFIG_HPP
+
+#include <Temporality/Config.hpp>
+
+#if defined(TEMPORALITY_TINYOBJ_EXPORT)
+    #define TEMPORALITY_TINYOBJ_API TEMPORALITY_API_EXPORT
+#else
+    #define TEMPORALITY_TINYOBJ_API TEMPORALITY_API_IMPORT
+#endif
+
+#include <Temporality/Macros.hpp>
+
+#endif // TEMPORALITY_TINYOBJ_CONFIG_HPP
