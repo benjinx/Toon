@@ -6,7 +6,11 @@
 //#include <Temporality/Camera.hpp>
 //#include <Temporality/DevUI.hpp>
 //#include <Temporality/Event.hpp>
-//#include <Temporality/Scene/Entity.hpp>
+#include <Temporality/Scene/Entity.hpp>
+#include <Temporality/RenderContext.hpp>
+#include <Temporality/UpdateContext.hpp>
+#include <Temporality/Scene/Component.hpp>
+#include <Temporality/Scene/MeshComponent.hpp>
 //#include <Temporality/Input.hpp>
 //#include <Temporality/Light.hpp>
 #include <Temporality/Log.hpp>
@@ -15,11 +19,13 @@
 //#include <Temporality/StaticMeshComponent.hpp>
 //#include <Temporality/RiggedMeshComponent.hpp>
 //#include <Temporality/Scene.hpp>
-//#include <Temporality/ScriptHost.hpp>
 #include <Temporality/Graphics/Shader.hpp>
 #include <Temporality/Graphics/Texture.hpp>
 #include <Temporality/Utils.hpp>
-//#include <Temporality/Window.hpp>
+#include <Temporality/Module.hpp>
+#include <Temporality/Graphics/GraphicsDriver.hpp>
+#include <Temporality/Graphics/TextureImporter.hpp>
+#include <Temporality/Graphics/MeshImporter.hpp>
 
 //#include <imgui/imgui.h>
 

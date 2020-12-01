@@ -54,6 +54,14 @@ public:
         // We should have a function to calculate bitangents
     }
 
+    gsl::span<const unsigned short> GetJoints() const override {
+        return gsl::span<unsigned short>();
+    }
+
+    gsl::span<const float> GetWeights() const override {
+        return gsl::span<float>();
+    }
+
 }; // class MeshData
 
 class TEMPORALITY_TINYOBJ_API MeshImporter : public Temporality::MeshImporter

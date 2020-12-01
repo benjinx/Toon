@@ -1,12 +1,11 @@
-#include <cstdio>
 #include <Temporality/Temporality.hpp>
-#include <Temporality/Module.hpp>
-#include <Temporality/Graphics/GraphicsDriver.hpp>
-#include <Temporality/Graphics/TextureImporter.hpp>
-#include <Temporality/Log.hpp>
 
+#include <cstdio>
+#include <memory>
 
-class CubeMeshData : Temporality::MeshData {
+using namespace Temporality;
+
+class CubeMeshData : MeshData {
 public:
     CubeMeshData() = default;
 
@@ -69,10 +68,11 @@ public:
 
 int main(int argc, char ** argv)
 {
-    Temporality::LoadModule("TemporalityOpenGL");
-    Temporality::LoadModule("TemporalitySTBI");
+    LoadModule("TemporalityOpenGL");
+    LoadModule("TemporalitySTBI");
+    LoadModule("TemporalityTinyOBJ");
 
-    auto gfx = Temporality::GetGraphicsDriver();
+    auto gfx = GetGraphicsDriver();
     if (gfx) {
         auto shader = gfx->CreateShader();
         shader->LoadFromFiles({"shaders/passThruColor.vert.glsl", "shaders/passThruColor.frag.glsl"});
@@ -82,21 +82,31 @@ int main(int argc, char ** argv)
 
         CubeMeshData meshdata;
         auto mesh = gfx->CreateMesh();
-        mesh->Load((Temporality::MeshData*)&meshdata);
+        mesh->Load((MeshData*)&meshdata);
+
+        Entity e;
+
+        auto meshComp = e.AddComponent<MeshComponent>(std::unique_ptr<Component>(new MeshComponent()));
+        meshComp->LoadFromFile("models/ball/model.obj");
+
+        //e.AddComponent());
+
+        RenderContext* rc = new RenderContext();
 
         gfx->SetWindowTitle("HelloWorld ~ Temporality");
         gfx->SetWindowSize({ 1024, 768 });
-        while (Temporality::IsRunning()) {
+        while (IsRunning()) {
             gfx->ProcessEvents();
 
             shader->Bind();
-            mesh->Render();
+            //mesh->Render();
+            e.Render(rc);
 
             gfx->SwapBuffers();
         }
     }
 
-    Temporality::FreeModules();
+    FreeModules();
 
     return 0;
 }

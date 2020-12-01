@@ -8,22 +8,40 @@
 namespace Temporality::TinyOBJ {
 
 TEMPORALITY_TINYOBJ_API
-std::vector<std::unique_ptr<Temporality::MeshData>> LoadFromFile(const std::string& filename)
+std::vector<std::unique_ptr<Temporality::MeshData>> MeshImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
 
-    const std::string& dir = GetDirname(filename);
+    //const std::string& dir = GetDirname(filename);
+    
     std::vector<std::unique_ptr<Temporality::MeshData>> meshes;
-
-    LogInfo("Loading from File: %s %s", dir, filename);
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
 
     std::string warn, err;
+    bool result = false;
 
-    bool result = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str(), dir.c_str());
+    const auto& assetPaths = GetAssetPaths();
+
+    for (const auto& path : assetPaths)
+    {
+        std::string fullPath = path + filename;
+        LogInfo("Loading from File: %s", fullPath);
+
+        std::string dir = GetDirname(fullPath);
+
+        warn = "";
+        err = "";
+
+        result = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, fullPath.c_str(), dir.c_str());
+
+        if (result) {
+            break;
+        }
+    }
+
 
     if (!warn.empty()) {
         LogWarn("tinyobj: %s", warn);

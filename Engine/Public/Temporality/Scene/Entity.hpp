@@ -1,8 +1,8 @@
-#ifndef GAMEOBJECT_HPP
-#define GAMEOBJECT_HPP
+#ifndef TEMPORALITY_ENTITY_HPP
+#define TEMPORALITY_ENTITY_HPP
 
-#include <Temporality/Axis.hpp>
 #include <Temporality/Config.hpp>
+#include <Temporality/Axis.hpp>
 #include <Temporality/Math.hpp>
 //#include <Temporality/OpenGL.hpp>
 #include <Temporality/Scene/Component.hpp>
@@ -18,7 +18,7 @@
 
 namespace Temporality {
 
-class Entity
+class TEMPORALITY_ENGINE_API Entity
 {
 public:
 
@@ -136,7 +136,7 @@ T* Entity::AddComponent(std::unique_ptr<Component>&& component)
     Component* ptr = component.get();
 
     _mComponents.push_back(std::move(component));
-    _mComponents.back()->SetEntity(this);
+    _mComponents.back()->Attach(this);
 
     if (_mComponentsByType.find(id) == _mComponentsByType.end())
     {
@@ -166,4 +166,4 @@ std::vector<T*> Entity::FindComponentsOfType()
 
 } // namespace Temporality
 
-#endif // GAMEOBJECT_HPP
+#endif // TEMPORALITY_ENTITY_HPP

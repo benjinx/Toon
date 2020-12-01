@@ -7,4 +7,5 @@ ADD_DEPENDENCIES(
     ${_target}
     TemporalityOpenGL
     TemporalitySTBI
+    TemporalityTinyOBJ
 )
