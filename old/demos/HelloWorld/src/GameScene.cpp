@@ -5,7 +5,7 @@ void GameScene::Start()
     Scene::Start();
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
@@ -22,7 +22,7 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Scene Objs
-    auto logo = AddGameObject("Logo");
+    auto logo = AddEntity("Logo");
     StaticMeshComponent* logoMesh = logo->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     logoMesh->SetShader(app->GetShader("passThru"));
 

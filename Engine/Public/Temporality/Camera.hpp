@@ -2,12 +2,14 @@
 #define CAMERA_H
 
 #include <Temporality/Config.hpp>
-#include <Temporality/GameObject.hpp>
+#include <Temporality/Scene/Entity.hpp>
 #include <Temporality/Math.hpp>
 
 //class Window;
 
-class Camera : public GameObject
+namespace Temporality {
+
+class Camera : public Entity
 {
 public:
 
@@ -97,5 +99,7 @@ private:
 
     glm::vec3 _mDirection = glm::vec3(0);
 };
+
+} // namespace Temporality
 
 #endif // CAMERA_H

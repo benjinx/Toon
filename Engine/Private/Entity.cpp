@@ -1,4 +1,4 @@
-#include "Temporality/GameObject.hpp"
+#include <Temporality/Scene/Entity.hpp>
 
 //#include <Temporality/App.hpp>
 #include <Temporality/Camera.hpp>
@@ -8,23 +8,25 @@
 //#include <Temporality/StaticMeshComponent.hpp>
 #include <Temporality/Utils.hpp>
 
-GameObject::GameObject()
+namespace Temporality {
+
+Entity::Entity()
 {
     SetTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1));
 }
 
-GameObject::GameObject(glm::vec3 position)
+Entity::Entity(glm::vec3 position)
 {
     SetPosition(position);
 }
 
-GameObject::~GameObject()
+Entity::~Entity()
 {
     delete _mSceneAxis;
     _mChildren.clear();
 }
 
-void GameObject::Update(const float dt)
+void Entity::Update(UpdateContext * ctx)
 {
     // Check if enabled
     if (!_mEnabled)
@@ -35,17 +37,17 @@ void GameObject::Update(const float dt)
     // Update
     for (const auto& comp : _mComponents)
     {
-        comp->Update(dt);
+        comp->Update(ctx);
     }
 
     // Update all children
     for (const auto& child : _mChildren)
     {
-        child->Update(dt);
+        child->Update(ctx);
     }
 }
 
-void GameObject::Render()
+void Entity::Render(RenderContext * ctx)
 {
     // Check for visibility
     if (!_mVisibility)
@@ -56,46 +58,46 @@ void GameObject::Render()
     // Render
     for (const auto& comp : _mComponents)
     {
-        comp->Render();
+        comp->Render(ctx);
     }
 
     // Call render on all children
     for (const auto& child : _mChildren)
     {
-        child->Render();
+        child->Render(ctx);
     }
 }
 
-void GameObject::RenderAxis()
+void Entity::RenderAxis()
 {
     if (_mSceneAxis == nullptr)
     {
         _mSceneAxis = new Axis();
     }
 
-    // Render the gobjs axis
+    // Render the entitys axis
     //_mSceneAxis->Render(GetWorldTransform());
 
     // Render it for our children
-    for (auto& gobj : _mChildren)
+    for (auto& entity : _mChildren)
     {
-        gobj->RenderAxis();
+        entity->RenderAxis();
     }
 }
 
-GameObject* GameObject::FindGameObject(std::string name)
+Entity* Entity::FindEntity(std::string name)
 {
-    for (auto& gobj : _mChildren)
+    for (auto& entity : _mChildren)
     {
-        if (gobj->GetName() == name)
+        if (entity->GetName() == name)
         {
-            return gobj.get();
+            return entity.get();
         }
     }
 
-    for (auto& gobj : _mChildren)
+    for (auto& entity : _mChildren)
     {
-        auto tmp = gobj->FindGameObject(name);
+        auto tmp = entity->FindEntity(name);
         if (tmp)
         {
             return tmp;
@@ -105,20 +107,20 @@ GameObject* GameObject::FindGameObject(std::string name)
     return nullptr;
 }
 
-void GameObject::AddChild(std::unique_ptr<GameObject>&& child)
+void Entity::AddChild(std::unique_ptr<Entity>&& child)
 {
     child->SetParent(this);
     _mChildren.push_back(std::move(child));
 }
 
-void GameObject::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
+void Entity::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
 {
     _mPosition = position;
     _mRotation = rotation;
     _mScale = scale;
 }
 
-glm::mat4 GameObject::GetTransform() const {
+glm::mat4 Entity::GetTransform() const {
     glm::mat4 transform = glm::mat4(1);
     transform = glm::translate(transform, _mPosition);
     transform *= glm::mat4_cast(_mRotation);
@@ -126,7 +128,7 @@ glm::mat4 GameObject::GetTransform() const {
     return transform;
 }
 
-glm::mat4 GameObject::GetWorldTransform() const
+glm::mat4 Entity::GetWorldTransform() const
 {
     if (GetParent())
     {
@@ -136,7 +138,7 @@ glm::mat4 GameObject::GetWorldTransform() const
     return GetTransform();
 }
 
-glm::vec3 GameObject::GetWorldPosition() const
+glm::vec3 Entity::GetWorldPosition() const
 {
     if (GetParent())
     {
@@ -146,7 +148,7 @@ glm::vec3 GameObject::GetWorldPosition() const
     return GetPosition();
 }
 
-glm::quat GameObject::GetWorldRotation() const
+glm::quat Entity::GetWorldRotation() const
 {
     if (GetParent())
     {
@@ -156,7 +158,7 @@ glm::quat GameObject::GetWorldRotation() const
     return GetRotation();
 }
 
-glm::vec3 GameObject::GetWorldScale() const
+glm::vec3 Entity::GetWorldScale() const
 {
     if (GetParent())
     {
@@ -165,3 +167,5 @@ glm::vec3 GameObject::GetWorldScale() const
 
     return GetScale();
 }
+
+} // namespace Temporality

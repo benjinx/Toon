@@ -785,7 +785,7 @@ namespace glTF2 {
 		return skins;
 	}
 
-	std::vector<std::unique_ptr<GameObject>> loadNodes(
+	std::vector<std::unique_ptr<Entity>> loadNodes(
 		const json& data,
 		const std::vector<camera_t>& cameras,
         const std::vector<light_t>& lights,
@@ -793,13 +793,13 @@ namespace glTF2 {
 		const std::vector<skin_t>& skins
 		)
 	{
-		std::vector<std::unique_ptr<GameObject>> gobjs;
+		std::vector<std::unique_ptr<Entity>> entitys;
 
-		std::function<std::unique_ptr<GameObject>(const json&, const json&)>
+		std::function<std::unique_ptr<Entity>(const json&, const json&)>
         loadNode = [&](const json& nodes, const json& data)
-        -> std::unique_ptr<GameObject>
+        -> std::unique_ptr<Entity>
         {
-            GameObject * gobj = nullptr;
+            Entity * entity = nullptr;
 
 			auto it = data.begin();
 
@@ -838,7 +838,7 @@ namespace glTF2 {
                 light->SetIntensity(lightData.intensity);
                 light->SetColor(lightData.color);
 
-                gobj = light;
+                entity = light;
             }
             else if (cameraIndex >= 0)
             {
@@ -868,22 +868,22 @@ namespace glTF2 {
 						camera->SetClip(c.znear, c.zfar);
 					}
 				}
-				gobj = camera;
+				entity = camera;
 			}
 			else {
-				gobj = new GameObject();
+				entity = new Entity();
 			}
 
 			int meshIndex = data.value("mesh", -1);
 			if (meshIndex >= 0) {
 				LogVerbose("Adding MeshComponent");
-                gobj->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>(meshes[meshIndex]));
+                entity->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>(meshes[meshIndex]));
 			}
 
 			it = data.find("name");
 			if (it != data.end()) {
-				gobj->SetName(it.value());
-				LogWarn("Name: %s", gobj->GetName());
+				entity->SetName(it.value());
+				LogWarn("Name: %s", entity->GetName());
 				if (it.value() == "Armature")
 				{
 					LogError("Armature");
@@ -900,20 +900,20 @@ namespace glTF2 {
 
 			it = data.find("translation");
 			if (it != data.end()) {
-				gobj->SetPosition(parseVec3(it.value(), gobj->GetPosition()));
-				LogWarn("Position: %f, %f, %f", gobj->GetPosition().x, gobj->GetPosition().y, gobj->GetPosition().z);
+				entity->SetPosition(parseVec3(it.value(), entity->GetPosition()));
+				LogWarn("Position: %f, %f, %f", entity->GetPosition().x, entity->GetPosition().y, entity->GetPosition().z);
 			}
 
 			it = data.find("rotation");
 			if (it != data.end()) {
-				gobj->SetRotation(parseQuat(it.value(), gobj->GetRotation()));
-				LogWarn("Rotation: %f, %f, %f", gobj->GetRotation().x, gobj->GetRotation().y, gobj->GetRotation().z);
+				entity->SetRotation(parseQuat(it.value(), entity->GetRotation()));
+				LogWarn("Rotation: %f, %f, %f", entity->GetRotation().x, entity->GetRotation().y, entity->GetRotation().z);
 			}
 
 			it = data.find("scale");
 			if (it != data.end()) {
-				gobj->SetScale(parseVec3(it.value(), gobj->GetScale()));
-				LogWarn("Scale: %f, %f, %f", gobj->GetScale().x, gobj->GetScale().y, gobj->GetScale().z);
+				entity->SetScale(parseVec3(it.value(), entity->GetScale()));
+				LogWarn("Scale: %f, %f, %f", entity->GetScale().x, entity->GetScale().y, entity->GetScale().z);
 			}
 
             it = data.find("children");
@@ -934,12 +934,12 @@ namespace glTF2 {
 						continue;
 					}
 
-					LogInfo("Parent: %s", gobj->GetName());
-                    gobj->AddChild(loadNode(nodes, nodes[child.get<int>()]));
+					LogInfo("Parent: %s", entity->GetName());
+                    entity->AddChild(loadNode(nodes, nodes[child.get<int>()]));
                 }
             }
 
-			return std::unique_ptr<GameObject>(gobj);
+			return std::unique_ptr<Entity>(entity);
 		};
 
 		std::vector<int> sceneNodeIndexes;
@@ -977,16 +977,16 @@ namespace glTF2 {
 
 					if (object.is_object()) {
 						LogVerbose("glTF node %s", object.value("name", ""));
-						auto gobj = loadNode(array, object);
-						if (gobj) {
-							gobjs.push_back(std::move(gobj));
+						auto entity = loadNode(array, object);
+						if (entity) {
+							entitys.push_back(std::move(entity));
 						}
 					}
 				}
 			}
 		}
 
-		return gobjs;
+		return entitys;
 	}
 
 	std::tuple<json, std::vector<std::vector<uint8_t>>, std::string>
@@ -1127,7 +1127,7 @@ namespace glTF2 {
 		return std::make_tuple(data, dataChunks, dir);
 	}
 
-	std::vector<std::unique_ptr<GameObject>> LoadSceneFromFile(const std::string& filename)
+	std::vector<std::unique_ptr<Entity>> LoadSceneFromFile(const std::string& filename)
 	{
 		//DuskBenchStart();
 
@@ -1145,10 +1145,10 @@ namespace glTF2 {
 		const auto& meshes = loadMeshes(data, bufferViews, buffers, accessors, materials);
         const auto& lights = loadLights(data);
 		const auto& skins = loadSkins(data);
-		auto gobjs = loadNodes(data, cameras, lights, meshes, skins);
+		auto entitys = loadNodes(data, cameras, lights, meshes, skins);
 
 		//DuskBenchEnd("glTF2::LoadSceneFromFile");
-		return gobjs;
+		return entitys;
 	}
 
 	std::vector<Mesh::Primitive> LoadPrimitivesFromFile(const std::string& filename)

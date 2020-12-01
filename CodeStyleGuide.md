@@ -701,29 +701,29 @@ Use range-based for when index is not needed. Use auto for iterators.
 
 *Right*
 ```
-std::vector<std::unique_ptr<GameObject>> gameObjects;
-for (auto& gameObject : gameObjects) {
-    gameObject->Update(dt);
+std::vector<std::unique_ptr<Entity>> entitys;
+for (auto& entity : entitys) {
+    entity->Update(dt);
 }
 
 // Index is used
-for (size_t i = 0; i < gameObjects.size(); ++i) {
+for (size_t i = 0; i < entitys.size(); ++i) {
     LogInfo("Updating Gameobject #%zu", i);
 }
 ```
 
 *Wrong*
 ```
-std::vector<std::unique_ptr<GameObject>> gameObjects;
+std::vector<std::unique_ptr<Entity>> entitys;
 
-std::vector<std::unique_ptr<GameObject>> it = gameObjects.begin();
-for (; it != gameObjects.end(); ++it) {
-    gameObject->Update(dt);
+std::vector<std::unique_ptr<Entity>> it = entitys.begin();
+for (; it != entitys.end(); ++it) {
+    entity->Update(dt);
 }
 
 // Index is not used
-for (size_t i = 0; i < gameObjects.size(); ++i) {
-    gameObjects[i]->Update(dt);
+for (size_t i = 0; i < entitys.size(); ++i) {
+    entitys[i]->Update(dt);
 }
 ```
 
@@ -732,14 +732,14 @@ All pointers should be written such that the * is NOT spaced from the type, but 
 *Right*
 ```
 int* x;
-std::vector<GameObjects*> gameObjects;
+std::vector<Entitys*> entitys;
 ```
 
 *Wrong*
 ```
 int * x;
 int *y;
-std::vector<GameObjects *> gameObjects;
+std::vector<Entitys *> entitys;
 ```
 
 `#include` statements should be grouped into the following categories: Temporality, System, and Third Party. Within those categories they should be alphabetized, except when order is important.
@@ -747,7 +747,7 @@ std::vector<GameObjects *> gameObjects;
 *Right*
 ```
 #include <Config.hpp>
-#include <GameObject.hpp>
+#include <Entity.hpp>
 #include <Mesh.hpp>
 
 #include <memory>
@@ -758,7 +758,7 @@ std::vector<GameObjects *> gameObjects;
 
 *Wrong*
 ```
-#include <GameObject.hpp>
+#include <Entity.hpp>
 #include <Mesh.hpp>
 #include <vector>
 #include <memory>
@@ -788,7 +788,7 @@ Omit unnecessary parameter names from funtion declarions where the size or funct
 *Right*
 ```
 void SetWidth(int);
-void AddGameObject(std::unique_ptr<GameObject>&&);
+void AddEntity(std::unique_ptr<Entity>&&);
 
 void doSomething(int amountToAdd);
 ```
@@ -796,7 +796,7 @@ void doSomething(int amountToAdd);
 *Wrong*
 ```
 void SetWidth(int width);
-void AddGameObject(std::unique_ptr<GameObject>&& gameObject);
+void AddEntity(std::unique_ptr<Entity>&& entity);
 
 void doSomething(int);
 ```

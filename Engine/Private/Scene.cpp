@@ -12,9 +12,11 @@
 
 //#include <imgui/imgui.h>
 
-void Scene::Update(float dt)
+namespace Temporality {
+
+void Scene::Update(UpdateContext * ctx)
 {
-    /*GameObject::Update(dt);
+    /*Entity::Update(dt);
 
     // Use our default shaders and set the color & light position.
     App* app = App::Inst();
@@ -28,13 +30,13 @@ void Scene::Update(float dt)
     defaultLighting->SetVec4("lightPosition", defaultLightPosition);*/
 }
 
-void Scene::Render()
+void Scene::Render(RenderContext * ctx)
 {
-    GameObject::Render();
+    Entity::Render(ctx);
 
     if (_mSkybox != nullptr)
     {
-        _mSkybox->Render();
+        _mSkybox->Render(ctx);
     }
 
     /*if (DevUI::showAxis)
@@ -42,7 +44,7 @@ void Scene::Render()
         RenderAxis();
 
         // Render the childrens
-        for (auto& gameObject : _mChildren)
+        for (auto& entity : _mChildren)
         {
             RenderAxis();
         }
@@ -51,11 +53,11 @@ void Scene::Render()
 
 bool Scene::LoadScene(std::string filename)
 {
-    /*std::vector<std::unique_ptr<GameObject>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
+    /*std::vector<std::unique_ptr<Entity>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
 
     for (unsigned int i = 0; i < loadedGobjs.size(); ++i)
     {
-        AddGameObject(std::move(loadedGobjs[i]));
+        AddEntity(std::move(loadedGobjs[i]));
     }
 
     if (loadedGobjs.empty())
@@ -66,32 +68,32 @@ bool Scene::LoadScene(std::string filename)
     return true;
 }
 
-GameObject* Scene::AddGameObject(std::string name, std::unique_ptr<GameObject> gameObject)
+Entity* Scene::AddEntity(std::string name, std::unique_ptr<Entity> entity)
 {
-    _mChildren.push_back(std::move(gameObject));
+    _mChildren.push_back(std::move(entity));
     _mChildren.back()->SetName(name);
     _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
-GameObject* Scene::AddGameObject()
+Entity* Scene::AddEntity()
 {
-    _mChildren.push_back(std::make_unique<GameObject>());
+    _mChildren.push_back(std::make_unique<Entity>());
     _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
-GameObject* Scene::AddGameObject(std::string name)
+Entity* Scene::AddEntity(std::string name)
 {
-    _mChildren.push_back(std::make_unique<GameObject>());
+    _mChildren.push_back(std::make_unique<Entity>());
     _mChildren.back()->SetName(name);
     _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
 
-GameObject* Scene::AddGameObject(std::unique_ptr<GameObject> gobj)
+Entity* Scene::AddEntity(std::unique_ptr<Entity> entity)
 {
-    _mChildren.push_back(std::move(gobj));
+    _mChildren.push_back(std::move(entity));
     _mChildren.back()->SetParent(this);
     return _mChildren.back().get();
 }
@@ -105,5 +107,7 @@ void Scene::CreateSkybox(std::vector<std::string> faces)
 
 void Scene::Options()
 {
-    //ImGui::Checkbox("Show GameObject Axis", &DevUI::showAxis);
+    //ImGui::Checkbox("Show Entity Axis", &DevUI::showAxis);
 }
+
+} // namespace Temporality

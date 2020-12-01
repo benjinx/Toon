@@ -16,8 +16,8 @@ public:
 private:
     StaticMeshComponent* _mHelmMesh;
     StaticMeshComponent* _mCubeMesh;
-    GameObject* _mHelm;
-    GameObject* _mCube;
+    Entity* _mHelm;
+    Entity* _mCube;
 };
 
 #endif // GAMESCENE_H

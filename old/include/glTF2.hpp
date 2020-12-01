@@ -1,7 +1,7 @@
 #ifndef GLTF2_HPP
 #define GLTF2_HPP
 
-#include <GameObject.hpp>
+#include <Entity.hpp>
 #include <Mesh.hpp>
 
 #include <string>
@@ -10,7 +10,7 @@
 
 namespace glTF2 {
 
-    std::vector<std::unique_ptr<GameObject>> LoadSceneFromFile(const std::string& filename);
+    std::vector<std::unique_ptr<Entity>> LoadSceneFromFile(const std::string& filename);
 
     std::vector<Mesh::Primitive> LoadPrimitivesFromFile(const std::string& filename);
 

@@ -5,10 +5,9 @@
 #include <Temporality/Config.hpp>
 #include <Temporality/Math.hpp>
 //#include <Temporality/OpenGL.hpp>
-#include <Temporality/Component.hpp>
+#include <Temporality/Scene/Component.hpp>
 //#include <Temporality/Shader.hpp>
 //#include <Temporality/Material.hpp>
-#include <Temporality/Component.hpp>
 #include <Temporality/Macros.hpp>
 
 #include <vector>
@@ -17,31 +16,32 @@
 #include <typeindex>
 #include <typeinfo>
 
-//
-class GameObject
+namespace Temporality {
+
+class Entity
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(GameObject)
+    DISALLOW_COPY_AND_ASSIGN(Entity)
 
-    GameObject();
-    GameObject(glm::vec3 position);
-    virtual ~GameObject();
+    Entity();
+    Entity(glm::vec3 position);
+    virtual ~Entity();
 
-    virtual void Update(const float dt);
-    virtual void Render();
+    virtual void Update(UpdateContext * ctx);
+    virtual void Render(RenderContext * ctx);
 
-    void SetParent(GameObject* parent) { 
+    void SetParent(Entity* parent) { 
         _mParent = parent;
     }
 
-    GameObject* GetParent() const { 
+    Entity* GetParent() const { 
         return _mParent;
     }
 
-    GameObject* FindGameObject(std::string name);
+    Entity* FindEntity(std::string name);
 
-    void AddChild(std::unique_ptr<GameObject>&& child);
+    void AddChild(std::unique_ptr<Entity>&& child);
 
     void RenderAxis();
 
@@ -98,14 +98,14 @@ public:
 protected:
 
     // Children
-    std::vector<std::unique_ptr<GameObject>> _mChildren;
+    std::vector<std::unique_ptr<Entity>> _mChildren;
     
 private:
     // Object name
     std::string _mName;
 
     // Parent
-    GameObject* _mParent = nullptr;
+    Entity* _mParent = nullptr;
 
     // Axis of the object
     Axis* _mSceneAxis = nullptr;
@@ -129,14 +129,14 @@ private:
 };
 
 template <typename T>
-T* GameObject::AddComponent(std::unique_ptr<Component>&& component)
+T* Entity::AddComponent(std::unique_ptr<Component>&& component)
 {
     auto id = std::type_index(typeid(T));
 
     Component* ptr = component.get();
 
     _mComponents.push_back(std::move(component));
-    _mComponents.back()->SetGameObject(this);
+    _mComponents.back()->SetEntity(this);
 
     if (_mComponentsByType.find(id) == _mComponentsByType.end())
     {
@@ -149,7 +149,7 @@ T* GameObject::AddComponent(std::unique_ptr<Component>&& component)
 }
 
 template <typename T>
-std::vector<T*> GameObject::FindComponentsOfType()
+std::vector<T*> Entity::FindComponentsOfType()
 {
     auto id = std::type_index(typeid(T));
     auto list = std::vector<T*>();
@@ -163,5 +163,7 @@ std::vector<T*> GameObject::FindComponentsOfType()
 
     return list;
 }
+
+} // namespace Temporality
 
 #endif // GAMEOBJECT_HPP

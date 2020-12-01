@@ -7,6 +7,8 @@
 
 //Camera * Camera::_sInst = nullptr;
 
+namespace Temporality {
+
 Camera::Camera()
 {
     /*const glm::ivec2& size = glm::ivec2(App::Inst()->GetWindow()->GetWidth(),
@@ -185,3 +187,5 @@ void Camera::HandleRotation(float xoffset, float yoffset)
     rotation = glm::angleAxis(delta.y, GetRight()) * rotation;
     SetRotation(rotation);*/
 }
+
+} // namespace Temporality

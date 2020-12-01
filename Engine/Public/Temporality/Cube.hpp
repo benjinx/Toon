@@ -2,10 +2,12 @@
 #define CUBE_H
 
 #include <Temporality/Config.hpp>
-#include <Temporality/GameObject.hpp>
+#include <Temporality/Scene/Entity.hpp>
 #include <Temporality/Rigidbody.hpp>
 
-class Cube : public GameObject
+namespace Temporality {
+
+class Cube : public Entity
 {
 public:
     Cube();
@@ -16,5 +18,7 @@ public:
 private:
     Rigidbody _mRigidbody;
 };
+
+} // namespace Temporality
 
 #endif // !CUBE_H

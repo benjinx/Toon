@@ -24,7 +24,11 @@ public:
     void AddMesh(std::shared_ptr<Mesh>&& mesh);
     
     void Render(RenderContext * ctx) override;
-    
+
+private:
+
+    std::vector<std::shared_ptr<Mesh>> _mMeshes;
+
 }; // class MeshComponent
 
 } // namespace Temporality

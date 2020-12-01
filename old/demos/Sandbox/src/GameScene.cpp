@@ -7,7 +7,7 @@ void GameScene::Start()
     LogTest();
 
     // Light Source
-    auto Light = AddGameObject("Light");
+    auto Light = AddEntity("Light");
     Light->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
 
     // Shaders
@@ -31,7 +31,7 @@ void GameScene::Start()
         "shaders/stencil.frag" }));
 
     // Scene Objs
-     _mHelm = AddGameObject("helm");
+     _mHelm = AddEntity("helm");
      _mHelmMesh = _mHelm->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
      _mHelmMesh->SetShader(app->GetShader("normalMapping"));
 
@@ -42,7 +42,7 @@ void GameScene::Start()
          _mHelm->SetRotation(glm::vec3(0.0f, 9.5f, 9.5f));
      }
 
-    // _mCube = AddGameObject("Cube");
+    // _mCube = AddEntity("Cube");
     // _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     // _mCubeMesh->SetShader(app->GetShader("advLighting"));
 
@@ -63,7 +63,7 @@ void GameScene::Start()
     // }
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 }
@@ -79,7 +79,7 @@ void GameScene::Update(float dt)
     glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     norm->Use();
     norm->SetVec3("lightColor", lightColor);
-    glm::vec4 lightPos = glm::vec4(FindGameObject("Light")->GetWorldPosition(), 1.0f);
+    glm::vec4 lightPos = glm::vec4(FindEntity("Light")->GetWorldPosition(), 1.0f);
     norm->SetVec4("lightPos", lightPos);
 
     auto adv = app->GetShader("advLighting");

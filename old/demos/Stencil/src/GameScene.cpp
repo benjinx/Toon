@@ -7,7 +7,7 @@ void GameScene::Start()
     App* app = App::Inst();
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     app->SetCurrentCamera(camera);
 
@@ -19,19 +19,19 @@ void GameScene::Start()
         "shaders/stencil.frag" }));
 
     // Scene Objs
-    _mPlane = AddGameObject("Plane");
+    _mPlane = AddEntity("Plane");
     _mPlaneMesh = _mPlane->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mPlaneMesh->SetShader(app->GetShader("defaultLighting"));
 
-    _mSphere = AddGameObject("Sphere");
+    _mSphere = AddEntity("Sphere");
     _mSphereMesh = _mSphere->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mSphereMesh->SetShader(app->GetShader("defaultLighting"));
 
-    _mCube = AddGameObject("Cube");
+    _mCube = AddEntity("Cube");
     _mCubeMesh = _mCube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mCubeMesh->SetShader(app->GetShader("defaultLighting"));
 
-    _mTorus = AddGameObject("Torus");
+    _mTorus = AddEntity("Torus");
     _mTorusMesh = _mTorus->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     _mTorusMesh->SetShader(app->GetShader("defaultLighting"));
 

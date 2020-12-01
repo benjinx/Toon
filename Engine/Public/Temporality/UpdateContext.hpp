@@ -2,6 +2,7 @@
 #define TEMPORALITY_UPDATE_CONTEXT_HPP
 
 #include <Temporality/Config.hpp>
+#include <cstdint>
 
 namespace Temporality {
 

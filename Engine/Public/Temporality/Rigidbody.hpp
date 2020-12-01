@@ -4,7 +4,9 @@
 #include <Temporality/Config.hpp>
 #include <Temporality/Math.hpp>
 
-class GameObject;
+namespace Temporality {
+
+class Entity;
 
 class Rigidbody
 {
@@ -12,8 +14,8 @@ public:
     void AddForce(const glm::vec3 force);
     void SetMass(const float mass);
     void UpdateAcceleration();
-    void UpdateFirstOrder(GameObject* gameObject, const float dt);
-    void ClampToGround(GameObject* gameObject, const float groundHeight, const float restitution);
+    void UpdateFirstOrder(Entity* entity, const float dt);
+    void ClampToGround(Entity* entity, const float groundHeight, const float restitution);
 
     void SetFixedAcceleration(glm::vec3 fixedAcceleration) { _mAccelerationFixed = fixedAcceleration; }
     void SetVelocity(glm::vec3 velocity) { _mVelocity = velocity; }
@@ -28,5 +30,7 @@ private:
     glm::vec3 _mAcceleration, _mForce;
     float _mMass, _mMassInv;
 };
+
+} // namespace Temporality
 
 #endif // !RIGIDBODY_H

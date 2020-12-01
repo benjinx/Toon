@@ -8,12 +8,12 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
     // Light Source
-    auto Light = AddGameObject("Light");
+    auto Light = AddEntity("Light");
     Light->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     // Shaders
@@ -29,19 +29,19 @@ void GameScene::Start()
         "shaders/basicLighting.frag" }));
     
     // Initialize Objects
-    auto Plane = AddGameObject("Plane");
+    auto Plane = AddEntity("Plane");
     StaticMeshComponent* PlaneMesh = Plane->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     PlaneMesh->SetShader(app->GetShader("basicLighting"));
 
-    auto Sphere = AddGameObject("Sphere");
+    auto Sphere = AddEntity("Sphere");
     StaticMeshComponent* SphereMesh = Sphere->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     SphereMesh->SetShader(app->GetShader("basicLighting"));
 
-    auto Cube = AddGameObject("Cube");
+    auto Cube = AddEntity("Cube");
     StaticMeshComponent* CubeMesh = Cube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     CubeMesh->SetShader(app->GetShader("basicLighting"));
 
-    auto Torus = AddGameObject("Torus");
+    auto Torus = AddEntity("Torus");
     StaticMeshComponent* TorusMesh = Torus->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     TorusMesh->SetShader(app->GetShader("basicLighting"));
 
@@ -98,17 +98,17 @@ void GameScene::Update(float dt)
 
     basicLighting->SetVec3("lightColor", lightColor);
 
-    glm::vec4 lightPos = glm::vec4(FindGameObject("Light")->GetPosition(), 1.0f);
+    glm::vec4 lightPos = glm::vec4(FindEntity("Light")->GetPosition(), 1.0f);
     basicLighting->SetVec4("lightVec", lightPos);
 
     glm::vec3 objColor = glm::vec3(DevUI::objectColor[0], DevUI::objectColor[1], DevUI::objectColor[2]);
     basicLighting->SetVec3("objectColor", objColor);
 
     // Rotate objects
-    FindGameObject("Sphere")->SetRotation(FindGameObject("Sphere")->GetWorldRotation()
+    FindEntity("Sphere")->SetRotation(FindEntity("Sphere")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 0.0f, 1.0f)));
-    FindGameObject("Cube")->SetRotation(FindGameObject("Cube")->GetWorldRotation()
+    FindEntity("Cube")->SetRotation(FindEntity("Cube")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
-    FindGameObject("Torus")->SetRotation(FindGameObject("Torus")->GetWorldRotation()
+    FindEntity("Torus")->SetRotation(FindEntity("Torus")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.25f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
 }

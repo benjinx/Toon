@@ -39,7 +39,7 @@ void RiggedMeshComponent::Render()
 {
     for (auto& mesh : _mMeshes)
     {
-        mesh->Render(_mShader, GetGameObject()->GetWorldTransform());
+        mesh->Render(_mShader, GetEntity()->GetWorldTransform());
     }
 }
 

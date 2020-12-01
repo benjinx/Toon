@@ -8,12 +8,12 @@ void GameScene::Start()
     printf("\nLoading Models/Materials\n");
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     App::Inst()->SetCurrentCamera(camera);
 
     // Light Source
-    auto Light = AddGameObject();
+    auto Light = AddEntity();
     Light->SetName("Light");
     Light->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -30,15 +30,15 @@ void GameScene::Start()
         "shaders/normalMapping.frag" }));
 
     // Initialize Objs
-    auto Earth = AddGameObject("Earth");
+    auto Earth = AddEntity("Earth");
     StaticMeshComponent* EarthMesh = Earth->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     EarthMesh->SetShader(app->GetShader("normalMapping"));
 
-    auto Moon = AddGameObject("Moon");
+    auto Moon = AddEntity("Moon");
     StaticMeshComponent* MoonMesh = Moon->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     MoonMesh->SetShader(app->GetShader("normalMapping"));
 
-    auto Mars = AddGameObject("Mars");
+    auto Mars = AddEntity("Mars");
     StaticMeshComponent* MarsMesh = Mars->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
     MarsMesh->SetShader(app->GetShader("normalMapping"));
 
@@ -85,7 +85,7 @@ void GameScene::Update(float dt)
     normalMapping->Use();
 
     normalMapping->SetVec3("lightColor", lightColor);
-    glm::vec4 lightPos = glm::vec4(FindGameObject("Light")->GetPosition(), 1.0f);
+    glm::vec4 lightPos = glm::vec4(FindEntity("Light")->GetPosition(), 1.0f);
     normalMapping->SetVec4("lightPos", lightPos);
 
     glm::vec3 camPos = App::Inst()->GetCurrentCamera()->GetPosition();
@@ -93,15 +93,15 @@ void GameScene::Update(float dt)
     normalMapping->SetVec4("eyePos", eyePos);
 
     // Rotate objects
-    FindGameObject("Earth")->SetRotation(FindGameObject("Earth")->GetWorldRotation()
+    FindEntity("Earth")->SetRotation(FindEntity("Earth")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.5f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
     
-    FindGameObject("Moon")->SetRotation(FindGameObject("Moon")->GetWorldRotation()
+    FindEntity("Moon")->SetRotation(FindEntity("Moon")->GetWorldRotation()
         * glm::angleAxis(glm::radians(-0.185f) * dt, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-    const auto& earthPos = FindGameObject("Earth")->GetPosition();
-    const auto& moonPos = FindGameObject("Moon")->GetPosition();
-    const auto& marsPos = FindGameObject("Mars")->GetPosition();
+    const auto& earthPos = FindEntity("Earth")->GetPosition();
+    const auto& moonPos = FindEntity("Moon")->GetPosition();
+    const auto& marsPos = FindEntity("Mars")->GetPosition();
 
     _mAngle += 0.5f * dt;
 
@@ -117,7 +117,7 @@ void GameScene::Update(float dt)
 
     glm::vec3 newPos = glm::vec3(x, 0.0f, -z);
     
-    FindGameObject("Moon")->SetPosition(newPos);
+    FindEntity("Moon")->SetPosition(newPos);
     
     _mMarsAngle += 0.5f * dt;
 
@@ -133,5 +133,5 @@ void GameScene::Update(float dt)
 
     glm::vec3 newMarsPos = glm::vec3(marsX, 0.0f, -marsZ);
 
-    //FindGameObject("Mars")->SetPosition(newMarsPos);
+    //FindEntity("Mars")->SetPosition(newMarsPos);
 }

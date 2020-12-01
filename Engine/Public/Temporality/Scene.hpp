@@ -3,7 +3,7 @@
 
 #include <Temporality/Axis.hpp>
 #include <Temporality/Config.hpp>
-#include <Temporality/GameObject.hpp>
+#include <Temporality/Scene/Entity.hpp>
 #include <Temporality/Graphics/Mesh.hpp>
 #include <Temporality/Skybox.hpp>
 //#include <Temporality/Shader.hpp>
@@ -11,7 +11,9 @@
 #include <memory>
 #include <unordered_map>
 
-class Scene : public GameObject
+namespace Temporality {
+
+class Scene : public Entity
 {
 public:
 
@@ -22,18 +24,18 @@ public:
     virtual void Pause() {}
     virtual void Resume() {}
 
-    virtual void Update(float dt);
-    virtual void Render();
+    virtual void Update(UpdateContext * ctx);
+    virtual void Render(RenderContext * ctx);
 
     bool LoadScene(std::string filename);
 
     // Ui Options.
     static void Options();
 
-    GameObject* AddGameObject(std::string name, std::unique_ptr<GameObject> gameObject);
-    GameObject* AddGameObject();
-    GameObject* AddGameObject(std::string name);
-    GameObject* AddGameObject(std::unique_ptr<GameObject> gobj);
+    Entity* AddEntity(std::string name, std::unique_ptr<Entity> entity);
+    Entity* AddEntity();
+    Entity* AddEntity(std::string name);
+    Entity* AddEntity(std::unique_ptr<Entity> entity);
 
     void CreateSkybox(std::vector<std::string> faces);
     Skybox* GetSkybox() { return _mSkybox.get(); }
@@ -43,5 +45,7 @@ private:
 
     std::unique_ptr<Skybox> _mSkybox;
 };
+
+} // namespace Temporality
 
 #endif // SCENE_H

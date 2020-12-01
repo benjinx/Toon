@@ -9,7 +9,7 @@ void GameScene::Start()
     App* app = App::Inst();
 
     // Camera
-    Camera * camera = (Camera *)AddGameObject("Camera", std::make_unique<Camera>());
+    Camera * camera = (Camera *)AddEntity("Camera", std::make_unique<Camera>());
     camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     app->SetCurrentCamera(camera);
 
@@ -36,7 +36,7 @@ void GameScene::Start()
     // Call skybox here
     CreateSkybox(faces);
 
-    GameObject* Cube = AddGameObject("Cube");
+    Entity* Cube = AddEntity("Cube");
     StaticMeshComponent* CubeMesh = Cube->AddComponent<StaticMeshComponent>(std::make_unique<StaticMeshComponent>());
 
     CubeMesh->SetShader(app->GetShader("reflection"));

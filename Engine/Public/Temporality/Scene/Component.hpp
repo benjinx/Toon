@@ -2,12 +2,12 @@
 #define TEMPORALITY_COMPONENT_HPP
 
 #include <Temporality/Config.hpp>
-// #include <Temporality/UpdateContext.hpp>
-// #include <Temporality/RenderContext.hpp>
+#include <Temporality/UpdateContext.hpp>
+#include <Temporality/RenderContext.hpp>
 
 namespace Temporality {
 
-class GameObject;
+class Entity;
 
 class TEMPORALITY_ENGINE_API Component
 {
@@ -18,20 +18,20 @@ public:
 
     virtual ~Component() = default;
 
-    virtual inline void Attach(GameObject* gameObject) {
-        _mGameObject = gameObject;
+    virtual inline void Attach(Entity* entity) {
+        _mEntity = entity;
     }
 
     virtual inline void Detach() {
-        _mGameObject = nullptr;
+        _mEntity = nullptr;
     }
 
     virtual inline bool IsAttached() const {
-        return (_mGameObject != nullptr);
+        return (_mEntity != nullptr);
     }
 
-    virtual GameObject * GetEntity() const {
-        return _mGameObject;
+    virtual Entity * GetEntity() const {
+        return _mEntity;
     }
 
     virtual inline void Update(UpdateContext * ctx) { }
@@ -40,10 +40,10 @@ public:
 
 private:
 
-    GameObject* _mGameObject = nullptr;
+    Entity* _mEntity = nullptr;
 
-} // class Component
+}; // class Component
 
-}; // namespacee Temporality
+} // namespacee Temporality
 
 #endif // TEMPORALITY_COMPONENT_HPP

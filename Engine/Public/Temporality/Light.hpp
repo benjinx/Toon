@@ -2,10 +2,12 @@
 #define LIGHT_H
 
 #include <Temporality/Config.hpp>
-#include <Temporality/GameObject.hpp>
+#include <Temporality/Scene/Entity.hpp>
 #include <Temporality/Math.hpp>
 
-class Light : public GameObject
+namespace Temporality {
+
+class Light : public Entity
 {
 public:
     Light() = default;
@@ -75,5 +77,7 @@ private:
     float _mCutOff,
           _mOuterCutOff;
 };
+
+} // namespace Temporality
 
 #endif // LIGHT_H

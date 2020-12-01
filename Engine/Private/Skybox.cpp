@@ -156,5 +156,5 @@ void Skybox::Render()
     glDepthFunc(GL_LESS);
 
     // Render the rest
-    //GameObject::Render();
+    //Entity::Render();
 }*/

@@ -1,6 +1,8 @@
 #include "Temporality/Rigidbody.hpp"
-#include "Temporality/GameObject.hpp"
+#include "Temporality/Scene/Entity.hpp"
 #include <iostream>
+
+namespace Temporality {
 
 void Rigidbody::AddForce(const glm::vec3 force)
 {
@@ -26,18 +28,18 @@ void Rigidbody::UpdateAcceleration()
     _mForce = glm::vec3(0);
 }
 
-void Rigidbody::UpdateFirstOrder(GameObject* gameObject, const float dt)
+void Rigidbody::UpdateFirstOrder(Entity* entity, const float dt)
 {
     //if (_mVelocity.x > 0.01f || _mVelocity.y > 0.01f || _mVelocity.z > 0.01f)
     //{
-        gameObject->SetPosition(gameObject->GetPosition() + (_mVelocity * dt));
+        entity->SetPosition(entity->GetPosition() + (_mVelocity * dt));
         _mVelocity += _mAcceleration * dt;
 
         UpdateAcceleration();
     //}
 
 
-    std::cout << "pos: " << gameObject->GetPosition().x << " " << gameObject->GetPosition().y << " " << gameObject->GetPosition().z << std::endl;
+    std::cout << "pos: " << entity->GetPosition().x << " " << entity->GetPosition().y << " " << entity->GetPosition().z << std::endl;
     std::cout << "dt: " << dt << std::endl;
     std::cout << "acc: " << _mAcceleration.x << " " << _mAcceleration.y << " " << _mAcceleration.z << std::endl;
     std::cout << "vel: " << _mVelocity.x << " " << _mVelocity.y << " " << _mVelocity.z << std::endl;
@@ -46,21 +48,23 @@ void Rigidbody::UpdateFirstOrder(GameObject* gameObject, const float dt)
 // clamp to ground (simple bounce): 
 //    if object goes into ground, clamp it to the ground and 
 //    use the remaining velocity for a bounce
-void Rigidbody::ClampToGround(GameObject* gameObject, const float groundHeight, const float restitution)
+void Rigidbody::ClampToGround(Entity* entity, const float groundHeight, const float restitution)
 {
-    if (gameObject->GetPosition().y < groundHeight)
+    if (entity->GetPosition().y < groundHeight)
     {
-        if (!(gameObject->GetPosition().y > 0.001f))
+        if (!(entity->GetPosition().y > 0.001f))
         {
-            glm::vec3 newPos = gameObject->GetPosition();
-            newPos.y = groundHeight + (groundHeight - gameObject->GetPosition().y);
-            gameObject->SetPosition(newPos);
+            glm::vec3 newPos = entity->GetPosition();
+            newPos.y = groundHeight + (groundHeight - entity->GetPosition().y);
+            entity->SetPosition(newPos);
             _mVelocity.y = (-_mVelocity.y) * restitution;
         }
         else
-            gameObject->SetPosition(glm::vec3(gameObject->GetPosition().x, gameObject->GetPosition().y * 0, gameObject->GetPosition().z));
+            entity->SetPosition(glm::vec3(entity->GetPosition().x, entity->GetPosition().y * 0, entity->GetPosition().z));
 
         // Rv = V - 2dot(N, v) * N
         // N is surface normal
     }
 }
+
+} // namespace Temporality

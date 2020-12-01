@@ -13,10 +13,10 @@ public:
     void Render() override;
 
 private:
-    GameObject* _mPlane;
-    GameObject* _mSphere;
-    GameObject* _mCube;
-    GameObject* _mTorus;
+    Entity* _mPlane;
+    Entity* _mSphere;
+    Entity* _mCube;
+    Entity* _mTorus;
     StaticMeshComponent* _mPlaneMesh;
     StaticMeshComponent* _mSphereMesh;
     StaticMeshComponent* _mCubeMesh;

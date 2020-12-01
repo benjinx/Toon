@@ -1,10 +1,12 @@
 #ifndef SKYBOX_HPP
 #define SKYBOX_HPP
 
-#include <Temporality/GameObject.hpp>
+#include <Temporality/Scene/Entity.hpp>
 //#include <Temporality/Shader.hpp>
 
-class Skybox : public GameObject
+namespace Temporality {
+
+class Skybox : public Entity
 {
 public:
     /*Skybox();
@@ -22,5 +24,7 @@ private:
 
     Shader* _mShader = nullptr;*/
 };
+
+} // namespace Temporality
 
 #endif // SKYBOX_HPP

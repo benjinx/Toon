@@ -6,7 +6,7 @@
 //#include <Temporality/Camera.hpp>
 //#include <Temporality/DevUI.hpp>
 //#include <Temporality/Event.hpp>
-//#include <Temporality/GameObject.hpp>
+//#include <Temporality/Scene/Entity.hpp>
 //#include <Temporality/Input.hpp>
 //#include <Temporality/Light.hpp>
 #include <Temporality/Log.hpp>

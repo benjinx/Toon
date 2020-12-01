@@ -5,7 +5,7 @@
 
 #include <Temporality/Math.hpp>
 
-class Joint //: public GameObject
+class Joint //: public Entity
 {
 public:
 	Joint() = default;
