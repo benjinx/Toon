@@ -95,12 +95,12 @@ MACRO(DEMO _target)
             ${_target}
             PROPERTIES
                 VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%\nTEMPORALITY_ASSET_PATH=${ASSET_PATH}"
+                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}\nTEMPORALITY_ASSET_PATH=${ASSET_PATH}"
         )
 
         ADD_CUSTOM_TARGET(
-            run-${_target} VERBATIM
-            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>%PATH%" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
+            run-${_target}
+            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
             DEPENDS ${_target}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
@@ -110,6 +110,16 @@ MACRO(DEMO _target)
             PROPERTIES 
                 FOLDER "Automation"
         )
+
+        # Append debug target to .vscode/launch.json if .vscode/ exists
+        IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode AND Python3_Interpreter_FOUND)
+            SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
+            ADD_CUSTOM_COMMAND(
+                TARGET ${_target} POST_BUILD
+                BYPRODUCTS ${_launch_json}
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} ($<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}"
+            )
+        ENDIF()
     ELSE()
 
         STRING(JOIN ":" LD_LIBRARY_PATH ${RUNTIME_SEARCH_PATH})
@@ -155,6 +165,15 @@ MACRO(DEMO _target)
                 valgrind-${_target}
                 PROPERTIES
                     FOLDER "Automation"
+            )
+        ENDIF()
+
+        IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode)
+            SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
+            ADD_CUSTOM_COMMAND(
+                TARGET ${_target} POST_BUILD
+                BYPRODUCTS ${_launch_json}
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} ${_target} $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}"
             )
         ENDIF()
     ENDIF()
