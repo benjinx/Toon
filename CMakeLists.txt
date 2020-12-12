@@ -163,3 +163,40 @@ SET(CMAKE_MSVCIDE_RUN_PATH ${RUNTIME_SEARCH_PATH})
 IF(BUILD_DEMOS)
     ADD_SUBDIRECTORY(Demos)
 ENDIF()
+
+###
+### Docker
+###
+
+FIND_PROGRAM(docker_COMMAND docker)
+
+IF(docker_COMMAND)
+    ADD_CUSTOM_TARGET(
+        build-docker-images
+        COMMAND ${docker_COMMAND} build --target builder-minimal -t whobrokethebuild/temporality:builder-minimal .
+        COMMAND ${docker_COMMAND} build --target builder -t whobrokethebuild/temporality:builder .
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
+    ADD_CUSTOM_TARGET(
+        push-docker-images
+        COMMAND ${docker_COMMAND} push whobrokethebuild/temporality:builder-minimal
+        COMMAND ${docker_COMMAND} push whobrokethebuild/temporality:builder
+        DEPENDS build-docker-images
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+ENDIF()
+
+###
+### CI
+###
+
+FIND_PROGRAM(circleci_COMMAND circleci)
+
+IF(circleci_COMMAND)
+    ADD_CUSTOM_TARGET(
+        test-circleci
+        COMMAND ${circleci_COMMAND} local execute --job "Clang, Release, System"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+ENDIF()

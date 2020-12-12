@@ -1,0 +1,59 @@
+version: 2.1
+
+jobs:
+  build:
+    parameters:
+      compiler:
+        type: string
+        default: "clang"
+      image:
+        type: string
+        default: "whobrokethebuild/temporality:builder"
+      build-type:
+        type: string
+        default: Release
+    environment:
+      CMAKE_BUILD_TYPE: << parameters.build-type >>
+    docker:
+      - image: << parameters.image >>
+    resource_class: small
+    steps:
+      - checkout
+      - run: |
+          if [ "<< parameters.compiler >>" = "clang" ]; then
+            export CC="clang"
+            export CXX="clang++"
+          elif [ "<< parameters.compiler >>" = "gcc" ]; then
+            export CC="gcc-8"
+            export CXX="g++-8"
+          fi
+          env
+          echo "Docker Image: << parameters.image >>"
+          cmake --version
+          mkdir Build && cd Build
+          cmake \
+            -DVERBOSE_LOGGING=ON \
+            -DBUILD_DEMOS=ON \
+            -DBUILD_TESTS=ON \
+            -G"Unix Makefiles" \
+            ..
+          make -l all test
+
+workflows:
+  all:
+    jobs:
+      - build:
+          name: "Clang, Release, System"
+          compiler: "clang"
+          image: "whobrokethebuild/temporality:builder"
+          build-type: "Release"
+      - build:
+          name: "Clang, Debug, ThirdParty"
+          compiler: "clang"
+          image: "whobrokethebuild/temporality:builder-minimal"
+          build-type: "Debug"
+      - build:
+          name: "GCC, Release, System"
+          compiler: "gcc"
+          image: "whobrokethebuild/temporality:builder"
+          build-type: "Release"
