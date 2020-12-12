@@ -2,17 +2,14 @@
 version: "{build}"
 
 os:
-  - Visual Studio 2017
+  - Visual Studio 2019
 
 platform:
-  - Win32
   - x64
 
 configuration:
   - Debug
   - Release
-
-clone_depth: 5
 
 init:
   - cmd: cmake --version
@@ -20,24 +17,17 @@ init:
 
 clone_folder: C:\projects\Temporality
 
-install:
-  - cmd: git submodule update --init --recursive
-
 before_build:
-  - cmd: cd C:\projects\Temporality
-  - cmd: cd build
-  - cmd: if "%PLATFORM%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 15 2017
-  - cmd: if "%PLATFORM%"=="x64"   set CMAKE_GENERATOR_NAME=Visual Studio 15 2017 Win64
-  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" ..
+  - ps: cmake --version
+  - ps: Get-ChildItem "env:"
 
-build:
-  project: C:\projects\Temporality\build\Temporality.sln # path to Visual Studio solution or project
-  verbosity: detailed                         # MSBuild verbosity level (quiet|minimal|normal|detailed)
+build_script:
+  - cmd: cd C:\projects\Temporality
+  - cmd: mkdir Build
+  - cmd: cd Build
+  # TODO -DBUILD_TESTS=ON
+  - cmd: cmake -G "Visual Studio 16 2019" -A x64 ..
+  - cmd: cmake --build .
+  # - cmd: cmake --build . --target RUN_TESTS
 
 test: off
-
-notifications:
-  - provider: Slack
-    auth_token:
-      secure: /2GDNF1IqKlMCtvtt806+FSaX9OCY+VPP0WBNO6tB9avaObTRLFJat14OWkF6IdXrgSRB2eYgSTwgDkdOqFb1Hf+LD9qqzwBgqToOOM2u6E=
-    channel: '#builds'
