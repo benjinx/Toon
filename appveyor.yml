@@ -18,7 +18,7 @@ init:
 clone_folder: C:\projects\Temporality
 
 before_build:
-  - ps: . C:\projects\Dusk\Scripts\ci-install-vulkan.ps1
+  - ps: . C:\projects\Temporality\Scripts\ci-install-vulkan.ps1
   - ps: cmake --version
   - ps: Get-ChildItem "env:"
 
