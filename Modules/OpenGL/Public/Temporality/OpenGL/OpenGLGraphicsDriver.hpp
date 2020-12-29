@@ -2,13 +2,13 @@
 #define TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 
 #include <Temporality/OpenGL/OpenGLConfig.hpp>
-#include <Temporality/Graphics/GraphicsDriver.hpp>
+#include <Temporality/SDL2/SDL2GraphicsDriver.hpp>
 
 #include <SDL.h>
 
 namespace Temporality::OpenGL {
 
-class TEMPORALITY_OPENGL_API OpenGLGraphicsDriver : public GraphicsDriver
+class TEMPORALITY_OPENGL_API OpenGLGraphicsDriver : public SDL2::SDL2GraphicsDriver
 {
 public:
 
@@ -18,15 +18,9 @@ public:
 
     virtual ~OpenGLGraphicsDriver();
 
-    void SetWindowTitle(const std::string& title) override;
+    bool Initialize() override;
 
-    std::string GetWindowTitle() override;
-
-    void SetWindowSize(const glm::ivec2& size) override;
-
-    glm::ivec2 GetWindowSize() override;
-
-    void ProcessEvents() override;
+    void Terminate() override;
 
     void SwapBuffers() override;
 
@@ -37,7 +31,7 @@ public:
     std::shared_ptr<Mesh> CreateMesh() override;
 
 private:
-    SDL_Window* _mWindow = nullptr;
+    void InitDebugMessageCallback();
 
     SDL_GLContext _mGLContext;
 }; // class OpenGLGraphicsDriver

@@ -9,6 +9,4 @@
     #define TEMPORALITY_TINYOBJ_API TEMPORALITY_API_IMPORT
 #endif
 
-#include <Temporality/Macros.hpp>
-
 #endif // TEMPORALITY_TINYOBJ_CONFIG_HPP

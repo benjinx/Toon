@@ -60,10 +60,36 @@
 
 #endif
 
-#if defined(TEMPORALITY_OS_WINDOWS)
+#if defined(NDEBUG)
+
+    #define TEMPORALITY_BUILD_RELEASE
+
+#else
+
+    #define TEMPORALITY_BUILD_DEBUG
+
+#endif
+
+#if defined(TEMPORALITY_PLATFORM_WINDOWS)
 
     #define TEMPORALITY_PATH_SLASH '\\'
     #define TEMPORALITY_PATH_SEPARATOR ';'
+
+    // Disable min/max defines
+    #define NOMINMAX
+
+    // Disable python defines for snprintf/vsnprintf
+    #define HAVE_SNPRINTF
+
+    // Disable extra includes from Windows.h
+    #define VC_EXTRALEAN
+
+    #include <Windows.h>
+
+    #undef FreeModule
+    #undef CreateWindow
+    
+    #undef OPAQUE
 
 #else
 

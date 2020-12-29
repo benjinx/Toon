@@ -9,6 +9,4 @@
     #define TEMPORALITY_STBI_API TEMPORALITY_API_IMPORT
 #endif
 
-#include <Temporality/Macros.hpp>
-
 #endif // TEMPORALITY_STBI_CONFIG_HPP

@@ -9,8 +9,6 @@
     #define TEMPORALITY_OPENGL_API TEMPORALITY_API_IMPORT
 #endif
 
-#include <Temporality/Macros.hpp>
-
 #include <glad/gl.h>
 #undef near
 #undef far
