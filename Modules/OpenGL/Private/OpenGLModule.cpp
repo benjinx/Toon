@@ -3,8 +3,14 @@
 
 namespace Temporality::OpenGL {
 
-void ModuleInit() {
+bool ModuleInit() {
     SetGraphicsDriver(std::unique_ptr<GraphicsDriver>(new OpenGLGraphicsDriver()));
+    if (!GetGraphicsDriver()->Initialize()) {
+        SetGraphicsDriver(nullptr);
+        return false;
+    }
+
+    return true;
 }
 
 void ModuleTerm() {

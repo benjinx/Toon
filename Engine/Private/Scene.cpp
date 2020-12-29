@@ -68,36 +68,6 @@ bool Scene::LoadScene(std::string filename)
     return true;
 }
 
-Entity* Scene::AddEntity(std::string name, std::unique_ptr<Entity> entity)
-{
-    _mChildren.push_back(std::move(entity));
-    _mChildren.back()->SetName(name);
-    _mChildren.back()->SetParent(this);
-    return _mChildren.back().get();
-}
-
-Entity* Scene::AddEntity()
-{
-    _mChildren.push_back(std::make_unique<Entity>());
-    _mChildren.back()->SetParent(this);
-    return _mChildren.back().get();
-}
-
-Entity* Scene::AddEntity(std::string name)
-{
-    _mChildren.push_back(std::make_unique<Entity>());
-    _mChildren.back()->SetName(name);
-    _mChildren.back()->SetParent(this);
-    return _mChildren.back().get();
-}
-
-Entity* Scene::AddEntity(std::unique_ptr<Entity> entity)
-{
-    _mChildren.push_back(std::move(entity));
-    _mChildren.back()->SetParent(this);
-    return _mChildren.back().get();
-}
-
 void Scene::CreateSkybox(std::vector<std::string> faces)
 {
     _mSkybox = std::make_unique<Skybox>();

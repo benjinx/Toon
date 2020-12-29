@@ -69,18 +69,13 @@ MACRO(DEMO _target)
     TARGET_COMPILE_OPTIONS(
         ${_target}
         PUBLIC
+            # Configure VS to use C++20
+            $<$<CXX_COMPILER_ID:MSVC>: /std:c++latest>
+
             # Disable unknown pragmas warning, C++ exceptions
             $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
             $<$<CXX_COMPILER_ID:Clang>: -Wall -Wno-unknown-pragmas -fno-exceptions>
             $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc- /GR->
-    )
-
-    SET_TARGET_PROPERTIES(
-        ${_target}
-        PROPERTIES
-            CXX_STANDARD 17
-            CXX_STANDARD_REQUIRED ON
-            CXX_EXTENSIONS OFF
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")

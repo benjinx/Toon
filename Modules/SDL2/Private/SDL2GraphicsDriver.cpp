@@ -15,16 +15,12 @@ bool SDL2GraphicsDriver::Initialize()
 
     LogInfo("Creating SDL2 Window.");
 
-    
+    return true;
 }
 
 TEMPORALITY_SDL2_API
 void SDL2GraphicsDriver::Terminate()
 {
-    if (_mGLContext) {
-        SDL_GL_DeleteContext(_mGLContext);
-        _mGLContext = nullptr;
-    }
     if (_mWindow) {
         SDL_DestroyWindow(_mWindow);
         _mWindow = nullptr;
@@ -55,20 +51,6 @@ bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
         return false;
     }
 
-    LogLoad("SDL2 Window created successfully.");
-
-    LogInfo("Creating SDL2 GL Context.");
-
-    _mGLContext = SDL_GL_CreateContext(_mWindow);
-
-    if (!_mGLContext)
-    {
-        LogError("Failed to create SDL2 GL Context. %s", SDL_GetError());
-        return false;
-    }
-
-    LogLoad("SDL2 GL Context created successfully.\n");
-
     // Makes an icon
     Uint16 pixels[16 * 16] = { 0xFFFF };
     SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, 16, 16, 16, 16 * 2,
@@ -95,7 +77,6 @@ TEMPORALITY_SDL2_API
 void SDL2GraphicsDriver::SetWindowSize(const glm::ivec2& size)
 {
     SDL_SetWindowSize(_mWindow, size.x, size.y);
-    glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 }
 
 TEMPORALITY_SDL2_API

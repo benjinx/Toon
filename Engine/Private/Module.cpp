@@ -1,77 +1,145 @@
 #include <Temporality/Module.hpp>
+#include <Temporality/Log.hpp>
 
-#if defined(TEMPORALITY_OS_WINDOWS)
-    #include <Windows.h>
+#if defined(TEMPORALITY_PLATFORM_WINDOWS)
     typedef HMODULE ModuleHandle;
 #else
     #include <dlfcn.h>
     typedef void * ModuleHandle;
 #endif
 
-#include <vector>
+#include <unordered_map>
 
 namespace Temporality {
 
-std::vector<ModuleHandle> _gModules;
+std::unordered_map<std::string, ModuleHandle> _gModules;
+
+ModuleHandle _dlopen(const std::string& filename)
+{
+    ModuleHandle handle = nullptr;
+
+    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+
+        LogVerbose("Loading Module from PATH: '%s'", getenv("PATH"));
+
+        handle = LoadLibraryA(filename.c_str());
+        if (!handle) {
+            //WindowsErrorMessage msg(HRESULT_FROM_WIN32(GetLastError()));
+            //LogError("Failed to load '%s', %s", filename, msg);
+            return nullptr;
+        }
+        
+    #else
+
+        LogVerbose("Loading Module from LD_LIBRARY_PATH: '%s'", getenv("LD_LIBRARY_PATH"));
+
+        #if defined(TEMPORALITY_PLATFORM_APPLE)
+
+            std::string libFilename = "lib" + filename + ".dylib";
+
+        #else
+
+            std::string libFilename = "lib" + filename + ".so";
+
+        #endif
+
+        handle = dlopen(libFilename.c_str(), RTLD_GLOBAL | RTLD_NOW);
+        if (!handle) {
+            LogError("Failed to load '%s', %s", libFilename, dlerror());
+            return nullptr;
+        }
+
+    #endif
+
+    return handle;
+}
+
+void * _dlsym(ModuleHandle handle, const std::string& symbol)
+{
+    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+
+        return GetProcAddress(handle, symbol.c_str());
+
+    #else
+
+        return dlsym(handle, symbol.c_str());
+
+    #endif
+}
+
+void _dlclose(ModuleHandle handle)
+{
+    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+
+        FreeLibrary(handle);
+
+    #else
+
+        dlclose(handle);
+
+    #endif
+}
 
 bool LoadModule(const std::string& name)
 {
-    ModuleHandle module = nullptr;
-    
-    #if defined(TEMPORALITY_OS_WINDOWS)
-        module = LoadLibraryA(name.c_str());
-        if (!module) {
-            fprintf(stderr, "Failed to load module. %s\n", name.c_str());
-            return false;
-        }
+    LogLoad("Loading module '%s'", name);
 
-        TemporalityModule * def = (TemporalityModule *)GetProcAddress(module, "_TemporalityModule");
-
-    #else
-        std::string filename = "lib" + name + ".so";
-        module = dlopen(filename.c_str(), RTLD_GLOBAL | RTLD_NOW);
-        if (!module) {
-            fprintf(stderr, "Failed to load module. %s : %s\n", filename.c_str(), dlerror());
-            return false;
-        }
-
-        TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
-    #endif
-
-    if (!def) {
-        fprintf(stderr, "Failed to find _TemporalityModule.\n");
+    ModuleHandle handle = _dlopen(name);
+    if (!handle) {
         return false;
     }
 
-    _gModules.push_back(module);
+    TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
+
+    if (!def) {
+        LogError("Failed to find _Module symbol");
+        return false;
+    }
 
     if (def->Initialize) {
-        def->Initialize();
+        if (!def->Initialize()) {
+            _dlclose(handle);
+
+            LogError("Failed to initialize module '%s'", name);
+            return false;
+        }
     }
+
+    _gModules.emplace(name, handle);
 
     return true;
 }
 
-void FreeModules()
+void FreeModule(const std::string& name)
 {
+    auto it = _gModules.find(name);
+    if (it == _gModules.end()) {
+        LogWarn("Failed to free module '%s', module is not loaded", name);
+        return;
+    }
 
-    for (auto module : _gModules) {
+    ModuleHandle handle = it->second;
+    TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
 
-        #if defined(TEMPORALITY_OS_WINDOWS)
-            TemporalityModule * def = (TemporalityModule *)GetProcAddress(module, "_TemporalityModule");
-        #else
-            TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
-        #endif
+    if (def && def->Terminate) {
+        def->Terminate();
+    }
 
+    _dlclose(handle);
+
+    _gModules.erase(it);
+}
+
+void FreeAllModules()
+{
+    for (const auto& it : _gModules) {
+        ModuleHandle handle = it.second;
+        TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
         if (def && def->Terminate) {
             def->Terminate();
         }
 
-        #if defined(TEMPORALITY_OS_WINDOWS)
-            FreeLibrary(module);
-        #else
-            dlclose(module);
-        #endif
+        _dlclose(handle);
     }
 
     _gModules.clear();

@@ -39,7 +39,11 @@ bool OpenGLGraphicsDriver::Initialize()
         return false;
     }
 
-    _mGLContext = SDL_GL_CreateContext(_mWindow);
+    LogInfo("SDL2 Window Created Successfully.");
+
+    LogInfo("Creating SDL2 GL Context.");
+
+    _mGLContext = SDL_GL_CreateContext(GetSDL2Window());
 
     if (!_mGLContext)
     {
@@ -102,6 +106,8 @@ bool OpenGLGraphicsDriver::Initialize()
     
     glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &value);
     LogVerbose("Max Uniform Block Size: %d", value);
+
+    return true;
 }
 
 TEMPORALITY_OPENGL_API
@@ -111,18 +117,14 @@ void OpenGLGraphicsDriver::Terminate()
         SDL_GL_DeleteContext(_mGLContext);
         _mGLContext = nullptr;
     }
-    if (_mWindow) {
-        SDL_DestroyWindow(_mWindow);
-        _mWindow = nullptr;
-    }
 
-    SDL_Quit();
+    SDL2GraphicsDriver::Terminate();
 }
 
 TEMPORALITY_OPENGL_API
 void OpenGLGraphicsDriver::SwapBuffers()
 {
-    SDL_GL_SwapWindow(_mWindow);
+    SDL_GL_SwapWindow(GetSDL2Window());
 }
 
 TEMPORALITY_OPENGL_API

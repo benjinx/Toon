@@ -4,29 +4,29 @@
 #if defined(_WIN32)
 
     // Windows
-    #define TEMPORALITY_OS_WINDOWS
+    #define TEMPORALITY_PLATFORM_WINDOWS
 
 #elif defined(__APPLE__) && defined(__MACH__)
 
     // Apple
     #include "TargetConditionals.h"
 
-    #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+    #if TARGET_PLATFORM_IPHONE || TARGET_IPHONE_SIMULATOR
         // iPhone iOS
-        #define TEMPORALITY_OS_IOS
-    #elif TARGET_OS_MAC
+        #define TEMPORALITY_PLATFORM_IOS
+    #elif TARGET_PLATFORM_MAC
         // Mac OSX
-        #define TEMPORALITY_OS_OSX
+        #define TEMPORALITY_PLATFORM_OSX
     #endif
 
 #elif defined(__unix__)
 
     #if defined(__ANDROID__)
         // Android
-        #define TEMPORALITY_OS_ANDROID
+        #define TEMPORALITY_PLATFORM_ANDROID
     #elif defined(__linux__)
         // Linux
-        #define TEMPORALITY_OS_LINUX
+        #define TEMPORALITY_PLATFORM_LINUX
     #else
         #error Unsupported UNIX Operating System
     #endif

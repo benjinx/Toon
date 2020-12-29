@@ -79,8 +79,8 @@ MACRO(MODULE _target _prefix)
     TARGET_COMPILE_OPTIONS(
         ${_target}
         PUBLIC
-            # Configure VS to use C++17
-            $<$<CXX_COMPILER_ID:MSVC>: /std:c++17>
+            # Configure VS to use C++20
+            $<$<CXX_COMPILER_ID:MSVC>: /std:c++latest>
 
             # Disable unknown pragmas warning, C++ exceptions
             $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
@@ -91,9 +91,6 @@ MACRO(MODULE _target _prefix)
     SET_TARGET_PROPERTIES(
         ${_target}
         PROPERTIES
-            CXX_STANDARD 17
-            CXX_STANDARD_REQUIRED ON
-            CXX_EXTENSIONS OFF
             DEFINE_SYMBOL "TEMPORALITY_${_prefix}_EXPORT"
     )
 

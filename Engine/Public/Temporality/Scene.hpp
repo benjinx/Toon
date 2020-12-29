@@ -32,11 +32,6 @@ public:
     // Ui Options.
     static void Options();
 
-    Entity* AddEntity(std::string name, std::unique_ptr<Entity> entity);
-    Entity* AddEntity();
-    Entity* AddEntity(std::string name);
-    Entity* AddEntity(std::unique_ptr<Entity> entity);
-
     void CreateSkybox(std::vector<std::string> faces);
     Skybox* GetSkybox() { return _mSkybox.get(); }
 

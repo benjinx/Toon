@@ -5,9 +5,11 @@
 
 namespace Temporality::STBI {
 
-void ModuleInit() {
+bool ModuleInit() {
     AddTextureImporter("STBI", std::unique_ptr<TextureImporter>(new STBITextureImporter()));
     LogInfo("Init");
+
+    return true;
 }
 
 void ModuleTerm() {

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <functional>
 
 namespace Temporality::OpenGL {
 

@@ -93,14 +93,12 @@ public:
     // Visibility
     void SetVisibility(bool value) { _mVisibility = value; }
     bool GetVisibility() { return _mVisibility; }
-
-
-protected:
+    
+private:
 
     // Children
     std::vector<std::unique_ptr<Entity>> _mChildren;
     
-private:
     // Object name
     std::string _mName;
 

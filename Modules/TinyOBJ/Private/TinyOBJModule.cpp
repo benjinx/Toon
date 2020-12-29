@@ -3,8 +3,10 @@
 
 namespace Temporality::TinyOBJ {
 
-void ModuleInit() {
+bool ModuleInit() {
     AddMeshImporter("TinyOBJ", std::make_unique<TinyOBJMeshImporter>());
+    
+    return true;
 }
 
 void ModuleTerm() {

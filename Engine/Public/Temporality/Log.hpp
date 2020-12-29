@@ -1,6 +1,7 @@
 #ifndef TEMPORALITY_LOG_HPP
 #define TEMPORALITY_LOG_HPP
 
+#include <Temporality/Platform.hpp>
 #include <Temporality/Utils.hpp>
 
 #include <cstdio> // for printf, vsnprintf
@@ -84,7 +85,8 @@ static inline void Log(LogLevel level, const char* format, Args... args)
 
         SetConsoleTextAttribute(hConsole, color);
 
-    #else 
+    #else
+    
         static bool isTTY = isatty(fileno(stdout));
 
         const char * Default = 0;39;

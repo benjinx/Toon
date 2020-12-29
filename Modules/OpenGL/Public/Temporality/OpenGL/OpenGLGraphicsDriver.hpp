@@ -14,9 +14,9 @@ public:
 
     DISALLOW_COPY_AND_ASSIGN(OpenGLGraphicsDriver)
 
-    OpenGLGraphicsDriver();
+    OpenGLGraphicsDriver() = default;
 
-    virtual ~OpenGLGraphicsDriver();
+    virtual ~OpenGLGraphicsDriver() = default;
 
     bool Initialize() override;
 
