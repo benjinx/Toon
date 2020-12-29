@@ -1,14 +1,14 @@
 #ifndef TEMPORALITY_TINYOBJ_MESH_IMPORTER_HPP
 #define TEMPORALITY_TINYOBJ_MESH_IMPORTER_HPP
 
-#include <Temporality/TinyOBJ/Config.hpp>
+#include <Temporality/TinyOBJ/TinyOBJConfig.hpp>
 #include <Temporality/Graphics/MeshImporter.hpp>
 
 #include <vector>
 
 namespace Temporality::TinyOBJ {
 
-class TEMPORALITY_TINYOBJ_API MeshData : public Temporality::MeshData
+class TEMPORALITY_TINYOBJ_API TinyOBJMeshData : public MeshData
 {
 public:
 
@@ -62,15 +62,15 @@ public:
         return gsl::span<float>();
     }
 
-}; // class MeshData
+}; // class TinyOBJMeshData
 
-class TEMPORALITY_TINYOBJ_API MeshImporter : public Temporality::MeshImporter
+class TEMPORALITY_TINYOBJ_API TinyOBJMeshImporter : public MeshImporter
 {
 public:
 
-    std::vector<std::unique_ptr<Temporality::MeshData>> LoadFromFile(const std::string& filename) override;
+    std::vector<std::unique_ptr<MeshData>> LoadFromFile(const std::string& filename) override;
     
-}; // class MeshImporter
+}; // class TinyOBJMeshImporter
 
 } // namespace Temporality::TinyOBJ
 

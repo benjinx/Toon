@@ -1,11 +1,11 @@
-#include <Temporality/OpenGL/Mesh.hpp>
+#include <Temporality/OpenGL/OpenGLMesh.hpp>
 
 #include <Temporality/Log.hpp>
 
 namespace Temporality::OpenGL {
 
 TEMPORALITY_OPENGL_API
-void Mesh::Render()
+void OpenGLMesh::Render()
 {
     glBindVertexArray(_mglVAO);
 
@@ -20,7 +20,7 @@ void Mesh::Render()
 }
 
 TEMPORALITY_OPENGL_API
-bool Mesh::Load(const MeshData* data)
+bool OpenGLMesh::Load(const MeshData* data)
 {
     BenchmarkStart();
 
@@ -127,7 +127,7 @@ bool Mesh::Load(const MeshData* data)
 }
 
 TEMPORALITY_OPENGL_API
-GLenum Mesh::GetGLMode(const MeshData::Mode& mode)
+GLenum OpenGLMesh::GetGLMode(const MeshData::Mode& mode)
 {
     switch (mode) {
     case MeshData::Mode::Points:

@@ -1,20 +1,20 @@
 #ifndef TEMPORALITY_OPENGL_TEXTURE_HPP
 #define TEMPORALITY_OPENGL_TEXTURE_HPP
 
-#include <Temporality/OpenGL/Config.hpp>
+#include <Temporality/OpenGL/OpenGLConfig.hpp>
 #include <Temporality/Graphics/Texture.hpp>
 
 namespace Temporality::OpenGL {
 
-class TEMPORALITY_OPENGL_API Texture : public Temporality::Texture
+class TEMPORALITY_OPENGL_API OpenGLTexture : public Texture
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(Texture)
+    DISALLOW_COPY_AND_ASSIGN(OpenGLTexture)
 
-    Texture() = default;
+    OpenGLTexture() = default;
 
-    virtual ~Texture();
+    virtual ~OpenGLTexture();
 
     bool Load(const TextureData * data) override;
 
@@ -23,7 +23,8 @@ public:
 private:
     GLuint _mGLid = 0;
     
-};
+}; // class OpenGLTexture
 
-}
+} // namespace Temporality::OpenGL
+
 #endif // TEMPORALITY_OPENGL_TEXTURE_HPP

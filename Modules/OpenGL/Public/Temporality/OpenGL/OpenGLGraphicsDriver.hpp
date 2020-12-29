@@ -1,22 +1,22 @@
 #ifndef TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 #define TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP
 
-#include <Temporality/OpenGL/Config.hpp>
+#include <Temporality/OpenGL/OpenGLConfig.hpp>
 #include <Temporality/Graphics/GraphicsDriver.hpp>
 
 #include <SDL.h>
 
 namespace Temporality::OpenGL {
 
-class TEMPORALITY_OPENGL_API GraphicsDriver : public Temporality::GraphicsDriver
+class TEMPORALITY_OPENGL_API OpenGLGraphicsDriver : public GraphicsDriver
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(GraphicsDriver)
+    DISALLOW_COPY_AND_ASSIGN(OpenGLGraphicsDriver)
 
-    GraphicsDriver();
+    OpenGLGraphicsDriver();
 
-    virtual ~GraphicsDriver();
+    virtual ~OpenGLGraphicsDriver();
 
     void SetWindowTitle(const std::string& title) override;
 
@@ -40,8 +40,8 @@ private:
     SDL_Window* _mWindow = nullptr;
 
     SDL_GLContext _mGLContext;
-};
+}; // class OpenGLGraphicsDriver
 
-}
+} // namespace Temporality::OpenGL
 
 #endif // TEMPORALITY_OPENGL_GRAPHICS_DRIVER_HPP

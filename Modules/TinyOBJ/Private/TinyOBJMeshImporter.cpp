@@ -1,4 +1,4 @@
-#include <Temporality/TinyOBJ/MeshImporter.hpp>
+#include <Temporality/TinyOBJ/TinyOBJMeshImporter.hpp>
 #include <Temporality/Log.hpp>
 #include <Temporality/Utils.hpp>
 
@@ -8,13 +8,13 @@
 namespace Temporality::TinyOBJ {
 
 TEMPORALITY_TINYOBJ_API
-std::vector<std::unique_ptr<Temporality::MeshData>> MeshImporter::LoadFromFile(const std::string& filename)
+std::vector<std::unique_ptr<MeshData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
 
     //const std::string& dir = GetDirname(filename);
     
-    std::vector<std::unique_ptr<Temporality::MeshData>> meshes;
+    std::vector<std::unique_ptr<MeshData>> meshes;
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -56,7 +56,7 @@ std::vector<std::unique_ptr<Temporality::MeshData>> MeshImporter::LoadFromFile(c
     bool hasColors = (!attrib.colors.empty());
 
     for (auto& shape : shapes) {
-        auto mesh = std::make_unique<MeshData>();
+        auto mesh = std::make_unique<TinyOBJMeshData>();
 
         mesh->Vertices.reserve(shape.mesh.indices.size());
 

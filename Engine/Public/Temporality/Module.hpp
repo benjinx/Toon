@@ -9,8 +9,8 @@ namespace Temporality {
 
 struct TEMPORALITY_ENGINE_API TemporalityModule {
     const char * Name;
-    void (*Init)();
-    void (*Term)();
+    void (*Initialize)();
+    void (*Terminate)();
 };
 
 TEMPORALITY_ENGINE_API
@@ -19,7 +19,7 @@ bool LoadModule(const std::string& name);
 TEMPORALITY_ENGINE_API
 void FreeModules();
 
-#define TEMPORALITY_MODULE() \
+#define TEMPORALITY_MODULE \
     extern "C" TEMPORALITY_API_EXPORT struct TemporalityModule _TemporalityModule =
 
 }

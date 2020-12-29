@@ -1,4 +1,4 @@
-#include <Temporality/OpenGL/Shader.hpp>
+#include <Temporality/OpenGL/OpenGLShader.hpp>
 #include <Temporality/Log.hpp>
 #include <Temporality/Utils.hpp>
 
@@ -9,7 +9,7 @@
 namespace Temporality::OpenGL {
 
 TEMPORALITY_OPENGL_API
-bool Shader::LoadFromFiles(const std::vector<std::string>& filenames)
+bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
 {
     BenchmarkStart();
 
@@ -104,19 +104,19 @@ bool Shader::LoadFromFiles(const std::vector<std::string>& filenames)
 }
 
 TEMPORALITY_OPENGL_API
-void Shader::Bind()
+void OpenGLShader::Bind()
 {
     glUseProgram(_mglID);
 }
 
 TEMPORALITY_OPENGL_API
-GLuint Shader::GetID()
+GLuint OpenGLShader::GetID()
 {
     return _mglID;
 }
 
 TEMPORALITY_OPENGL_API
-GLuint Shader::LoadSPV(const std::string& filename)
+GLuint OpenGLShader::LoadSPV(const std::string& filename)
 {
     LogVerbose("Looking for SPIR-V shader '%s'", filename);
 
@@ -163,7 +163,7 @@ GLuint Shader::LoadSPV(const std::string& filename)
 }
 
 TEMPORALITY_OPENGL_API
-GLuint Shader::LoadGLSL(const std::string& filename)
+GLuint OpenGLShader::LoadGLSL(const std::string& filename)
 {
     LogVerbose("Looking for GLSL shader '%s'", filename);
 
@@ -263,7 +263,7 @@ GLuint Shader::LoadGLSL(const std::string& filename)
 }
 
 TEMPORALITY_OPENGL_API
-GLenum Shader::GetGLShaderType(const std::string& filename)
+GLenum OpenGLShader::GetGLShaderType(const std::string& filename)
 {
     std::string ext = GetExtension(filename);
     if (ext == "spv" || ext == "glsl") {

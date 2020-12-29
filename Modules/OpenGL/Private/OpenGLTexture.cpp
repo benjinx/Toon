@@ -1,16 +1,16 @@
-#include <Temporality/OpenGL/Texture.hpp>
+#include <Temporality/OpenGL/OpenGLTexture.hpp>
 #include <Temporality/Log.hpp>
 
 namespace Temporality::OpenGL {
 
 TEMPORALITY_OPENGL_API
-Texture::~Texture()
+OpenGLTexture::~OpenGLTexture()
 {
     glDeleteTextures(1, &_mGLid);
 }
 
 TEMPORALITY_OPENGL_API
-bool Texture::Load(const TextureData * data)
+bool OpenGLTexture::Load(const TextureData * data)
 {
     if (_mGLid)
     {
@@ -51,9 +51,9 @@ bool Texture::Load(const TextureData * data)
 }
 
 TEMPORALITY_OPENGL_API
-void Texture::Bind()
+void OpenGLTexture::Bind()
 {
     glBindTexture(GL_TEXTURE_2D, _mGLid);
 }
 
-}
+} // namespace Temporality::OpenGL

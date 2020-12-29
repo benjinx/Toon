@@ -1,17 +1,17 @@
 #ifndef TEMPORALITY_OPENGL_SHADER_HPP
 #define TEMPORALITY_OPENGL_SHADER_HPP
 
-#include <Temporality/OpenGL/Config.hpp>
+#include <Temporality/OpenGL/OpenGLConfig.hpp>
 #include <Temporality/Graphics/Shader.hpp>
 
 namespace Temporality::OpenGL {
 
-class TEMPORALITY_OPENGL_API Shader : public Temporality::Shader 
+class TEMPORALITY_OPENGL_API OpenGLShader : public Shader 
 {
 public:
-    DISALLOW_COPY_AND_ASSIGN(Shader)
+    DISALLOW_COPY_AND_ASSIGN(OpenGLShader)
 
-    Shader() = default;
+    OpenGLShader() = default;
 
     bool LoadFromFiles(const std::vector<std::string>& filenames) override;
 
@@ -28,7 +28,8 @@ private:
 
     GLuint _mglID = 0;
 
-}; // class Shader
+}; // class OpenGLShader
 
 } // namespace Temporality::OpenGL
+
 #endif // TEMPORALITY_OPENGL_SHADER_HPP

@@ -1,17 +1,17 @@
 #ifndef TEMPORALITY_OPENGL_MESH_HPP
 #define TEMPORALITY_OPENGL_MESH_HPP
 
-#include <Temporality/OpenGL/Config.hpp>
+#include <Temporality/OpenGL/OpenGLConfig.hpp>
 #include <Temporality/Graphics/Mesh.hpp>
 
 namespace Temporality::OpenGL {
 
-class TEMPORALITY_OPENGL_API Mesh : public Temporality::Mesh
+class TEMPORALITY_OPENGL_API OpenGLMesh : public Mesh
 {
 public:
-    DISALLOW_COPY_AND_ASSIGN(Mesh)
+    DISALLOW_COPY_AND_ASSIGN(OpenGLMesh)
 
-    Mesh() = default;
+    OpenGLMesh() = default;
 
     void Render() override;
 
@@ -26,7 +26,7 @@ private:
     GLsizei _mglCount;
 
     bool _mIndexed;
-}; // class Mesh
+}; // class OpenGLMesh
 
 } // namespace Temporality::OpenGL
 

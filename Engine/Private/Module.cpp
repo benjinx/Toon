@@ -45,8 +45,8 @@ bool LoadModule(const std::string& name)
 
     _gModules.push_back(module);
 
-    if (def->Init) {
-        def->Init();
+    if (def->Initialize) {
+        def->Initialize();
     }
 
     return true;
@@ -63,8 +63,8 @@ void FreeModules()
             TemporalityModule * def = (TemporalityModule *)dlsym(module, "_TemporalityModule");
         #endif
 
-        if (def && def->Term) {
-            def->Term();
+        if (def && def->Terminate) {
+            def->Terminate();
         }
 
         #if defined(TEMPORALITY_OS_WINDOWS)

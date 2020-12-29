@@ -1,4 +1,4 @@
-#include <Temporality/STBI/TextureImporter.hpp>
+#include <Temporality/STBI/STBITextureImporter.hpp>
 #include <Temporality/Log.hpp>
 
 #define STB_NO_HDR
@@ -11,13 +11,13 @@
 namespace Temporality::STBI {
 
 TEMPORALITY_STBI_API
-TextureData::~TextureData()
+STBITextureData::~STBITextureData()
 {
     stbi_image_free(Data);
 }
 
 TEMPORALITY_STBI_API
-std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromFile(const std::string& filename)
+std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
     glm::ivec2 size;
@@ -39,7 +39,7 @@ std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromFile(const st
         return nullptr;
     }
 
-    auto tex = std::make_unique<TextureData>();
+    auto tex = std::make_unique<STBITextureData>();
     tex->Data = data;
     tex->Size = size;
     tex->Components = components;
@@ -51,7 +51,7 @@ std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromFile(const st
 }
 
 TEMPORALITY_STBI_API
-std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromMemory(const uint8_t * buffer, size_t length)
+std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t * buffer, size_t length)
 {
     BenchmarkStart();
     glm::ivec2 size;
@@ -62,7 +62,7 @@ std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromMemory(const 
         return nullptr;
     }
 
-    auto tex = std::make_unique<TextureData>();
+    auto tex = std::make_unique<STBITextureData>();
     tex->Data = data;
     tex->Size = size;
     tex->Components = components;
@@ -71,4 +71,4 @@ std::unique_ptr<Temporality::TextureData> TextureImporter::LoadFromMemory(const 
     return tex;
 }
 
-}
+} // namespace Temporality::STBI

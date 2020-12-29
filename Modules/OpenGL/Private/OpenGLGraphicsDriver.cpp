@@ -1,17 +1,17 @@
-#include <Temporality/OpenGL/GraphicsDriver.hpp>
+#include <Temporality/OpenGL/OpenGLGraphicsDriver.hpp>
 #include <Temporality/Log.hpp>
 
 #include <glad/gl.h>
 
 #include <Temporality/Temporality.hpp>
-#include <Temporality/OpenGL/Mesh.hpp>
-#include <Temporality/OpenGL/Shader.hpp>
-#include <Temporality/OpenGL/Texture.hpp>
+#include <Temporality/OpenGL/OpenGLMesh.hpp>
+#include <Temporality/OpenGL/OpenGLShader.hpp>
+#include <Temporality/OpenGL/OpenGLTexture.hpp>
 
 namespace Temporality::OpenGL {
 
 TEMPORALITY_OPENGL_API
-GraphicsDriver::GraphicsDriver()
+OpenGLGraphicsDriver::OpenGLGraphicsDriver()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         LogInfo("Unable to initialize SDL");
@@ -78,7 +78,7 @@ GraphicsDriver::GraphicsDriver()
 }
 
 TEMPORALITY_OPENGL_API
-GraphicsDriver::~GraphicsDriver()
+OpenGLGraphicsDriver::~OpenGLGraphicsDriver()
 {
     if (_mGLContext) {
         SDL_GL_DeleteContext(_mGLContext);
@@ -93,26 +93,26 @@ GraphicsDriver::~GraphicsDriver()
 }
 
 TEMPORALITY_OPENGL_API
-void GraphicsDriver::SetWindowTitle(const std::string& title)
+void OpenGLGraphicsDriver::SetWindowTitle(const std::string& title)
 {
     SDL_SetWindowTitle(_mWindow, title.c_str());
 }
 
 TEMPORALITY_OPENGL_API
-std::string GraphicsDriver::GetWindowTitle()
+std::string OpenGLGraphicsDriver::GetWindowTitle()
 {
     return (std::string)SDL_GetWindowTitle(_mWindow);
 }
 
 TEMPORALITY_OPENGL_API
-void GraphicsDriver::SetWindowSize(const glm::ivec2& size)
+void OpenGLGraphicsDriver::SetWindowSize(const glm::ivec2& size)
 {
     SDL_SetWindowSize(_mWindow, size.x, size.y);
     glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 }
 
 TEMPORALITY_OPENGL_API
-glm::ivec2 GraphicsDriver::GetWindowSize()
+glm::ivec2 OpenGLGraphicsDriver::GetWindowSize()
 {
     glm::ivec2 size;
     SDL_GetWindowSize(_mWindow, &size.x, &size.y);
@@ -120,7 +120,7 @@ glm::ivec2 GraphicsDriver::GetWindowSize()
 }
 
 TEMPORALITY_OPENGL_API
-void GraphicsDriver::ProcessEvents()
+void OpenGLGraphicsDriver::ProcessEvents()
 {
     SDL_Event event;
 
@@ -148,27 +148,27 @@ void GraphicsDriver::ProcessEvents()
 }
 
 TEMPORALITY_OPENGL_API
-void GraphicsDriver::SwapBuffers()
+void OpenGLGraphicsDriver::SwapBuffers()
 {
     SDL_GL_SwapWindow(_mWindow);
 }
 
 TEMPORALITY_OPENGL_API
-std::shared_ptr<Temporality::Texture> GraphicsDriver::CreateTexture()
+std::shared_ptr<Texture> OpenGLGraphicsDriver::CreateTexture()
 {
-    return std::make_shared<Texture>();
+    return std::make_shared<OpenGLTexture>();
 }
 
 TEMPORALITY_OPENGL_API
-std::shared_ptr<Temporality::Shader> GraphicsDriver::CreateShader()
+std::shared_ptr<Shader> OpenGLGraphicsDriver::CreateShader()
 {
-    return std::make_shared<Shader>();
+    return std::make_shared<OpenGLShader>();
 }
 
 TEMPORALITY_OPENGL_API
-std::shared_ptr<Temporality::Mesh> GraphicsDriver::CreateMesh()
+std::shared_ptr<Mesh> OpenGLGraphicsDriver::CreateMesh()
 {
-    return std::make_shared<Mesh>();
+    return std::make_shared<OpenGLMesh>();
 }
 
-}
+} // namespace Temporality::OpenGL
