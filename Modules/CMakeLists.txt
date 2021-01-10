@@ -9,6 +9,7 @@ ADD_SUBDIRECTORY(SDL2)
 ADD_SUBDIRECTORY(OpenGL)
 ADD_SUBDIRECTORY(STBI)
 ADD_SUBDIRECTORY(TinyOBJ)
+ADD_SUBDIRECTORY(Vulkan)
 
 # Update the global RUNTIME_SEARCH_PATH to include paths to the
 # module's .dll's

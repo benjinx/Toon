@@ -18,6 +18,5 @@
 #endif
 
 #include <Temporality/Macros.hpp>
-#include <Temporality/Platform.hpp>
 
 #endif // TEMPORALITY_CONFIG_HPP

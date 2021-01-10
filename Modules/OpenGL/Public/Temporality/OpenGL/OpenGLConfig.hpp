@@ -10,7 +10,8 @@
 #endif
 
 #include <glad/gl.h>
-#undef near
-#undef far
+
+#include <Temporality/SDL2/SDL2Config.hpp>
+#include <SDL_opengl.h>
 
 #endif // TEMPORALITY_OPENGL_CONFIG_HPP

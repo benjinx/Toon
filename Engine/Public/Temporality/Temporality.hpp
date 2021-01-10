@@ -26,6 +26,9 @@
 #include <Temporality/Graphics/GraphicsDriver.hpp>
 #include <Temporality/Graphics/TextureImporter.hpp>
 #include <Temporality/Graphics/MeshImporter.hpp>
+#include <Temporality/Version.hpp>
+
+#include <string>
 
 //#include <imgui/imgui.h>
 
@@ -36,6 +39,24 @@ bool IsRunning();
 
 TEMPORALITY_ENGINE_API
 void SetRunning(bool running);
+
+TEMPORALITY_ENGINE_API
+Version GetVersion();
+
+TEMPORALITY_ENGINE_API
+void SetApplicationName(const std::string& name);
+
+TEMPORALITY_ENGINE_API
+std::string GetApplicationName();
+
+TEMPORALITY_ENGINE_API
+void SetApplicationVersion(unsigned major, unsigned minor, unsigned patch);
+
+TEMPORALITY_ENGINE_API
+void SetApplicationVersion(const Version& version);
+
+TEMPORALITY_ENGINE_API
+Version GetApplicationVersion();
 
 } // namespace Temporality
 

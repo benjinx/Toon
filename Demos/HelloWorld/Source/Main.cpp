@@ -68,28 +68,29 @@ public:
 
 int main(int argc, char ** argv)
 {
-    LoadModule("TemporalityOpenGL");
+    //LoadModule("TemporalityOpenGL");
+    LoadModule("TemporalityVulkan");
     LoadModule("TemporalitySTBI");
     LoadModule("TemporalityTinyOBJ");
 
     auto gfx = GetGraphicsDriver();
     if (gfx) {
-        auto shader = gfx->CreateShader();
-        shader->LoadFromFiles({"shaders/passThruColor.vert.glsl", "shaders/passThruColor.frag.glsl"});
+        // auto shader = gfx->CreateShader();
+        // shader->LoadFromFiles({"shaders/passThruColor.vert.glsl", "shaders/passThruColor.frag.glsl"});
 
-        auto texture = gfx->CreateTexture();
-        texture->LoadFromFile("images/avatars/logo.jpg");
+        // auto texture = gfx->CreateTexture();
+        // texture->LoadFromFile("images/avatars/logo.jpg");
 
-        CubeMeshData meshdata;
-        auto mesh = gfx->CreateMesh();
-        mesh->Load((MeshData*)&meshdata);
+        // CubeMeshData meshdata;
+        // auto mesh = gfx->CreateMesh();
+        // mesh->Load((MeshData*)&meshdata);
 
-        Entity e;
+        // Entity e;
 
-        auto meshComp = e.AddComponent<MeshComponent>(std::unique_ptr<Component>(new MeshComponent()));
-        meshComp->LoadFromFile("models/ball/model.obj");
+        // auto meshComp = e.AddComponent<MeshComponent>(std::unique_ptr<Component>(new MeshComponent()));
+        // meshComp->LoadFromFile("models/ball/model.obj");
 
-        //e.AddComponent());
+        // //e.AddComponent());
 
         RenderContext* rc = new RenderContext();
 
@@ -98,9 +99,9 @@ int main(int argc, char ** argv)
         while (IsRunning()) {
             gfx->ProcessEvents();
 
-            shader->Bind();
+            //shader->Bind();
             //mesh->Render();
-            e.Render(rc);
+            //e.Render(rc);
 
             gfx->SwapBuffers();
         }

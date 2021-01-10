@@ -1,8 +1,8 @@
 #ifndef TEMPORALITY_LOG_HPP
 #define TEMPORALITY_LOG_HPP
 
-#include <Temporality/Platform.hpp>
 #include <Temporality/Utils.hpp>
+#include <Temporality/Macros.hpp>
 
 #include <cstdio> // for printf, vsnprintf
 
@@ -14,7 +14,7 @@
     auto temporalityBenchClockStart = std::chrono::high_resolution_clock::now();
 
 #define BenchmarkEnd(funcName)                                                      \
-    LogPerf("Function: %s took %.3f millis\n", funcName,                            \
+    LogPerf("Function: %s took %.3f millis\n", TEMPORALITY_FUNCTION_NAME(),         \
         std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(      \
             std::chrono::high_resolution_clock::now() - temporalityBenchClockStart  \
         ).count());
