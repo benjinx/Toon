@@ -1,4 +1,4 @@
-#include <Temporality/Graphics/TextureImporter.hpp>
+#include <Temporality/TextureImporter.hpp>
 
 namespace Temporality {
 

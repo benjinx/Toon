@@ -45,6 +45,10 @@ bool VulkanGraphicsDriver::Initialize()
         return false;
     }
 
+    if (!InitSwapChain()) {
+        return false;
+    }
+
     BenchmarkEnd("VulkanGraphicsDriver::Initialize()");
 
     return true;
@@ -82,10 +86,9 @@ std::shared_ptr<Shader> VulkanGraphicsDriver::CreateShader()
     return nullptr;
 }
 
-std::shared_ptr<Mesh> VulkanGraphicsDriver::CreateMesh()
+std::unique_ptr<Primitive> VulkanGraphicsDriver::CreatePrimitive()
 {
-
-    return nullptr;
+    return std::unique_ptr<Primitive>(new VulkanPrimitive());
 }
 
 bool VulkanGraphicsDriver::IsDeviceSuitable(const VkPhysicalDevice device)
@@ -647,6 +650,443 @@ bool VulkanGraphicsDriver::InitAllocator()
 void VulkanGraphicsDriver::TermAllocator()
 {
     vmaDestroyAllocator(_vmaAllocator);
+}
+
+bool VulkanGraphicsDriver::InitSwapChain()
+{
+    VkResult vkResult;
+
+    VkSurfaceCapabilitiesKHR surfaceCapabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_vkPhysicalDevice, _vkSurface, &surfaceCapabilities);
+
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(_vkPhysicalDevice, _vkSurface, &formatCount, nullptr);
+
+    std::vector<VkSurfaceFormatKHR> formats(formatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(_vkPhysicalDevice, _vkSurface, &formatCount, formats.data());
+
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(_vkPhysicalDevice, _vkSurface, &presentModeCount, nullptr);
+
+    std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(_vkPhysicalDevice, _vkSurface, &presentModeCount, presentModes.data());
+
+    // VK_FORMAT_R8G8B8A8_UNORM
+    _vkSwapChainImageFormat = formats[0];
+    for (const auto& format : formats) {
+        if (format.format == VK_FORMAT_B8G8R8A8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            _vkSwapChainImageFormat = format;
+            break;
+        }
+    }
+
+    // TODO: Mine will use the VK_PRESENT_MODE_MAILBOX_KHR, stephens will use VK_PRESENT_MODE_FIFO_KHR
+    VkPresentModeKHR swapChainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
+    for (const auto& presentMode : presentModes) {
+        if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            swapChainPresentMode = presentMode;
+            break;
+        }
+    }
+
+    _vkSwapChainExtent = surfaceCapabilities.currentExtent;
+    if (_vkSwapChainExtent.width == UINT32_MAX) {
+        glm::ivec2 size = GetWindowSize();
+
+        _vkSwapChainExtent.width = std::clamp(static_cast<uint32_t>(size.x),
+            surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
+
+        _vkSwapChainExtent.height = std::clamp(static_cast<uint32_t>(size.y),
+            surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
+    }
+
+    /*uint32_t backbufferCount = std::clamp(
+        GetBackbufferCount(),
+        surfaceCapabilities.minImageCount,
+        surfaceCapabilities.maxImageCount
+    );*/
+
+    uint32_t backbufferCount = 2;
+
+    VkSwapchainCreateInfoKHR swapChainCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+        .pNext = nullptr,
+        .flags = 0,
+        .surface = _vkSurface,
+        .minImageCount = static_cast<uint32_t>(backbufferCount),
+        .imageFormat = _vkSwapChainImageFormat.format,
+        .imageColorSpace = _vkSwapChainImageFormat.colorSpace,
+        .imageExtent = _vkSwapChainExtent,
+        .imageArrayLayers = 1,
+        .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .queueFamilyIndexCount = 0,
+        .pQueueFamilyIndices = nullptr,
+        .preTransform = surfaceCapabilities.currentTransform,
+        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+        .presentMode = swapChainPresentMode,
+        .clipped = VK_TRUE,
+    };
+
+    uint32_t queueFamilyIndices[] = {
+        _vkGraphicsQueueFamilyIndex,
+        _vkPresentQueueFamilyIndex
+    };
+
+    if (_vkGraphicsQueueFamilyIndex != _vkPresentQueueFamilyIndex) {
+        swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        swapChainCreateInfo.queueFamilyIndexCount = 2;
+        swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+    }
+
+    vkResult = vkCreateSwapchainKHR(_vkDevice, &swapChainCreateInfo, nullptr, &_vkSwapChain);
+    if (vkResult != VK_SUCCESS) {
+        LogError("vkCreateSwapchainKHR() failed");
+        return false;
+    }
+
+    vkGetSwapchainImagesKHR(_vkDevice, _vkSwapChain, &backbufferCount, nullptr);
+
+    _vkSwapChainImages.resize(backbufferCount);
+    vkGetSwapchainImagesKHR(_vkDevice, _vkSwapChain, &backbufferCount, _vkSwapChainImages.data());
+
+    _vkSwapChainImageViews.resize(backbufferCount);
+
+    for (size_t i = 0; i < _vkSwapChainImages.size(); ++i) {
+        VkImageViewCreateInfo VkImageViewCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .image = _vkSwapChainImages[i],
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = _vkSwapChainImageFormat.format,
+            .subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        };
+
+        vkResult = vkCreateImageView(_vkDevice, &VkImageViewCreateInfo, nullptr, &_vkSwapChainImageViews[i]);
+        if (vkResult != VK_SUCCESS) {
+            LogError("vkCreateImageView() failed");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void VulkanGraphicsDriver::TermSwapChain()
+{
+    if (_vkDepthImageView) {
+        vkDestroyImageView(_vkDevice, _vkDepthImageView, nullptr);
+        _vkDepthImageView = nullptr;
+    }
+
+    if (_vkDepthImage) {
+        vkDestroyImage(_vkDevice, _vkDepthImage, nullptr);
+        _vkDepthImage = nullptr;
+    }
+
+    if (_vkDepthImageMemory) {
+        vkFreeMemory(_vkDevice, _vkDepthImageMemory, nullptr);
+        _vkDepthImageMemory = nullptr;
+    }
+
+    for (auto& framebuffer : _vkFramebuffers) {
+        if (framebuffer) {
+            vkDestroyFramebuffer(_vkDevice, framebuffer, nullptr);
+            framebuffer = nullptr;
+        }
+    }
+
+    if (!_vkCommandBuffers.empty()) {
+        vkFreeCommandBuffers(_vkDevice, _vkCommandPool, static_cast<size_t>(_vkCommandBuffers.size()), _vkCommandBuffers.data());
+        _vkCommandBuffers.assign(_vkCommandBuffers.size(), nullptr);
+    }
+
+    // for (const auto& pipeline : _pipelines) {
+    //     pipeline->Terminate();
+    // }
+
+    if (_vkPipelineLayout) {
+        vkDestroyPipelineLayout(_vkDevice, _vkPipelineLayout, nullptr);
+        _vkPipelineLayout = nullptr;
+    }
+
+    if (_vkRenderPass) {
+        vkDestroyRenderPass(_vkDevice, _vkRenderPass, nullptr);
+        _vkRenderPass = nullptr;
+    }
+
+    for (auto& imageView : _vkSwapChainImageViews) {
+        if (imageView) {
+            vkDestroyImageView(_vkDevice, imageView, nullptr);
+            imageView = nullptr;
+        }
+    }
+
+    if (_vkSwapChain) {
+        vkDestroySwapchainKHR(_vkDevice, _vkSwapChain, nullptr);
+        _vkSwapChain = nullptr;
+    }
+
+    if (_vkDescriptorPool) {
+        vkDestroyDescriptorPool(_vkDevice, _vkDescriptorPool, nullptr);
+        _vkDescriptorPool = nullptr;
+    }
+}
+
+bool VulkanGraphicsDriver::ResetSwapChain()
+{
+    BenchmarkStart();
+
+    vkDeviceWaitIdle(_vkDevice);
+
+    TermSwapChain();
+
+    if (!InitSwapChain()) {
+        return false;
+    }
+
+    if (!InitRenderPass()) {
+        return false;
+    }
+
+    if (!InitDescriptorPool()) {
+        return false;
+    }
+
+    if (!InitGraphicsPipelines()) {
+        return false;
+    }
+
+    if (!InitDepthBuffer()) {
+        return false;
+    }
+
+    if (!InitFramebuffers()) {
+        return false;
+    }
+
+    if (!InitCommandPool()) {
+        return false;
+    }
+
+    if (!InitCommandBuffers()) {
+        return false;
+    }
+
+    BenchmarkEnd("VulkanGraphicsDriver::ResetSwapChain()");
+    return true;
+}
+
+bool VulkanGraphicsDriver::InitRenderPass()
+{
+    VkResult vkResult;
+
+    VkAttachmentDescription colorAttachmentDescription = {
+        .flags = 0,
+        .format = _vkSwapChainImageFormat.format,
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+        .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+    };
+
+    VkAttachmentDescription depthAttachmentDescription = {
+        .flags = 0,
+        .format = _vkDepthImageFormat,
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+        .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+    };
+
+    VkAttachmentReference colorAttachmentReference = {
+        .attachment = 0,
+        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    };
+
+    VkAttachmentReference depthAttachmentReference = {
+        .attachment = 1,
+        .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+    };
+
+    VkSubpassDescription subpassDescription = {
+        .flags = 0,
+        .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+        .inputAttachmentCount = 0,
+        .pInputAttachments = nullptr,
+        .colorAttachmentCount = 1,
+        .pColorAttachments = &colorAttachmentReference,
+        .pResolveAttachments = nullptr,
+        .pDepthStencilAttachment = &depthAttachmentReference,
+        .preserveAttachmentCount = 0,
+        .pPreserveAttachments = nullptr,
+    };
+
+    VkSubpassDependency subpassDependency = {
+        .srcSubpass = VK_SUBPASS_EXTERNAL,
+        .dstSubpass = 0,
+        .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        .srcAccessMask = 0,
+        .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+    };
+
+    std::array<VkAttachmentDescription, 2> attachments = {
+        colorAttachmentDescription,
+        depthAttachmentDescription,
+    };
+
+    VkRenderPassCreateInfo renderPassCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .attachmentCount = static_cast<uint32_t>(attachments.size()),
+        .pAttachments = attachments.data(),
+        .subpassCount = 1,
+        .pSubpasses = &subpassDescription,
+        .dependencyCount = 1,
+        .pDependencies = &subpassDependency,
+    };
+
+    vkResult = vkCreateRenderPass(_vkDevice, &renderPassCreateInfo, nullptr, &_vkRenderPass);
+    if (vkResult != VK_SUCCESS) {
+        LogError("vkCreateRenderPass() failed");
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanGraphicsDriver::InitDescriptorPool()
+{
+    VkResult vkResult;
+
+    VkDescriptorPoolSize descriptorPoolSize = {
+        .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = static_cast<uint32_t>(_vkSwapChainImages.size()),
+    };
+
+    VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .maxSets = static_cast<uint32_t>(_vkSwapChainImages.size()),
+        .poolSizeCount = 1,
+        .pPoolSizes = &descriptorPoolSize,
+    };
+
+    vkResult = vkCreateDescriptorPool(_vkDevice, &descriptorPoolCreateInfo, nullptr, &_vkDescriptorPool);
+    if (vkResult != VK_SUCCESS) {
+        LogError("vkCreateDescriptorPool() failed");
+        return false;
+    }
+
+    std::vector<VkDescriptorSetLayoutBinding> layoutBindingList;
+    //layoutBindingList.resize(_constantBufferBindings.size());
+
+    // size_t i = 0;
+    // for (const auto& it : _constantBufferBindings) {
+    //     layoutBindingList[i] = {
+    //         .binding = it.first,
+    //         .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    //         .descriptorCount = 1,
+    //         .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+    //         .pImmutableSamplers = nullptr,
+    //     };
+    // }
+
+    VkDescriptorSetLayoutCreateInfo descriptorLayoutCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .bindingCount = static_cast<uint32_t>(layoutBindingList.size()),
+        .pBindings = layoutBindingList.data(),
+    };
+
+    vkResult = vkCreateDescriptorSetLayout(_vkDevice, &descriptorLayoutCreateInfo, nullptr, &_vkDescriptorSetLayout);
+    if (vkResult != VK_SUCCESS) {
+        LogError("vkCreateDescriptorSetLayout() failed");
+        return false;
+    }
+
+    VkDescriptorSetLayout setLayouts[] = { _vkDescriptorSetLayout };
+
+    // TODO: Move into Pipeline
+    // Get "default" Registered Constant Buffers from the graphics driver at creation time
+    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .setLayoutCount = 1,
+        .pSetLayouts = setLayouts,
+        .pushConstantRangeCount = 0,
+        .pPushConstantRanges = nullptr,
+    };
+
+    vkResult = vkCreatePipelineLayout(_vkDevice, &pipelineLayoutCreateInfo, nullptr, &_vkPipelineLayout);
+    if (vkResult != VK_SUCCESS) {
+        LogFatal("vkCreatePipelineLayout() failed");
+    }
+
+    std::vector<VkDescriptorSetLayout> layouts(_vkSwapChainImages.size(), _vkDescriptorSetLayout);
+    VkDescriptorSetAllocateInfo allocateInfo = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .descriptorPool = _vkDescriptorPool,
+        .descriptorSetCount = static_cast<uint32_t>(_vkSwapChainImages.size()),
+        .pSetLayouts = layouts.data(),
+    };
+
+    _vkDescriptorSets.resize(_vkSwapChainImages.size());
+    vkResult = vkAllocateDescriptorSets(_vkDevice, &allocateInfo, _vkDescriptorSets.data());
+    if (vkResult != VK_SUCCESS) {
+        LogError("vkAllocateDescriptorSets() failed");
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanGraphicsDriver::InitGraphicsPipelines()
+{
+    for (auto& pipeline : _pipelines) {
+        if (!pipeline->Initialize()) {
+            return false;
+        }
+    }
+
+    return false;
+}
+
+bool VulkanGraphicsDriver::InitDepthBuffer()
+{
+    return false;
+}
+
+bool VulkanGraphicsDriver::InitFramebuffers()
+{
+    return false;
+}
+
+bool VulkanGraphicsDriver::InitCommandPool()
+{
+    return false;
+}
+
+bool VulkanGraphicsDriver::InitCommandBuffers()
+{
+    return false;
 }
 
 } // namespace Temporality::Vulkan

@@ -1,6 +1,6 @@
 #include <Temporality/Scene/MeshComponent.hpp>
-#include <Temporality/Graphics/MeshImporter.hpp>
-#include <Temporality/Graphics/GraphicsDriver.hpp>
+#include <Temporality/MeshImporter.hpp>
+#include <Temporality/GraphicsDriver.hpp>
 #include <Temporality/Scene/Entity.hpp>
 #include <Temporality/Log.hpp>
 
@@ -20,9 +20,9 @@ bool MeshComponent::LoadFromFile(const std::string& filename)
         if (!meshes.empty()) {
             for (auto& meshData : meshes) {
                 auto mesh = gfx->CreateMesh();
-                if (mesh->Load(meshData.get())) {
+                /*if (mesh->Load(meshData.get())) {
                     _mMeshes.push_back(std::move(mesh));
-                }
+                }*/
             }
             return true;
         }

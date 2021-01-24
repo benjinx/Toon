@@ -2,7 +2,7 @@
 #define TEMPORALITY_SDL2_GRAPHICS_DRIVER_HPP
 
 #include <Temporality/SDL2/SDL2Config.hpp>
-#include <Temporality/Graphics/GraphicsDriver.hpp>
+#include <Temporality/GraphicsDriver.hpp>
 
 #include <SDL.h>
 

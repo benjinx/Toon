@@ -1,4 +1,4 @@
-#include <Temporality/Graphics/MeshImporter.hpp>
+#include <Temporality/MeshImporter.hpp>
 
 #include <unordered_map>
 

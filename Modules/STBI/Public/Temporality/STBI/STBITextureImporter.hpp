@@ -3,8 +3,8 @@
 
 #include <Temporality/STBI/STBIConfig.hpp>
 
-#include <Temporality/Graphics/Texture.hpp>
-#include <Temporality/Graphics/TextureImporter.hpp>
+#include <Temporality/Texture.hpp>
+#include <Temporality/TextureImporter.hpp>
 
 #include <Temporality/Math.hpp>
 #include <memory>

@@ -2,7 +2,8 @@
 #define TEMPORALITY_MESH_IMPORTER_HPP
 
 #include <Temporality/Config.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
+#include <Temporality/PrimitiveData.hpp>
 
 #include <memory>
 #include <vector>
@@ -18,7 +19,7 @@ public:
 
     virtual ~MeshImporter() = default;
 
-    virtual std::vector<std::unique_ptr<MeshData>> LoadFromFile(const std::string& filename) = 0;
+    virtual std::vector<std::unique_ptr<PrimitiveData>> LoadFromFile(const std::string& filename) = 0;
 }; // class MeshImporter
 
 TEMPORALITY_ENGINE_API

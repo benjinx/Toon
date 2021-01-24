@@ -4,6 +4,11 @@
 #include <Temporality/Vulkan/VulkanConfig.hpp>
 
 #include <Temporality/SDL2/SDL2GraphicsDriver.hpp>
+#include <Temporality/Vulkan/VulkanPipeline.hpp>
+//#include <Temporality/Vulkan/VulkanTexture.hpp>
+#include <Temporality/Vulkan/VulkanShader.hpp>
+#include <Temporality/Vulkan/VulkanPrimitive.hpp>
+#include <Temporality/Vulkan/VulkanBuffer.hpp>
 
 #include <vector>
 
@@ -14,6 +19,8 @@
 #include <vk_mem_alloc.h>
 
 namespace Temporality::Vulkan {
+
+#define TEMPORALITY_VULKAN_GRAPHICS_DRIVER(x) (dynamic_cast<Temporality::Vulkan::VulkanGraphicsDriver *>(x))
 
 class TEMPORALITY_VULKAN_API VulkanGraphicsDriver : public SDL2::SDL2GraphicsDriver
 {
@@ -35,7 +42,27 @@ public:
 
     std::shared_ptr<Shader> CreateShader() override;
 
-    std::shared_ptr<Mesh> CreateMesh() override;
+    std::unique_ptr<Primitive> CreatePrimitive() override;
+
+    inline VkDevice GetDevice() const {
+        return _vkDevice;
+    }
+
+    inline VmaAllocator GetAllocator() const {
+        return _vmaAllocator;
+    }
+
+    inline VkExtent2D GetSwapChainExtent() const {
+        return _vkSwapChainExtent;
+    }
+
+    inline VkPipelineLayout GetPipelineLayout() {
+        return _vkPipelineLayout;
+    }
+
+    inline VkRenderPass GetRenderPass() const {
+        return _vkRenderPass;
+    }
 
 private:
 
@@ -73,25 +100,47 @@ private:
 
     void TermAllocator();
 
+    bool InitSwapChain();
+
+    void TermSwapChain();
+
+    bool ResetSwapChain();
+
+    bool InitRenderPass();
+
+    bool InitDescriptorPool();
+
+    bool InitGraphicsPipelines();
+
+    bool InitDepthBuffer();
+
+    bool InitFramebuffers();
+
+    bool InitCommandPool();
+
+    bool InitCommandBuffers();
+
+    bool InitSyncObjects();
+
     std::unordered_map<std::string, VkLayerProperties> _vkAvailableLayers;
 
     std::unordered_map<std::string, VkExtensionProperties> _vkAvailableInstanceExtensions;
 
     std::unordered_map<std::string, VkExtensionProperties> _vkAvailableDeviceExtensions;
 
-    VkInstance _vkInstance;
+    VkInstance _vkInstance = nullptr;
 
-    VkDebugUtilsMessengerEXT _vkDebugMessenger;
+    VkDebugUtilsMessengerEXT _vkDebugMessenger = nullptr;
 
-    VkSurfaceKHR _vkSurface;
+    VkSurfaceKHR _vkSurface = nullptr;
 
     VkPhysicalDeviceProperties _vkPhysicalDeviceProperties;
 
     VkPhysicalDeviceFeatures _vkPhysicalDeviceFeatures;
 
-    VkPhysicalDevice _vkPhysicalDevice;
+    VkPhysicalDevice _vkPhysicalDevice = nullptr;
 
-    VkDevice _vkDevice;
+    VkDevice _vkDevice = nullptr;
 
     uint32_t _vkGraphicsQueueFamilyIndex;
     uint32_t _vkPresentQueueFamilyIndex;
@@ -100,6 +149,56 @@ private:
     VkQueue _vkPresentQueue = nullptr;
 
     VmaAllocator _vmaAllocator = nullptr;
+
+    VkSurfaceFormatKHR _vkSwapChainImageFormat;
+
+    VkExtent2D _vkSwapChainExtent;
+
+    VkSwapchainKHR _vkSwapChain = nullptr;
+
+    std::vector<VkImage> _vkSwapChainImages;
+
+    std::vector<VkImageView> _vkSwapChainImageViews;
+
+    VkRenderPass _vkRenderPass = nullptr;
+
+    VkFormat _vkDepthImageFormat;
+
+    VkImage _vkDepthImage = nullptr;
+
+    VkDeviceMemory _vkDepthImageMemory = nullptr;
+
+    VkImageView _vkDepthImageView = nullptr;
+
+    std::vector<VkFramebuffer> _vkFramebuffers;
+
+    VkCommandPool _vkCommandPool = nullptr;
+
+    std::vector<VkCommandBuffer> _vkCommandBuffers;
+
+    std::vector<VkSemaphore> _vkImageAvailableSemaphores;
+
+    std::vector<VkSemaphore> _vkRenderingFinishedSemaphores;
+
+    std::vector<VkFence> _vkInFlightFences;
+
+    std::vector<VkFence> _vkImagesInFlight;
+
+    std::vector<VkBuffer> _vkUniformBuffers;
+
+    std::vector<VmaAllocation> _vkUniformBufferAllocations;
+
+    VkDescriptorPool _vkDescriptorPool = nullptr;
+
+    VkDescriptorSetLayout _vkDescriptorSetLayout = nullptr;
+
+    VkPipelineLayout _vkPipelineLayout = nullptr;
+
+    std::vector<VkDescriptorSet> _vkDescriptorSets;
+
+    int _currentFrame = 0;
+
+    std::vector<std::shared_ptr<Pipeline>> _pipelines;
 
 }; // class VulkanGraphicsDriver
 

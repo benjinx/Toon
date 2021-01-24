@@ -2,7 +2,7 @@
 #define TEMPORALITY_TINYOBJ_MESH_IMPORTER_HPP
 
 #include <Temporality/TinyOBJ/TinyOBJConfig.hpp>
-#include <Temporality/Graphics/MeshImporter.hpp>
+#include <Temporality/MeshImporter.hpp>
 
 #include <vector>
 

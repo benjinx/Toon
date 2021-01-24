@@ -4,7 +4,7 @@
 #include <Temporality/Camera.hpp>
 #include <Temporality/Light.hpp>
 #include <Temporality/Log.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
 //#include <Temporality/StaticMeshComponent.hpp>
 #include <Temporality/Utils.hpp>
 

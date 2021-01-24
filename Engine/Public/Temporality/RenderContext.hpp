@@ -2,7 +2,7 @@
 #define TEMPORALITY_RENDER_CONTEXT_HPP
 
 #include <Temporality/Config.hpp>
-#include <Temporality/Graphics/TransformData.hpp>
+#include <Temporality/TransformData.hpp>
 
 namespace Temporality {
 

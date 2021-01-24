@@ -1,4 +1,4 @@
-#include <Temporality/Graphics/Texture.hpp>
+#include <Temporality/Texture.hpp>
 #include <Temporality/Log.hpp>
 
 namespace Temporality {

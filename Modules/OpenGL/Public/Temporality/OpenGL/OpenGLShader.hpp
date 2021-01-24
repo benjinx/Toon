@@ -2,7 +2,7 @@
 #define TEMPORALITY_OPENGL_SHADER_HPP
 
 #include <Temporality/OpenGL/OpenGLConfig.hpp>
-#include <Temporality/Graphics/Shader.hpp>
+#include <Temporality/Shader.hpp>
 
 namespace Temporality::OpenGL {
 

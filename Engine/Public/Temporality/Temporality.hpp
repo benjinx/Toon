@@ -15,17 +15,17 @@
 //#include <Temporality/Light.hpp>
 #include <Temporality/Log.hpp>
 //#include <Temporality/Material.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
 //#include <Temporality/StaticMeshComponent.hpp>
 //#include <Temporality/RiggedMeshComponent.hpp>
 //#include <Temporality/Scene.hpp>
-#include <Temporality/Graphics/Shader.hpp>
-#include <Temporality/Graphics/Texture.hpp>
+#include <Temporality/Shader.hpp>
+#include <Temporality/Texture.hpp>
 #include <Temporality/Utils.hpp>
 #include <Temporality/Module.hpp>
-#include <Temporality/Graphics/GraphicsDriver.hpp>
-#include <Temporality/Graphics/TextureImporter.hpp>
-#include <Temporality/Graphics/MeshImporter.hpp>
+#include <Temporality/GraphicsDriver.hpp>
+#include <Temporality/TextureImporter.hpp>
+#include <Temporality/MeshImporter.hpp>
 #include <Temporality/Version.hpp>
 
 #include <string>

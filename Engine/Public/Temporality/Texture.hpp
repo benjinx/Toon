@@ -2,7 +2,7 @@
 #define TEMPORALITY_TEXTURE_HPP
 
 #include <Temporality/Config.hpp>
-#include <Temporality/Graphics/TextureImporter.hpp>
+#include <Temporality/TextureImporter.hpp>
 
 namespace Temporality {
 

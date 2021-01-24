@@ -2,7 +2,7 @@
 #define TEMPORALITY_OPENGL_TEXTURE_HPP
 
 #include <Temporality/OpenGL/OpenGLConfig.hpp>
-#include <Temporality/Graphics/Texture.hpp>
+#include <Temporality/Texture.hpp>
 
 namespace Temporality::OpenGL {
 

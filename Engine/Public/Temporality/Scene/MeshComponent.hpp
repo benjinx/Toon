@@ -3,7 +3,7 @@
 
 #include <Temporality/Config.hpp>
 #include <Temporality/Scene/Component.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
 
 #include <memory>
 #include <vector>

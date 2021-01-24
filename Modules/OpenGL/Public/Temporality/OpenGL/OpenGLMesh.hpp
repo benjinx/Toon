@@ -2,7 +2,7 @@
 #define TEMPORALITY_OPENGL_MESH_HPP
 
 #include <Temporality/OpenGL/OpenGLConfig.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
 
 namespace Temporality::OpenGL {
 

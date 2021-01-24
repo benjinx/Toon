@@ -2,7 +2,7 @@
 #define AXIS_HPP
 
 #include <Temporality/Config.hpp>
-#include <Temporality/Graphics/Mesh.hpp>
+#include <Temporality/Mesh.hpp>
 //#include <Temporality/OpenGL.hpp>
 
 #include <memory>
