@@ -53,7 +53,7 @@ void PrimitiveData::CalculateTBN()
         // TODO: Account for NaN and smoothing
     };
 
-    if (topology == PrimitiveTopology::Triangles) {
+    if (topology == PrimitiveTopology::TriangleList) {
         if (indexList.empty()) {
             for (size_t i = 0; i < vertexList.size(); i += 3) {
                 calcVertex(

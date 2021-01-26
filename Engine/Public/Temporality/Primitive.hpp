@@ -11,10 +11,10 @@ namespace Temporality {
 
 enum class PrimitiveTopology 
 {
-    Points,
-    Lines,
+    PointList,
+    LineList,
     LineStrip,
-    Triangles,
+    TriangleList,
     TriangleStrip,
 
 }; // enum class PrimitiveTopology
@@ -38,13 +38,13 @@ public:
 inline std::string PrimitiveTopologyToString(PrimitiveTopology primitiveTopology)
 {
     switch (primitiveTopology) {
-    case PrimitiveTopology::Points:
+    case PrimitiveTopology::PointList:
         return "Points";
-    case PrimitiveTopology::Lines:
+    case PrimitiveTopology::LineList:
         return "Lines";
     case PrimitiveTopology::LineStrip:
         return "LineStrip";
-    case PrimitiveTopology::Triangles:
+    case PrimitiveTopology::TriangleList:
         return "Triangles";
     case PrimitiveTopology::TriangleStrip:
         return "TriangleStrip";

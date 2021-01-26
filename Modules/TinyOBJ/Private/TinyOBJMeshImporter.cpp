@@ -1,6 +1,7 @@
 #include <Temporality/TinyOBJ/TinyOBJMeshImporter.hpp>
 #include <Temporality/Log.hpp>
 #include <Temporality/Utils.hpp>
+#include <Temporality/TinyOBJ/TinyOBJPrimitiveData.hpp>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -8,13 +9,13 @@
 namespace Temporality::TinyOBJ {
 
 TEMPORALITY_TINYOBJ_API
-std::vector<std::unique_ptr<MeshData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
+std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
 
     //const std::string& dir = GetDirname(filename);
-    
-    std::vector<std::unique_ptr<MeshData>> meshes;
+
+    std::vector<std::unique_ptr<PrimitiveData>> primitiveList;
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -52,57 +53,57 @@ std::vector<std::unique_ptr<MeshData>> TinyOBJMeshImporter::LoadFromFile(const s
     }
 
     bool hasNormals = (!attrib.normals.empty());
-    bool hasUVs = (!attrib.texcoords.empty());
+    bool hasTexCoords = (!attrib.texcoords.empty());
     bool hasColors = (!attrib.colors.empty());
 
     for (auto& shape : shapes) {
-        auto mesh = std::make_unique<TinyOBJMeshData>();
+        TinyOBJPrimitiveData * primitiveData = new TinyOBJPrimitiveData();
+        
+        primitiveData->VertexList.resize(shape.mesh.indices.size());
 
-        mesh->Vertices.reserve(shape.mesh.indices.size());
+        for (size_t i = 0; i < shape.mesh.indices.size(); ++i) {
+            auto index = shape.mesh.indices[i];
+            auto& vertex = primitiveData->VertexList[i];
 
-        if (hasNormals) {
-            mesh->Normals.reserve(shape.mesh.indices.size());
-        }
-
-        if (hasUVs) {
-            mesh->UVs.reserve(shape.mesh.indices.size());
-        }
-
-        if (hasColors) {
-            mesh->Colors.reserve(shape.mesh.indices.size());
-        }
-
-        for (const auto& i : shape.mesh.indices) {
-            mesh->Vertices.push_back(attrib.vertices[3 * i.vertex_index + 0]);
-            mesh->Vertices.push_back(attrib.vertices[3 * i.vertex_index + 1]);
-            mesh->Vertices.push_back(attrib.vertices[3 * i.vertex_index + 2]);
-            mesh->Vertices.push_back(1.0f);
+            vertex.Position = {
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2],
+                1.0f,
+            };
 
             if (hasNormals) {
-                mesh->Normals.push_back(attrib.normals[3 * i.normal_index + 0]);
-                mesh->Normals.push_back(attrib.normals[3 * i.normal_index + 1]);
-                mesh->Normals.push_back(attrib.normals[3 * i.normal_index + 2]);
-                mesh->Normals.push_back(1.0f);
+                vertex.Normal = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2],
+                    1.0f,
+                };
             }
-
-            if (hasUVs) {
-                mesh->UVs.push_back(attrib.texcoords[2 * i.texcoord_index + 0]);
-                mesh->UVs.push_back(attrib.texcoords[2 * i.texcoord_index + 1]);
-            }
-
+            
             if (hasColors) {
-                mesh->Colors.push_back(attrib.colors[3 * i.vertex_index + 0]);
-                mesh->Colors.push_back(attrib.colors[3 * i.vertex_index + 1]);
-                mesh->Colors.push_back(attrib.colors[3 * i.vertex_index + 2]);
-                mesh->Colors.push_back(1.0f);
+                vertex.Color = {
+                    attrib.colors[3 * index.vertex_index + 0],
+                    attrib.colors[3 * index.vertex_index + 1],
+                    attrib.colors[3 * index.vertex_index + 2],
+                    1.0f,
+                };
+            }
+            
+            if (hasTexCoords) {
+                vertex.TexCoord1 = {
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    attrib.texcoords[2 * index.texcoord_index + 1],
+                };
             }
         }
 
-        meshes.push_back(std::move(mesh));
+        primitiveData->CalculateTBN();
+        primitiveList.push_back(std::unique_ptr<PrimitiveData>(primitiveData));
     }
 
     BenchmarkEnd("TinyOBJ::MeshImporter::LoadFromFile");
-    return meshes;
+    return primitiveList;
 }
 
 } // namespace Temporality::TinyOBJ

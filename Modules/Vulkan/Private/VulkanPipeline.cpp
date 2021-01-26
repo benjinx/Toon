@@ -1,7 +1,6 @@
 #include <Temporality/Vulkan/VulkanPipeline.hpp>
 
 #include <Temporality/Log.hpp>
-#include <Temporality/Benchmark.hpp>
 #include <Temporality/Vertex.hpp>
 #include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
 #include <Temporality/Vulkan/VulkanShader.hpp>

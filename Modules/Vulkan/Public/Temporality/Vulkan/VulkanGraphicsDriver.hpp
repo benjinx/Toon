@@ -7,8 +7,10 @@
 #include <Temporality/Vulkan/VulkanPipeline.hpp>
 //#include <Temporality/Vulkan/VulkanTexture.hpp>
 #include <Temporality/Vulkan/VulkanShader.hpp>
+#include <Temporality/Vulkan/VulkanMesh.hpp>
 #include <Temporality/Vulkan/VulkanPrimitive.hpp>
 #include <Temporality/Vulkan/VulkanBuffer.hpp>
+#include <Temporality/Vulkan/VulkanRenderContext.hpp>
 
 #include <vector>
 
@@ -36,11 +38,15 @@ public:
 
     void Terminate() override;
 
-    void SwapBuffers() override;
+    void Render() override;
 
     std::shared_ptr<Texture> CreateTexture() override;
 
     std::shared_ptr<Shader> CreateShader() override;
+
+    std::shared_ptr<Pipeline> CreatePipeline(std::shared_ptr<Shader> shader) override;
+
+    std::shared_ptr<Mesh> CreateMesh() override;
 
     std::unique_ptr<Primitive> CreatePrimitive() override;
 
@@ -63,6 +69,12 @@ public:
     inline VkRenderPass GetRenderPass() const {
         return _vkRenderPass;
     }
+
+    uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags props);
+
+    bool CreateBuffer(VkBuffer * buffer, VmaAllocation * vmaAllocation, VkDeviceSize size, VkBufferUsageFlags bufferUsage, VmaMemoryUsage memoryUsage);
+
+    bool CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 private:
 

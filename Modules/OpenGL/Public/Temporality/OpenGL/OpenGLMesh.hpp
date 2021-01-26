@@ -12,20 +12,15 @@ public:
     DISALLOW_COPY_AND_ASSIGN(OpenGLMesh)
 
     OpenGLMesh() = default;
+    
+    virtual ~OpenGLMesh() = default;
 
-    void Render() override;
+    bool Load(const std::vector<std::unique_ptr<PrimitiveData>>& data) override;
 
-    bool Load(const MeshData* data) override;
+    void Render(RenderContext * ctx) override;
 
 private:
 
-    GLenum GetGLMode(const MeshData::Mode& mode);
-
-    GLuint _mglVAO;
-    GLenum _mglMode;
-    GLsizei _mglCount;
-
-    bool _mIndexed;
 }; // class OpenGLMesh
 
 } // namespace Temporality::OpenGL

@@ -50,13 +50,13 @@ private:
 inline std::optional<VkPrimitiveTopology> GetVkPrimitiveTopology(PrimitiveTopology primitiveTopology)
 {
     switch (primitiveTopology) {
-    case PrimitiveTopology::Points:
+    case PrimitiveTopology::PointList:
         return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
-    case PrimitiveTopology::Lines:
+    case PrimitiveTopology::LineList:
         return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
     case PrimitiveTopology::LineStrip:
         return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-    case PrimitiveTopology::Triangles:
+    case PrimitiveTopology::TriangleList:
         return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     case PrimitiveTopology::TriangleStrip:
         return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;

@@ -43,9 +43,9 @@ bool OpenGLGraphicsDriver::Initialize()
 
     LogInfo("Creating SDL2 GL Context.");
 
-    _mGLContext = SDL_GL_CreateContext(GetSDL2Window());
+    _glContext = SDL_GL_CreateContext(GetSDL2Window());
 
-    if (!_mGLContext)
+    if (!_glContext)
     {
         LogError("Failed to create SDL2 GL Context. %s", SDL_GetError());
         return false;
@@ -113,36 +113,76 @@ bool OpenGLGraphicsDriver::Initialize()
 TEMPORALITY_OPENGL_API
 void OpenGLGraphicsDriver::Terminate()
 {
-    if (_mGLContext) {
-        SDL_GL_DeleteContext(_mGLContext);
-        _mGLContext = nullptr;
+    if (_glContext) {
+        SDL_GL_DeleteContext(_glContext);
+        _glContext = nullptr;
     }
 
     SDL2GraphicsDriver::Terminate();
 }
 
 TEMPORALITY_OPENGL_API
-void OpenGLGraphicsDriver::SwapBuffers()
+void OpenGLGraphicsDriver::Render()
 {
+    glm::vec4 cc = GetClearColor();
+    glClearColor(cc[0], cc[1], cc[2], cc[3]);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    BindUniformBufferObjects();
+
+    if (_currentScene) {
+        _currentScene->Render(_renderContext.get());
+    }
+
     SDL_GL_SwapWindow(GetSDL2Window());
+}
+
+TEMPORALITY_OPENGL_API
+std::shared_ptr<Pipeline> OpenGLGraphicsDriver::CreatePipeline(std::shared_ptr<Shader> shader)
+{
+    auto ptr = std::shared_ptr<Pipeline>(new OpenGLPipeline());
+    ptr->SetShader(shader);
+    return ptr;
 }
 
 TEMPORALITY_OPENGL_API
 std::shared_ptr<Texture> OpenGLGraphicsDriver::CreateTexture()
 {
-    return std::make_shared<OpenGLTexture>();
+    return std::shared_ptr<Texture>(new OpenGLTexture());
 }
 
 TEMPORALITY_OPENGL_API
 std::shared_ptr<Shader> OpenGLGraphicsDriver::CreateShader()
 {
-    return std::make_shared<OpenGLShader>();
+    auto shader = std::shared_ptr<Shader>(new OpenGLShader());
+    _shaders.push_back(shader);
+    return shader;
 }
 
 TEMPORALITY_OPENGL_API
 std::shared_ptr<Mesh> OpenGLGraphicsDriver::CreateMesh()
 {
-    return std::make_shared<OpenGLMesh>();
+    return std::shared_ptr<Mesh>(new OpenGLMesh());
+}
+
+TEMPORALITY_OPENGL_API
+std::unique_ptr<Primitive> OpenGLGraphicsDriver::CreatePrimitive()
+{
+    return std::unique_ptr<Primitive>(new OpenGLPrimitive());
+}
+
+TEMPORALITY_OPENGL_API
+void OpenGLGraphicsDriver::BindUniformBufferObjects()
+{
+    for (const auto& it : _constantBufferBindings) {
+        OpenGLBuffer * buffer = TEMPORALITY_OPENGL_BUFFER(it.second.get());
+        if (!buffer) {
+            continue;
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, it.first, buffer->GetGLID());
+    }
 }
 
 void GLAPIENTRY

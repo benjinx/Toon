@@ -26,6 +26,8 @@ public:
 
     void Terminate() override;
 
+    void GenerateCommands(VkCommandBuffer vkCommandBuffer);
+
 private:
 
     VkPipeline _vkPipeline;

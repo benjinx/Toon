@@ -32,7 +32,7 @@ public:
 
     bool WriteTo(size_t offset, size_t length, uint8_t * data) override;
 
-    inline VkBuffer GetBuffer() {
+    inline VkBuffer GetVkBuffer() {
         return _vkBuffer;
     }
 

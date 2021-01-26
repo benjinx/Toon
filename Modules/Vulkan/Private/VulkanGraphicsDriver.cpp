@@ -9,6 +9,7 @@
 
 namespace Temporality::Vulkan {
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::Initialize()
 {
     BenchmarkStart();
@@ -54,6 +55,7 @@ bool VulkanGraphicsDriver::Initialize()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::Terminate()
 {
     BenchmarkStart();
@@ -69,28 +71,153 @@ void VulkanGraphicsDriver::Terminate()
     BenchmarkEnd("VulkanGraphicsDriver::Terminate");
 }
 
-void VulkanGraphicsDriver::SwapBuffers()
+TEMPORALITY_VULKAN_API
+void VulkanGraphicsDriver::Render()
 {
 
 }
 
+TEMPORALITY_VULKAN_API
 std::shared_ptr<Texture> VulkanGraphicsDriver::CreateTexture()
 {
 
     return nullptr;
 }
 
+TEMPORALITY_VULKAN_API
 std::shared_ptr<Shader> VulkanGraphicsDriver::CreateShader()
 {
 
     return nullptr;
 }
 
+TEMPORALITY_VULKAN_API
+std::shared_ptr<Pipeline> VulkanGraphicsDriver::CreatePipeline(std::shared_ptr<Shader> shader)
+{
+    auto ptr = std::shared_ptr<Pipeline>(new VulkanPipeline());
+    ptr->SetShader(shader);
+    // ptr->Initialize();
+    _pipelines.push_back(ptr);
+
+    ResetSwapChain();
+    return ptr;
+}
+
+TEMPORALITY_VULKAN_API
+std::shared_ptr<Mesh> VulkanGraphicsDriver::CreateMesh()
+{
+    return std::shared_ptr<Mesh>(new VulkanMesh());
+}
+
+TEMPORALITY_VULKAN_API
 std::unique_ptr<Primitive> VulkanGraphicsDriver::CreatePrimitive()
 {
     return std::unique_ptr<Primitive>(new VulkanPrimitive());
 }
 
+TEMPORALITY_VULKAN_API
+uint32_t VulkanGraphicsDriver::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags props)
+{
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice, &memoryProperties);
+
+    for (unsigned i = 0; i < memoryProperties.memoryTypeCount; ++i) {
+        if ((filter & (1 << i)) && 
+            (memoryProperties.memoryTypes[i].propertyFlags & props) == props) {
+            return i;
+        }
+    }
+
+    LogError("Failed to find suitable memory type");
+    return UINT32_MAX;
+}
+
+TEMPORALITY_VULKAN_API
+bool VulkanGraphicsDriver::CreateBuffer(VkBuffer * buffer, VmaAllocation * vmaAllocation, VkDeviceSize size, VkBufferUsageFlags bufferUsage, VmaMemoryUsage memoryUsage)
+{
+    VkResult vkResult;
+    
+    VkBufferCreateInfo bufferCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .size = size,
+        .usage = bufferUsage,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+    };
+
+    VmaAllocationCreateInfo allocationCreateInfo = {
+        .flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
+        .usage = memoryUsage,
+    };
+
+    VmaAllocationInfo allocationInfo = {
+    };
+
+    vkResult = vmaCreateBuffer(_vmaAllocator, &bufferCreateInfo, &allocationCreateInfo, buffer, vmaAllocation, &allocationInfo);
+    if (vkResult != VK_SUCCESS) {
+        LogError("Failed to create buffer");
+        return false;
+    }
+
+    return true;
+}
+
+TEMPORALITY_VULKAN_API
+bool VulkanGraphicsDriver::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+    VkResult vkResult;
+
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .commandPool = _vkCommandPool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+    };
+
+    VkCommandBuffer commandBuffer;
+    vkResult = vkAllocateCommandBuffers(_vkDevice, &commandBufferAllocateInfo, &commandBuffer);
+    if (vkResult != VK_SUCCESS) {
+        LogError("Failed to allocate command buffer");
+        return false;
+    }
+
+    VkCommandBufferBeginInfo commandBufferBeginInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+    };
+
+    vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo);
+
+    VkBufferCopy copyRegion = {
+        .srcOffset = 0,
+        .dstOffset = 0,
+        .size = size,
+    };
+
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    vkResult = vkEndCommandBuffer(commandBuffer);
+    if (vkResult != VK_SUCCESS) {
+        LogError("Failed to build command buffer");
+        return false;
+    }
+
+    VkSubmitInfo submitInfo = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .pNext = nullptr,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &commandBuffer,
+    };
+
+    vkResult = vkQueueSubmit(_vkGraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(_vkGraphicsQueue);
+
+    return true;
+}
+
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::IsDeviceSuitable(const VkPhysicalDevice device)
 {
     vkGetPhysicalDeviceProperties(device, &_vkPhysicalDeviceProperties);
@@ -100,6 +227,7 @@ bool VulkanGraphicsDriver::IsDeviceSuitable(const VkPhysicalDevice device)
         && _vkPhysicalDeviceFeatures.geometryShader;
 }
 
+TEMPORALITY_VULKAN_API
 std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceLayers()
 {
     std::vector<const char*> requiredLayers = {};
@@ -116,6 +244,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceLayers()
     return requiredLayers;
 }
 
+TEMPORALITY_VULKAN_API
 std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceExtensions()
 {
     std::vector<const char*> requiredExtensions = {
@@ -145,6 +274,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceExtensions()
     return requiredExtensions;
 }
 
+TEMPORALITY_VULKAN_API
 std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
 {
     SDL_bool sdlResult;
@@ -168,12 +298,12 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
         else {
             LogWarn("Vulkan Extension '%s' not available", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
-
     #endif
 
     return requiredExtensions;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitInstance()
 {
     VkResult vkResult;
@@ -317,6 +447,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL _VulkanDebugMessageCallback(
     return VK_FALSE;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
 {
     VkResult vkResult;
@@ -365,6 +496,7 @@ bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::TermDebugUtilsMessenger()
 {
     if (!_vkDebugMessenger) {
@@ -379,6 +511,7 @@ void VulkanGraphicsDriver::TermDebugUtilsMessenger()
     vkDestroyDebugUtilsMessengerEXT(_vkInstance, _vkDebugMessenger, nullptr);
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::TermInstance()
 {
     if (!_vkInstance) {
@@ -387,6 +520,7 @@ void VulkanGraphicsDriver::TermInstance()
     }
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitSurface()
 {
     SDL_bool sdlResult;
@@ -400,6 +534,7 @@ bool VulkanGraphicsDriver::InitSurface()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::TermSurface()
 {
     if (_vkSurface) {
@@ -408,6 +543,7 @@ void VulkanGraphicsDriver::TermSurface()
     }
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitPhysicalDevice()
 {
     VkResult vkResult;
@@ -472,6 +608,7 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitLogicalDevice()
 {
     VkResult vkResult;
@@ -601,6 +738,7 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::TermLogicalDevice()
 {
     if (_vkDevice) {
@@ -609,6 +747,7 @@ void VulkanGraphicsDriver::TermLogicalDevice()
     }
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitAllocator()
 {
     VkResult vkResult;
@@ -647,11 +786,13 @@ bool VulkanGraphicsDriver::InitAllocator()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 void VulkanGraphicsDriver::TermAllocator()
 {
     vmaDestroyAllocator(_vmaAllocator);
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitSwapChain()
 {
     VkResult vkResult;
@@ -840,6 +981,7 @@ void VulkanGraphicsDriver::TermSwapChain()
     }
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::ResetSwapChain()
 {
     BenchmarkStart();
@@ -884,6 +1026,7 @@ bool VulkanGraphicsDriver::ResetSwapChain()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitRenderPass()
 {
     VkResult vkResult;
@@ -970,6 +1113,7 @@ bool VulkanGraphicsDriver::InitRenderPass()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitDescriptorPool()
 {
     VkResult vkResult;
@@ -1058,6 +1202,7 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
     return true;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitGraphicsPipelines()
 {
     for (auto& pipeline : _pipelines) {
@@ -1069,21 +1214,25 @@ bool VulkanGraphicsDriver::InitGraphicsPipelines()
     return false;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitDepthBuffer()
 {
     return false;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitFramebuffers()
 {
     return false;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitCommandPool()
 {
     return false;
 }
 
+TEMPORALITY_VULKAN_API
 bool VulkanGraphicsDriver::InitCommandBuffers()
 {
     return false;

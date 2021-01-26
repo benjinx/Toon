@@ -48,7 +48,7 @@ void MeshComponent::Render(RenderContext * ctx)
     //gfx->SetShaderData("TemporalityTransformData", sizeof(TransformData), transformData);
 
     for (auto& mesh : _mMeshes) {
-        mesh->Render();
+        mesh->Render(ctx);
     }
 }
 

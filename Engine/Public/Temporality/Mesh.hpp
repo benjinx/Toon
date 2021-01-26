@@ -1,10 +1,11 @@
-#ifndef TEMPORALITY_CORE_MESH_HPP
-#define TEMPORALITY_CORE_MESH_HPP
+#ifndef TEMPORALITY_MESH_HPP
+#define TEMPORALITY_MESH_HPP
 
 #include <Temporality/Config.hpp>
 #include <Temporality/Primitive.hpp>
 #include <Temporality/PrimitiveData.hpp>
 #include <Temporality/Pipeline.hpp>
+#include <Temporality/RenderContext.hpp>
 
 #include <vector>
 #include <memory>
@@ -21,9 +22,9 @@ public:
 
     virtual ~Mesh() = default;
 
-    virtual void Render() { }
-
     virtual bool Load(const std::vector<std::unique_ptr<PrimitiveData>>& data);
+
+    virtual void Render(RenderContext * ctx) = 0;
 
     virtual void SetPipeline(std::shared_ptr<Pipeline> pipeline) {
         _pipeline = pipeline;
@@ -42,4 +43,4 @@ std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename);
 
 } // namespace Temporality
 
-#endif // TEMPORALITY_CORE_MESH_HPP
+#endif // TEMPORALITY_MESH_HPP

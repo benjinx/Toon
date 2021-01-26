@@ -118,7 +118,7 @@ bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     VkResult vkResult;
 
     if (_memoryUsage != MemoryUsage::Download) {
-        DuskLogError("Unable to read data from buffer with MemoryUsage: %s",
+        LogError("Unable to read data from buffer with MemoryUsage: %s",
             MemoryUsageToString(_memoryUsage));
         return false;
     }
@@ -155,7 +155,7 @@ bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     void * ptr;
     vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
     if (vkResult != VK_SUCCESS) {
-        DuskLogError("vmaMapMemory() failed");
+        LogError("vmaMapMemory() failed");
         return false;
     }
 

@@ -5,67 +5,6 @@
 
 using namespace Temporality;
 
-class CubeMeshData : MeshData {
-public:
-    CubeMeshData() = default;
-
-    inline Mode GetMode() const
-    {
-        return MeshData::Mode::Triangles;
-    }
-
-    inline gsl::span<const unsigned int> GetIndices() const 
-    {
-        return gsl::span<const unsigned int>();
-    }
-
-    inline gsl::span<const float> GetVertices() const 
-    {
-        static const float vertices[] = {
-            -1.0f, -1.0f, 0.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f,
-             0.0f,  1.0f, 0.0f, 1.0f,
-        };
-
-        return gsl::span<const float>(vertices, sizeof(vertices) / sizeof(float));
-    }
-
-    inline gsl::span<const float> GetNormals() const 
-    {
-        return gsl::span<const float>();
-    }
-
-    inline gsl::span<const float> GetUVs() const
-    {
-        return gsl::span<const float>();
-    }
-
-    inline gsl::span<const float> GetColors() const 
-    {
-        return gsl::span<const float>();
-    }
-
-    inline gsl::span<const float> GetTangents() const 
-    {
-        return gsl::span<const float>();
-    }
-
-    inline gsl::span<const float> GetBitangets() const 
-    {
-        return gsl::span<const float>();
-    }
-
-    inline gsl::span<const unsigned short> GetJoints() const 
-    {
-        return gsl::span<const unsigned short>();
-    }
-
-    inline gsl::span<const float> GetWeights() const 
-    {
-        return gsl::span<const float>();
-    }
-};
-
 int main(int argc, char ** argv)
 {
     //LoadModule("TemporalityOpenGL");
@@ -103,7 +42,7 @@ int main(int argc, char ** argv)
             //mesh->Render();
             //e.Render(rc);
 
-            gfx->SwapBuffers();
+            gfx->Render();
         }
     }
 

@@ -4,7 +4,9 @@
 #include <Temporality/Config.hpp>
 
 #include <Temporality/Shader.hpp>
-#include <Temporality/Mesh.hpp>
+#include <Temporality/Primitive.hpp>
+
+#include <memory>
 
 namespace Temporality {
 
@@ -132,7 +134,7 @@ protected:
 
     std::shared_ptr<Shader> _shader = nullptr;
 
-    PrimitiveTopology _primitiveTopology = PrimitiveTopology::Triangles;
+    PrimitiveTopology _primitiveTopology = PrimitiveTopology::TriangleList;
 
     FrontFace _frontFace = FrontFace::CounterClockwise;
 

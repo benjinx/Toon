@@ -33,7 +33,7 @@ std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename)
             continue;
         }
 
-        auto mesh = gfx->CreatePrimitive();
+        auto mesh = gfx->CreateMesh();
         if (!mesh->Load(primitiveList)) {
             break;
         }

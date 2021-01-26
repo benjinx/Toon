@@ -6,6 +6,8 @@
 
 namespace Temporality::OpenGL {
 
+#define TEMPORALITY_OPENGL_SHADER(x) (dynamic_cast<Temporality::OpenGL::OpenGLShader *>(x))
+
 class TEMPORALITY_OPENGL_API OpenGLShader : public Shader 
 {
 public:

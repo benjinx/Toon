@@ -83,9 +83,7 @@ public:
 
     virtual std::shared_ptr<Shader> CreateShader() = 0;
 
-    virtual std::shared_ptr<Mesh> CreateMesh() {
-        return std::shared_ptr<Mesh>(new Mesh());
-    }
+    virtual std::shared_ptr<Mesh> CreateMesh() = 0;
 
     virtual std::unique_ptr<Primitive> CreatePrimitive() = 0;
 
