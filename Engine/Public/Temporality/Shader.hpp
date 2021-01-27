@@ -19,9 +19,6 @@ public:
 
     virtual bool LoadFromFiles(const std::vector<std::string>& filenames) = 0;
 
-    virtual void Bind() = 0;
-
-
 }; // class Shader
 
 } // namespace Temporality

@@ -1,7 +1,7 @@
 
 SET(_target TemporalityVulkan)
 
-MODULE(${_target} VULKAN)
+DEFINE_MODULE(${_target} VULKAN)
 
 TARGET_LINK_LIBRARIES(
     ${_target}

@@ -89,8 +89,7 @@ std::shared_ptr<Texture> VulkanGraphicsDriver::CreateTexture()
 TEMPORALITY_VULKAN_API
 std::shared_ptr<Shader> VulkanGraphicsDriver::CreateShader()
 {
-
-    return nullptr;
+    return std::shared_ptr<Shader>(new VulkanShader());
 }
 
 TEMPORALITY_VULKAN_API

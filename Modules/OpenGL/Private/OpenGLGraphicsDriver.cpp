@@ -221,8 +221,15 @@ _OpenGLDebugMessageCallback(
         case GL_DEBUG_SEVERITY_LOW:
             Log(LogLevel::Warning, "[WARN](OpenGLDebugMessage) %s\n", message);
             break;
+
+        #if defined(TEMPORALITY_ENABLE_VERBOSE_LOGGING)
+
         case GL_DEBUG_SEVERITY_NOTIFICATION:
             Log(LogLevel::Verbose, "[VERB](OpenGLDebugMessage) %s\n", message);
+            break;
+
+        #endif
+        
         }
     }
 }

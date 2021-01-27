@@ -1,6 +1,8 @@
+
+INCLUDE(CompileShaders)
 INCLUDE(SetSourceGroups)
 
-MACRO(DEMO _target)
+MACRO(DEFINE_DEMO _target)
     FILE(
         GLOB_RECURSE
         _sources
@@ -9,6 +11,24 @@ MACRO(DEMO _target)
         Source/*.c
         Source/*.cpp
     )
+
+    ###
+    ### Shader Processing
+    ###
+
+    FILE(
+        GLOB_RECURSE
+        _shaders_in
+        Assets/Shaders/*.glsl
+        #Assets/Shaders/*.hlsl
+    )
+
+    LIST(INSERT ASSET_PATH 0
+        ${CMAKE_CURRENT_SOURCE_DIR}/Assets
+        ${CMAKE_CURRENT_BINARY_DIR}/Assets
+    )
+
+    COMPILE_SHADERS("${_shaders_in}" _shaders_out)
 
     ###
     ### Asset Processing
@@ -37,6 +57,8 @@ MACRO(DEMO _target)
     ADD_EXECUTABLE(
         ${_target}
         ${_sources}
+        ${_shaders_in}
+        ${_shaders_out}
         ${_assets}
     )
 
@@ -47,6 +69,8 @@ MACRO(DEMO _target)
     )
 
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_in}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_out}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
 
     TARGET_INCLUDE_DIRECTORIES(
@@ -109,11 +133,27 @@ MACRO(DEMO _target)
         # Append debug target to .vscode/launch.json if .vscode/ exists
         IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode AND Python3_Interpreter_FOUND)
             SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
-            ADD_CUSTOM_COMMAND(
-                TARGET ${_target} POST_BUILD
-                BYPRODUCTS ${_launch_json}
-                COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} ($<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}"
-            )
+            SET(_graphics_drivers "")
+
+            IF("OpenGL" IN_LIST REQUIRED_MODULES)
+                LIST(APPEND _graphics_drivers "OpenGL")
+            ENDIF()
+
+            IF("Vulkan" IN_LIST REQUIRED_MODULES)
+                LIST(APPEND _graphics_drivers "Vulkan")
+            ENDIF()
+
+            IF("DirectX" IN_LIST REQUIRED_MODULES)
+                LIST(APPEND _graphics_drivers "DirectX")
+            ENDIF()
+
+            FOREACH(_driver ${_graphics_drivers})
+                ADD_CUSTOM_COMMAND(
+                    TARGET ${_target} POST_BUILD
+                    BYPRODUCTS ${_launch_json}
+                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} (${_driver}, $<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" "TEMPORALITY_GRAPHICS_DRIVER=${_driver}"
+                )
+            ENDFOREACH()
         ENDIF()
     ELSE()
 
@@ -165,11 +205,23 @@ MACRO(DEMO _target)
 
         IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode)
             SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
-            ADD_CUSTOM_COMMAND(
-                TARGET ${_target} POST_BUILD
-                BYPRODUCTS ${_launch_json}
-                COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} ${_target} $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}"
-            )
+            SET(_graphics_drivers "")
+
+            IF("OpenGL" IN_LIST REQUIRED_MODULES)
+                LIST(APPEND _graphics_drivers "OpenGL")
+            ENDIF()
+
+            IF("Vulkan" IN_LIST REQUIRED_MODULES)
+                LIST(APPEND _graphics_drivers "Vulkan")
+            ENDIF()
+
+            FOREACH(_driver ${_graphics_drivers})
+                ADD_CUSTOM_COMMAND(
+                    TARGET ${_target} POST_BUILD
+                    BYPRODUCTS ${_launch_json}
+                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} \\(${_driver}\\)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" "TEMPORALITY_GRAPHICS_DRIVER=${_driver}"
+                )
+            ENDFOREACH()
         ENDIF()
     ENDIF()
 ENDMACRO()

@@ -1,4 +1,4 @@
 
 SET(_target TemporalityTinyOBJ)
 
-MODULE(${_target} TINYOBJ)
+DEFINE_MODULE(${_target} TINYOBJ)

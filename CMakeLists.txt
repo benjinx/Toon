@@ -51,6 +51,75 @@ OPTION(BUILD_DEMOS "Build Demo Projects"                                    ON)
 OPTION(BUILD_THIRDPARTY "Build Missing ThirdParty Dependencies"             ON)
 
 ###
+### Modules and Dependencies
+###
+
+SET(
+    MODULES 
+    "All" 
+    CACHE STRING
+    "Semicolon-separated list of required modules, use 'All' to build all modules"
+)
+
+# Generate list of available modules
+SET(AVAILABLE_MODULES
+    "OpenGL"
+    "SDL2"
+    "STBI"
+    "TinyOBJ"
+    "Vulkan"
+)
+
+IF(BUILD_DEMOS OR MODULES STREQUAL "All")
+    SET(MODULES "${AVAILABLE_MODULES}")
+ENDIF()
+
+# Filter requested modules that are not available
+SET(REQUIRED_MODULES "")
+FOREACH(_module ${MODULES})
+    IF(${_module} IN_LIST AVAILABLE_MODULES)
+        LIST(APPEND REQUIRED_MODULES ${_module})
+    ELSE()
+        MESSAGE(WARNING "Module '${_module}' not supported on this platform")
+    ENDIF()
+ENDFOREACH()
+
+# Generate list of required third party dependencies
+SET(REQUIRED_DEPENDENCIES
+    "glm"
+    "GSL"
+    "nlohmann_json"
+    "Python3"
+)
+
+IF("OpenGL" IN_LIST REQUIRED_MODULES)
+    LIST(APPEND REQUIRED_MODULES "SDL2")
+ENDIF()
+
+IF("Vulkan" IN_LIST REQUIRED_MODULES)
+    LIST(APPEND REQUIRED_DEPENDENCIES "VulkanSDK")
+    LIST(APPEND REQUIRED_MODULES "SDL2")
+ENDIF()
+
+IF("SDL2" IN_LIST REQUIRED_MODULES)
+    LIST(APPEND REQUIRED_DEPENDENCIES "SDL2")
+ENDIF()
+
+IF("Archive" IN_LIST REQUIRED_MODULES)
+ENDIF()
+
+IF(BUILD_TESTS)
+    LIST(APPEND REQUIRED_DEPENDENCIES "GTest")
+ENDIF()
+
+LIST(REMOVE_DUPLICATES REQUIRED_MODULES)
+LIST(REMOVE_DUPLICATES REQUIRED_DEPENDENCIES)
+
+MESSAGE(STATUS "Available modules: ${AVAILABLE_MODULES}")
+MESSAGE(STATUS "Building Modules: ${REQUIRED_MODULES}")
+MESSAGE(STATUS "Required Dependencies: ${REQUIRED_DEPENDENCIES}")
+
+###
 ### Third Party Dependencies
 ###
 
@@ -70,6 +139,10 @@ IF(BUILD_THIRDPARTY)
         ${THIRDPARTY_BINARY_DIR}/GSL
         ${THIRDPARTY_BINARY_DIR}/GTest
     )
+
+    # CMake refuses to quote the list when passing it on the command line, and `;` will
+    # split the command in half, so we have to switch them to a different separator
+    STRING(REPLACE ";" ":" _tmp "${REQUIRED_DEPENDENCIES}")
     
     EXECUTE_PROCESS(
         COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" 
@@ -103,20 +176,40 @@ IF(BUILD_THIRDPARTY)
     ENDIF()
 ENDIF()
 
-FIND_PACKAGE(glm CONFIG REQUIRED)
-IF(NOT TARGET glm::glm)
-    MESSAGE(SEND_ERROR "Incompatible version of glm found.")
+IF("glm" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(glm CONFIG REQUIRED)
+    IF(NOT TARGET glm::glm)
+        MESSAGE(SEND_ERROR "Incompatible version of glm found.")
+    ENDIF()
 ENDIF()
 
-FIND_PACKAGE(GSL REQUIRED)
+IF("GSL" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(GSL REQUIRED)
+ENDIF()
 
-FIND_PACKAGE(nlohmann_json CONFIG REQUIRED)
-FIND_PACKAGE(SDL2 2.0.6 CONFIG REQUIRED)
+IF("nlohmann_json" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(nlohmann_json CONFIG REQUIRED)
+ENDIF()
+
+IF("SDL2" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(SDL2 2.0.6 CONFIG REQUIRED)
+ENDIF()
+
+IF("GTest" IN_LIST REQUIRED_DEPENDENCIES)
+    SET(GTEST_MSVC_SEARCH "MD")
+    FIND_PACKAGE(GTest REQUIRED)
+ENDIF()
+
+IF("VulkanSDK" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(VulkanSDK REQUIRED)
+ENDIF()
+
+IF("Python3" IN_LIST REQUIRED_DEPENDENCIES)
+    FIND_PACKAGE(Python3 3.8 COMPONENTS Interpreter)
+ENDIF()
 
 FIND_PROGRAM(gdb_COMMAND gdb)
 FIND_PROGRAM(valgrind_COMMAND valgrind)
-
-FIND_PACKAGE(Python3 3.8 COMPONENTS Interpreter)
 
 IF(TARGET SDL2::SDL2)
     GET_TARGET_PROPERTY(_location SDL2::SDL2 IMPORTED_LOCATION)

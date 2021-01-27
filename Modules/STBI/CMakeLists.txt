@@ -1,4 +1,4 @@
 
 SET(_target TemporalitySTBI)
 
-MODULE(${_target} STBI)
+DEFINE_MODULE(${_target} STBI)

@@ -10,10 +10,24 @@ using namespace std::chrono;
 
 void run()
 {
-    Temporality::LoadModule("TemporalityOpenGL");
-    //LoadModule("TemporalityVulkan");
     Temporality::LoadModule("TemporalitySTBI");
     Temporality::LoadModule("TemporalityTinyOBJ");
+
+    const char * graphicsDriver = getenv("TEMPORALITY_GRAPHICS_DRIVER");
+    
+    if (!graphicsDriver) {
+        graphicsDriver = "Vulkan";
+    }
+
+    if (strcmp(graphicsDriver, "OpenGL") == 0) {
+        Temporality::LoadModule("TemporalityOpenGL");
+    }
+    else if (strcmp(graphicsDriver, "DirectX") == 0) {
+        Temporality::LoadModule("TemporalityDirectX");
+    }
+    else {
+        Temporality::LoadModule("TemporalityVulkan");
+    }
 
     auto gfx = Temporality::GetGraphicsDriver();
     if (!gfx) {
@@ -29,9 +43,6 @@ void run()
     camera.SetMode(Temporality::CameraMode::Perspective);
     camera.SetPosition({ 3, 3, 3 });
     camera.SetLookAt({ 0, 0, 0 });
-
-    transformData->View = camera.GetView();
-    transformData->Projection = camera.GetProjection();
 
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
@@ -77,6 +88,10 @@ void run()
         gfx->Render();
 
         gfx->ProcessEvents();
+
+        transformData->View = camera.GetView();
+        transformData->Projection = camera.GetProjection();
+        
 
         std::this_thread::sleep_for(16ms);
     }

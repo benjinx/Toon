@@ -1,7 +1,7 @@
 
 INCLUDE(SetSourceGroups)
 
-MACRO(MODULE _target _prefix)
+MACRO(DEFINE_MODULE _target _prefix)
     FILE(
         GLOB_RECURSE
         _public

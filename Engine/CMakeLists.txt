@@ -1,9 +1,11 @@
 
-INCLUDE(Module)
+INCLUDE(DefineModule)
+INCLUDE(CompileShaders)
+INCLUDE(SetSourceGroups)
 
 SET(_target TemporalityEngine)
 
-MODULE(${_target} ENGINE)
+DEFINE_MODULE(${_target} ENGINE)
 
 TARGET_LINK_LIBRARIES(
     ${_target}
@@ -19,3 +21,33 @@ LIST(APPEND ASSET_PATH
 )
 
 SET(ASSET_PATH ${ASSET_PATH} PARENT_SCOPE)
+
+###
+### Shader Processing
+###
+
+FILE(
+    GLOB_RECURSE
+    _shaders_in
+    Assets/Shaders/*.glsl
+    #Assets/Shaders/*.hlsl
+)
+
+LIST(APPEND ASSET_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/Assets
+    ${CMAKE_CURRENT_BINARY_DIR}/Assets
+)
+
+SET(ASSET_PATH ${ASSET_PATH} PARENT_SCOPE)
+
+COMPILE_SHADERS("${_shaders_in}" _shaders_out)
+
+TARGET_SOURCES(
+    ${_target}
+    PRIVATE
+        ${_shaders_in}
+        ${_shaders_out}
+)
+
+SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_in}")
+SET_SOURCE_GROUPS(${CMAKE_CURRENT_BINARY_DIR} "${_shaders_out}")

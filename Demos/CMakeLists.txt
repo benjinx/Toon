@@ -1,4 +1,4 @@
-INCLUDE(Demo)
+INCLUDE(DefineDemo)
 
 #Add Demos Here
 ADD_SUBDIRECTORY(HelloWorld)

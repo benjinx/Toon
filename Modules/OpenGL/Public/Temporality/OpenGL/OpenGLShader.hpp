@@ -17,7 +17,7 @@ public:
 
     bool LoadFromFiles(const std::vector<std::string>& filenames) override;
 
-    void Bind() override;
+    void Bind();
 
     GLuint GetID();
 
