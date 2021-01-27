@@ -5,6 +5,22 @@ namespace Temporality {
 static bool _Running = true;
 
 TEMPORALITY_ENGINE_API
+bool Initialize(int argc, char ** argv) 
+{
+    LogVerbose("Temporality Version: %s", GetVersion().GetString());
+    LogVerbose("Application Name: %s", GetApplicationName());
+    LogVerbose("Application Version: %s", GetApplicationVersion().GetString());
+
+    return true;
+}
+
+TEMPORALITY_ENGINE_API
+void Terminate()
+{
+    FreeAllModules();
+}
+
+TEMPORALITY_ENGINE_API
 bool IsRunning()
 {
     return _Running;

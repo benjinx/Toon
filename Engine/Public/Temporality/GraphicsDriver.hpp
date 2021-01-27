@@ -39,7 +39,7 @@ public:
 
     virtual ~GraphicsDriver() = default;
 
-    virtual bool Initialize() = 0;
+    virtual bool Initialize();
 
     virtual void Terminate() = 0;
 

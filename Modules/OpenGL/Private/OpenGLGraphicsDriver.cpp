@@ -107,6 +107,25 @@ bool OpenGLGraphicsDriver::Initialize()
     glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &value);
     LogVerbose("Max Uniform Block Size: %d", value);
 
+    // TODO: Move
+    const unsigned TRANSFORM_DATA_BINDING = 0;
+
+    bool result;
+
+    std::shared_ptr<Buffer> transformDataBuffer = std::shared_ptr<Buffer>(new OpenGLBuffer());
+    result = transformDataBuffer->Initialize(
+        sizeof(TransformData),
+        nullptr,
+        BufferUsage::Constant,
+        MemoryUsage::UploadOften
+    );
+
+    if (!result) {
+        LogError("Freak out");
+    }
+
+    AddConstantBuffer(transformDataBuffer, TRANSFORM_DATA_BINDING);
+
     return true;
 }
 

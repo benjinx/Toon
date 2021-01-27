@@ -14,6 +14,7 @@
 
 namespace Temporality {
 
+TEMPORALITY_ENGINE_API
 void Scene::Update(UpdateContext * ctx)
 {
     /*Entity::Update(dt);
@@ -30,6 +31,7 @@ void Scene::Update(UpdateContext * ctx)
     defaultLighting->SetVec4("lightPosition", defaultLightPosition);*/
 }
 
+TEMPORALITY_ENGINE_API
 void Scene::Render(RenderContext * ctx)
 {
     Entity::Render(ctx);
@@ -51,6 +53,7 @@ void Scene::Render(RenderContext * ctx)
     }*/
 }
 
+TEMPORALITY_ENGINE_API
 bool Scene::LoadScene(std::string filename)
 {
     /*std::vector<std::unique_ptr<Entity>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
@@ -68,6 +71,7 @@ bool Scene::LoadScene(std::string filename)
     return true;
 }
 
+TEMPORALITY_ENGINE_API
 void Scene::CreateSkybox(std::vector<std::string> faces)
 {
     _mSkybox = std::make_unique<Skybox>();
@@ -75,6 +79,7 @@ void Scene::CreateSkybox(std::vector<std::string> faces)
     //_mSkybox->LoadCubemap(faces);
 }
 
+TEMPORALITY_ENGINE_API
 void Scene::Options()
 {
     //ImGui::Checkbox("Show Entity Axis", &DevUI::showAxis);

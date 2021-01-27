@@ -10,8 +10,8 @@ public:
 	~JointTransforms();
 
 private:
-	glm::vec3 _mPosition;
-	glm::quat _mRotation;
+	glm::vec3 _position;
+	glm::quat _orientation;
 };
 
 #endif // JOINT_TRANSFORMS_HPP

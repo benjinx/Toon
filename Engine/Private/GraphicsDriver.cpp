@@ -32,6 +32,15 @@ GraphicsDriver * GetGraphicsDriver()
 }
 
 TEMPORALITY_ENGINE_API
+bool GraphicsDriver::Initialize()
+{
+    _updateContext.reset(new UpdateContext());
+    _renderContext.reset(new RenderContext());
+
+    return true;
+}
+
+TEMPORALITY_ENGINE_API
 bool GraphicsDriver::AddConstantBuffer(std::shared_ptr<Buffer> buffer, unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
@@ -47,7 +56,7 @@ TEMPORALITY_ENGINE_API
 bool GraphicsDriver::RemoveConstantBuffer(unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
-    if (it != _constantBufferBindings.end()) {
+    if (it == _constantBufferBindings.end()) {
         return false;
     }
 
@@ -59,7 +68,7 @@ TEMPORALITY_ENGINE_API
 Buffer * GraphicsDriver::GetConstantBuffer(unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
-    if (it != _constantBufferBindings.end()) {
+    if (it == _constantBufferBindings.end()) {
         return nullptr;
     }
 

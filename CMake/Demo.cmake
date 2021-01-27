@@ -75,7 +75,7 @@ MACRO(DEMO _target)
             # Disable unknown pragmas warning, C++ exceptions
             $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
             $<$<CXX_COMPILER_ID:Clang>: -Wall -Wno-unknown-pragmas -fno-exceptions>
-            $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc- /GR->
+            $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc->
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")

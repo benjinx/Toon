@@ -39,7 +39,7 @@ void Entity::Update(UpdateContext * ctx)
     }
 
     // Update
-    for (const auto& comp : _mComponents)
+    for (const auto& comp : _componentList)
     {
         comp->Update(ctx);
     }
@@ -61,7 +61,7 @@ void Entity::Render(RenderContext * ctx)
     }
 
     // Render
-    for (const auto& comp : _mComponents)
+    for (const auto& comp : _componentList)
     {
         comp->Render(ctx);
     }
@@ -115,6 +115,16 @@ Entity* Entity::FindEntity(std::string name)
 }
 
 TEMPORALITY_ENGINE_API
+Component * Entity::AddComponent(std::unique_ptr<Component>&& component)
+{
+    component->Attach(this);
+    _componentPtrs.push_back(component.get());
+    _componentList.push_back(std::move(component));
+
+    return _componentPtrs.back();
+}
+
+TEMPORALITY_ENGINE_API
 void Entity::AddChild(std::unique_ptr<Entity>&& child)
 {
     child->SetParent(this);
@@ -124,17 +134,17 @@ void Entity::AddChild(std::unique_ptr<Entity>&& child)
 TEMPORALITY_ENGINE_API
 void Entity::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
 {
-    _mPosition = position;
-    _mRotation = rotation;
-    _mScale = scale;
+    _position = position;
+    _orientation = rotation;
+    _scale = scale;
 }
 
 TEMPORALITY_ENGINE_API
 glm::mat4 Entity::GetTransform() const {
     glm::mat4 transform = glm::mat4(1);
-    transform = glm::translate(transform, _mPosition);
-    transform *= glm::mat4_cast(_mRotation);
-    transform = glm::scale(transform, _mScale);
+    transform = glm::translate(transform, GetPosition());
+    transform *= glm::mat4_cast(GetOrientation());
+    transform = glm::scale(transform, GetScale());
     return transform;
 }
 
@@ -161,14 +171,14 @@ glm::vec3 Entity::GetWorldPosition() const
 }
 
 TEMPORALITY_ENGINE_API
-glm::quat Entity::GetWorldRotation() const
+glm::quat Entity::GetWorldOrientation() const
 {
     if (GetParent())
     {
-        return GetParent()->GetRotation() * GetRotation();
+        return GetParent()->GetOrientation() * GetOrientation();
     }
 
-    return GetRotation();
+    return GetOrientation();
 }
 
 TEMPORALITY_ENGINE_API

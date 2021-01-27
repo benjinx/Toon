@@ -1,5 +1,5 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef TEMPORALITY_SCENE_H
+#define TEMPORALITY_SCENE_H
 
 #include <Temporality/Axis.hpp>
 #include <Temporality/Config.hpp>
@@ -13,7 +13,7 @@
 
 namespace Temporality {
 
-class Scene : public Entity
+class TEMPORALITY_ENGINE_API Scene : public Entity
 {
 public:
 
@@ -43,4 +43,4 @@ private:
 
 } // namespace Temporality
 
-#endif // SCENE_H
+#endif // TEMPORALITY_SCENE_H

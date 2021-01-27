@@ -18,6 +18,16 @@
 
 namespace Temporality {
 
+TEMPORALITY_ENGINE_API
+inline glm::vec3 GetWorldUp() {
+    return { 0.0f, 1.0f, 0.0f };
+}
+
+TEMPORALITY_ENGINE_API
+inline glm::vec3 GetWorldForward() {
+    return { 0.0f, 0.0f, -1.0f };
+}
+
 class TEMPORALITY_ENGINE_API Entity
 {
 public:
@@ -54,34 +64,33 @@ public:
     void SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale);
 
     glm::mat4 GetTransform() const;
-    glm::vec3 GetPosition() const { return _mPosition; }
-    glm::quat GetRotation() const { return _mRotation; }
-    glm::vec3 GetScale() const { return _mScale; }
+    glm::vec3 GetPosition() const { return _position; }
+    glm::quat GetOrientation() const { return _orientation; }
+    glm::vec3 GetScale() const { return _scale; }
 
-    // Remember matrix order is Translate (Position), Rotate, Scale
+    // Remember matrix order is Translate (Position), Orientate, Scale
     void SetPosition(glm::vec3 position) {
-        _mPosition = position;
+        _position = position;
     }
 
-    // Remember matrix order is Translate (Position), Rotate, Scale
-    void SetRotation(glm::quat rotation) {
-        _mRotation = rotation;
+    // Remember matrix order is Translate (Position), Orientate, Scale
+    void SetOrientation(glm::quat orientation) {
+        _orientation = orientation;
     }
 
-    // Remember matrix order is Translate (Position), Rotate, Scale
+    // Remember matrix order is Translate (Position), Orientate, Scale
     void SetScale(glm::vec3 scale) {
-        _mScale = scale;
+        _scale = scale;
     }
 
     // World Transforms
     glm::mat4 GetWorldTransform() const;
     glm::vec3 GetWorldPosition() const;
-    glm::quat GetWorldRotation() const;
+    glm::quat GetWorldOrientation() const;
     glm::vec3 GetWorldScale() const;
 
     // Component
-    template <typename T>
-    T* AddComponent(std::unique_ptr<Component>&& component);
+    Component * AddComponent(std::unique_ptr<Component>&& component);
     
     template <typename T>
     std::vector<T*> FindComponentsOfType();
@@ -109,14 +118,16 @@ private:
     Axis* _mSceneAxis = nullptr;
 
     // Pos, rot, scale
-    glm::vec3 _mPosition = glm::vec3(0.0f),
-              _mScale = glm::vec3(1.0f);
-    glm::quat _mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec3 _position = glm::vec3(0.0f),
+              _scale = glm::vec3(1.0f);
+    glm::quat _orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
     // Components
-    std::vector<std::unique_ptr<Component>> _mComponents;
+    std::vector<std::unique_ptr<Component>> _componentList;
 
-    std::unordered_map<std::type_index, std::vector<Component*>> _mComponentsByType;
+    std::vector<Component *> _componentPtrs;
+
+    //std::unordered_map<std::type_index, std::vector<Component*>> _componentListByType;
 
     // Enabled
     bool _mEnabled = true;
@@ -126,41 +137,21 @@ private:
 
 };
 
-template <typename T>
-T* Entity::AddComponent(std::unique_ptr<Component>&& component)
-{
-    auto id = std::type_index(typeid(T));
+// template <typename T>
+// std::vector<T*> Entity::FindComponentsOfType()
+// {
+//     auto id = std::type_index(typeid(T));
+//     auto list = std::vector<T*>();
+//     if (_componentListByType.find(id) != _componentListByType.end())
+//     {
+//         for (auto c : _componentListByType[id])
+//         {
+//             list.push_back(static_cast<T*>(c));
+//         }
+//     }
 
-    Component* ptr = component.get();
-
-    _mComponents.push_back(std::move(component));
-    _mComponents.back()->Attach(this);
-
-    if (_mComponentsByType.find(id) == _mComponentsByType.end())
-    {
-        _mComponentsByType[id] = std::vector<Component *>();
-    }
-
-    _mComponentsByType[id].push_back(ptr);
-
-    return (T*)ptr;
-}
-
-template <typename T>
-std::vector<T*> Entity::FindComponentsOfType()
-{
-    auto id = std::type_index(typeid(T));
-    auto list = std::vector<T*>();
-    if (_mComponentsByType.find(id) != _mComponentsByType.end())
-    {
-        for (auto c : _mComponentsByType[id])
-        {
-            list.push_back(static_cast<T*>(c));
-        }
-    }
-
-    return list;
-}
+//     return list;
+// }
 
 } // namespace Temporality
 

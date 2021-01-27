@@ -14,7 +14,9 @@ bool VulkanGraphicsDriver::Initialize()
 {
     BenchmarkStart();
 
-    SDL2GraphicsDriver::Initialize();
+    if (!SDL2GraphicsDriver::Initialize()) {
+        return false;
+    }
 
     SDL2GraphicsDriver::CreateWindow(SDL_WINDOW_VULKAN);
 

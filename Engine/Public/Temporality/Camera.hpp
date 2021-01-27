@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef TEMPORALITY_CAMERA_H
+#define TEMPORALITY_CAMERA_H
 
 #include <Temporality/Config.hpp>
 #include <Temporality/Scene/Entity.hpp>
@@ -9,14 +9,16 @@
 
 namespace Temporality {
 
-class Camera : public Entity
+enum CameraMode {
+    Perspective,
+    Orthographic,
+};
+
+class TEMPORALITY_ENGINE_API Camera : public Entity
 {
 public:
 
-    enum Mode {
-        Perspective,
-        Orthographic,
-    };
+    DISALLOW_COPY_AND_ASSIGN(Camera)
         
     Camera();
 
@@ -27,43 +29,53 @@ public:
     glm::mat4 GetView() const;
     glm::mat4 GetProjection() const;
 
-    void SetMode(Mode mode);
-    Mode GetMode() const { return _mMode; }
+    void SetMode(CameraMode mode);
+    inline CameraMode GetMode() const {
+        return _mMode;
+    }
 
     void SetAspect(float aspect);
     void SetAspect(const glm::vec2& size);
 
-    inline float GetAspect() const { return _mAspect; }
+    inline float GetAspect() const {
+        return _mAspect;
+    }
 
     void SetFOVX(float fovx);
     void SetFOVY(float fovy);
 
-    void SetViewportScale(float left, float right, float bottom, float top);
     void SetViewportScale(const glm::vec4& viewScale);
-
-    glm::vec4 GetViewportScale() const { return _mViewportScale; }
-
-    void SetViewportSize(float width, float height);
     void SetViewportSize(const glm::vec2& viewSize);
 
-    glm::vec2 GetViewportSize() const { return _mViewportSize; }
+    inline glm::vec4 GetViewportScale() const {
+        return _mViewportScale;
+    }
+
+    inline glm::vec2 GetViewportSize() const {
+        return _mViewportSize;
+    }
 
     glm::vec4 GetViewport() const;
 
-    void SetClip(float near, float far);
     void SetClip(const glm::vec2& clip);
-    inline glm::vec2 GetClip() const { return _mClip; }
+
+    inline glm::vec2 GetClip() const {
+        return _mClip;
+    }
 
     void SetUp(const glm::vec3& up);
-    glm::vec3 GetUp() { return _mUp; }
-    glm::vec3 GetRight() { return glm::normalize(glm::cross(GetForward(), GetUp())); }
+
+    inline glm::vec3 GetUp() const {
+        return _mUp;
+    }
+
+    glm::vec3 GetRight() const;
 
     void SetForward(const glm::vec3& forward);
+
     glm::vec3 GetForward() const;
 
     void SetLookAt(const glm::vec3& point);
-
-    void SetAutoResize(bool autoResize);
 
     void HandleMovement(float dt);
     void HandleRotation(float xoffset, float yoffset);
@@ -75,9 +87,7 @@ public:
 
 private:
 
-    Mode _mMode = Mode::Perspective;
-
-    bool _mAutoResize = true;
+    CameraMode _mMode = CameraMode::Perspective;
 
     glm::vec2 _mClip = glm::vec2(0.1f, 10000.0f);
 
@@ -102,4 +112,4 @@ private:
 
 } // namespace Temporality
 
-#endif // CAMERA_H
+#endif // TEMPORALITY_CAMERA_H

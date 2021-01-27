@@ -3,7 +3,7 @@
 
 #include <Temporality/Config.hpp>
 //#include <Temporality/App.hpp>
-//#include <Temporality/Camera.hpp>
+#include <Temporality/Camera.hpp>
 //#include <Temporality/DevUI.hpp>
 //#include <Temporality/Event.hpp>
 #include <Temporality/Scene/Entity.hpp>
@@ -33,6 +33,12 @@
 //#include <imgui/imgui.h>
 
 namespace Temporality {
+
+TEMPORALITY_ENGINE_API
+bool Initialize(int argc, char ** argv);
+
+TEMPORALITY_ENGINE_API
+void Terminate();
 
 TEMPORALITY_ENGINE_API
 bool IsRunning();

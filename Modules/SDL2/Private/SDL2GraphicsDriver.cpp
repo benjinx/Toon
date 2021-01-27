@@ -8,6 +8,10 @@ namespace Temporality::SDL2 {
 TEMPORALITY_SDL2_API
 bool SDL2GraphicsDriver::Initialize()
 {
+    if (!GraphicsDriver::Initialize()) {
+        return false;
+    }
+
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         LogError("Unable to initialize SDL: %s", SDL_GetError());
         return false;

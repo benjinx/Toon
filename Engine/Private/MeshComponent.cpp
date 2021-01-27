@@ -6,37 +6,13 @@
 
 namespace Temporality {
 
-bool MeshComponent::LoadFromFile(const std::string& filename)
+TEMPORALITY_ENGINE_API
+void MeshComponent::SetMesh(std::shared_ptr<Mesh> mesh)
 {
-    auto gfx = GetGraphicsDriver();
-    if (!gfx) {
-        LogError("Unable to load mesh '%s', no graphics driver found", filename);
-        return false;
-    }
-
-    const auto& importers = GetAllMeshImporters();
-    for (const auto& importer : importers) {
-        auto meshes = importer->LoadFromFile(filename);
-        if (!meshes.empty()) {
-            for (auto& meshData : meshes) {
-                auto mesh = gfx->CreateMesh();
-                /*if (mesh->Load(meshData.get())) {
-                    _mMeshes.push_back(std::move(mesh));
-                }*/
-            }
-            return true;
-        }
-    }
-
-    LogError("Unable to load mesh '%s'", filename);
-    return false;
+    _mesh = mesh;
 }
 
-void MeshComponent::AddMesh(std::shared_ptr<Mesh> && mesh)
-{
-    _mMeshes.push_back(std::move(mesh));
-}
-
+TEMPORALITY_ENGINE_API
 void MeshComponent::Render(RenderContext * ctx)
 {
     auto gfx = GetGraphicsDriver();
@@ -44,12 +20,11 @@ void MeshComponent::Render(RenderContext * ctx)
 
     transformData->Model = GetEntity()->GetWorldTransform();
     transformData->UpdateMVP();
+    
+    Buffer * buffer = GetGraphicsDriver()->GetConstantBuffer(0);
+    buffer->WriteTo(0, sizeof(TransformData), reinterpret_cast<uint8_t *>(ctx->GetTransformData()));
 
-    //gfx->SetShaderData("TemporalityTransformData", sizeof(TransformData), transformData);
-
-    for (auto& mesh : _mMeshes) {
-        mesh->Render(ctx);
-    }
+    _mesh->Render(ctx);
 }
 
 } // namespace Temporality
