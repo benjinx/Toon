@@ -2,6 +2,8 @@
 
 #include <Toon/Log.hpp>
 
+#include <cstring>
+
 namespace Toon::OpenGL {
 
 TOON_OPENGL_API
