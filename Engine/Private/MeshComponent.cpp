@@ -1,18 +1,18 @@
-#include <Temporality/Scene/MeshComponent.hpp>
-#include <Temporality/MeshImporter.hpp>
-#include <Temporality/GraphicsDriver.hpp>
-#include <Temporality/Scene/Entity.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/MeshComponent.hpp>
+#include <Toon/MeshImporter.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/Entity.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void MeshComponent::SetMesh(std::shared_ptr<Mesh> mesh)
 {
     _mesh = mesh;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void MeshComponent::Render(RenderContext * ctx)
 {
     auto gfx = GetGraphicsDriver();
@@ -27,4 +27,4 @@ void MeshComponent::Render(RenderContext * ctx)
     _mesh->Render(ctx);
 }
 
-} // namespace Temporality
+} // namespace Toon

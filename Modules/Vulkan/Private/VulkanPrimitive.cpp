@@ -1,13 +1,13 @@
-#include <Temporality/Vulkan/VulkanPrimitive.hpp>
+#include <Toon/Vulkan/VulkanPrimitive.hpp>
 
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 VulkanPrimitive::~VulkanPrimitive()
 {
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 }
 
 bool VulkanPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
@@ -57,11 +57,11 @@ void VulkanPrimitive::GenerateCommands(VkCommandBuffer vkCommandBuffer)
 {
     // TODO: Test moving index buffer inside of other if _indexed check
     if (_indexed) {
-        VulkanBuffer * vkIndexBuffer = TEMPORALITY_VULKAN_BUFFER(_indexBuffer.get());
+        VulkanBuffer * vkIndexBuffer = TOON_VULKAN_BUFFER(_indexBuffer.get());
         vkCmdBindIndexBuffer(vkCommandBuffer, vkIndexBuffer->GetVkBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 
-    VulkanBuffer * vkVertexBuffer = TEMPORALITY_VULKAN_BUFFER(_vertexBuffer.get());
+    VulkanBuffer * vkVertexBuffer = TOON_VULKAN_BUFFER(_vertexBuffer.get());
     VkBuffer vertexBuffers[] = { vkVertexBuffer->GetVkBuffer() };
     
     VkDeviceSize offsets[] = { 0 };
@@ -75,4 +75,4 @@ void VulkanPrimitive::GenerateCommands(VkCommandBuffer vkCommandBuffer)
     }
 }
 
-} // namespace Temporality::Vulkan
+} // namespace Toon::Vulkan

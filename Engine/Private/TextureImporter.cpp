@@ -1,6 +1,6 @@
-#include <Temporality/TextureImporter.hpp>
+#include <Toon/TextureImporter.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _TextureImporters;
 
@@ -14,14 +14,14 @@ void updateTextureImporterList()
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void AddTextureImporter(const std::string& id, std::unique_ptr<TextureImporter> importer)
 {
     _TextureImporters[id] = std::move(importer);
     updateTextureImporterList();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void RemoveTextureImporter(const std::string& id)
 {
     auto it = _TextureImporters.find(id);
@@ -32,10 +32,10 @@ void RemoveTextureImporter(const std::string& id)
     updateTextureImporterList();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 const std::vector<TextureImporter *>& GetAllTextureImporters()
 {
     return _TextureImporterList;
 }
 
-} // namespace Temporality
+} // namespace Toon

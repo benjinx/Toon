@@ -1,15 +1,15 @@
-#include <Temporality/OpenGL/OpenGLTexture.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/OpenGL/OpenGLTexture.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 OpenGLTexture::~OpenGLTexture()
 {
     glDeleteTextures(1, &_mGLid);
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLTexture::Load(const TextureData * data)
 {
     if (_mGLid)
@@ -50,10 +50,10 @@ bool OpenGLTexture::Load(const TextureData * data)
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLTexture::Bind()
 {
     glBindTexture(GL_TEXTURE_2D, _mGLid);
 }
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

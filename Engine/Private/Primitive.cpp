@@ -1,9 +1,9 @@
-#include <Temporality/Primitive.hpp>
-#include <Temporality/PrimitiveData.hpp>
+#include <Toon/Primitive.hpp>
+#include <Toon/PrimitiveData.hpp>
 
-#include <Temporality/Log.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 
-} // namespace Temporality
+} // namespace Toon

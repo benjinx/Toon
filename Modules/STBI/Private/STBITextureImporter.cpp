@@ -1,5 +1,5 @@
-#include <Temporality/STBI/STBITextureImporter.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/STBI/STBITextureImporter.hpp>
+#include <Toon/Log.hpp>
 
 #define STB_NO_HDR
 #define STB_NO_PSD
@@ -8,15 +8,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-namespace Temporality::STBI {
+namespace Toon::STBI {
 
-TEMPORALITY_STBI_API
+TOON_STBI_API
 STBITextureData::~STBITextureData()
 {
     stbi_image_free(Data);
 }
 
-TEMPORALITY_STBI_API
+TOON_STBI_API
 std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
@@ -50,7 +50,7 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string
     return tex;
 }
 
-TEMPORALITY_STBI_API
+TOON_STBI_API
 std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t * buffer, size_t length)
 {
     BenchmarkStart();
@@ -71,4 +71,4 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
     return tex;
 }
 
-} // namespace Temporality::STBI
+} // namespace Toon::STBI

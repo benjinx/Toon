@@ -1,10 +1,10 @@
 
-SET(_target TemporalityVulkan)
+SET(_target ToonVulkan)
 
 DEFINE_MODULE(${_target} VULKAN)
 
 TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC
-        TemporalitySDL2
+        ToonSDL2
 )

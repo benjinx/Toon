@@ -1,7 +1,7 @@
-#include <Temporality/Shader.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/Shader.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 
-} // namespace Temporality
+} // namespace Toon

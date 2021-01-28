@@ -1,10 +1,10 @@
 
-SET(_target TemporalityOpenGL)
+SET(_target ToonOpenGL)
 
 DEFINE_MODULE(${_target} OPENGL)
 
 TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC
-        TemporalitySDL2
+        ToonSDL2
 )

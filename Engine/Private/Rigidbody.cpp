@@ -1,8 +1,8 @@
-#include "Temporality/Rigidbody.hpp"
-#include "Temporality/Scene/Entity.hpp"
+#include "Toon/Rigidbody.hpp"
+#include "Toon/Entity.hpp"
 #include <iostream>
 
-namespace Temporality {
+namespace Toon {
 
 void Rigidbody::AddForce(const glm::vec3 force)
 {
@@ -67,4 +67,4 @@ void Rigidbody::ClampToGround(Entity* entity, const float groundHeight, const fl
     }
 }
 
-} // namespace Temporality
+} // namespace Toon

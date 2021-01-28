@@ -1,11 +1,11 @@
-#include <Temporality/Mesh.hpp>
-#include <Temporality/MeshImporter.hpp>
-#include <Temporality/GraphicsDriver.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/Mesh.hpp>
+#include <Toon/MeshImporter.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool Mesh::Load(const std::vector<std::unique_ptr<PrimitiveData>>& data)
 {
     GraphicsDriver * gfx = GetGraphicsDriver();
@@ -21,7 +21,7 @@ bool Mesh::Load(const std::vector<std::unique_ptr<PrimitiveData>>& data)
     return true;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename)
 {
     GraphicsDriver * gfx = GetGraphicsDriver();
@@ -45,4 +45,4 @@ std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename)
     return nullptr;
 }
 
-} // namespace Temporality
+} // namespace Toon

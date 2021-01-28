@@ -1,5 +1,5 @@
 
-SET(_target TemporalitySDL2)
+SET(_target ToonSDL2)
 
 DEFINE_MODULE(${_target} SDL2)
 

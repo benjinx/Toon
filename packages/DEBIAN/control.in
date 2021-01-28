@@ -1,4 +1,4 @@
-Package: libtemporality-dev
+Package: libtoon-dev
 Version: @PROJECT_VERSION@-1
 Section: base
 Priority: optional
@@ -10,4 +10,4 @@ Depends: libopenal-dev,
  libtheora-dev, 
  libglu1-mesa-dev 
 Maintainer: Benjamin Campbell <mynameizkevin@gmail.com>
-Description: Temporality Game Engine
+Description: Toon Game Engine

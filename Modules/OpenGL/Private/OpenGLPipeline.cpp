@@ -1,31 +1,31 @@
-#include <Temporality/OpenGL/OpenGLPipeline.hpp>
+#include <Toon/OpenGL/OpenGLPipeline.hpp>
 
-#include <Temporality/GraphicsDriver.hpp>
-#include <Temporality/OpenGL/OpenGLShader.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/OpenGL/OpenGLShader.hpp>
 
 #include <cassert>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLPipeline::Initialize()
 {
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLPipeline::Terminate()
 {
 
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLPipeline::Bind()
 {
     auto gfx = GetGraphicsDriver();
     glm::ivec2 windowSize = gfx->GetWindowSize();
 
-    OpenGLShader * shader = TEMPORALITY_OPENGL_SHADER(_shader.get());
+    OpenGLShader * shader = TOON_OPENGL_SHADER(_shader.get());
     if (shader) {
         shader->Bind();
     }
@@ -79,4 +79,4 @@ bool OpenGLPipeline::Bind()
     return true;
 }
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

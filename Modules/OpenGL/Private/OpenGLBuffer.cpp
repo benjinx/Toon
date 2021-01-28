@@ -1,10 +1,10 @@
-#include <Temporality/OpenGL/OpenGLBuffer.hpp>
+#include <Toon/OpenGL/OpenGLBuffer.hpp>
 
-#include <Temporality/Log.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsage, MemoryUsage memoryUsage)
 {
     _bufferUsage = bufferUsage;
@@ -31,13 +31,13 @@ bool OpenGLBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLBuffer::Terminate()
 {
     glDeleteBuffers(1, &_glID);
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
 {
     if (_memoryUsage != MemoryUsage::Download) {
@@ -66,7 +66,7 @@ bool OpenGLBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
 {
     if (_memoryUsage != MemoryUsage::UploadOnce && _memoryUsage != MemoryUsage::UploadOften) {
@@ -95,10 +95,10 @@ bool OpenGLBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLBuffer::Bind()
 {
     glBindBuffer(_glTarget, _glID);
 }
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

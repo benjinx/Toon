@@ -1,15 +1,15 @@
-#include <Temporality/OpenGL/OpenGLShader.hpp>
-#include <Temporality/Log.hpp>
-#include <Temporality/Utils.hpp>
+#include <Toon/OpenGL/OpenGLShader.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Utils.hpp>
 
 #include <fstream>
 #include <vector>
 #include <sstream>
 #include <functional>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
 {
     BenchmarkStart();
@@ -104,19 +104,19 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLShader::Bind()
 {
     glUseProgram(_mglID);
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 GLuint OpenGLShader::GetID()
 {
     return _mglID;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 GLuint OpenGLShader::LoadSPV(const std::string& filename)
 {
     LogVerbose("Looking for SPIR-V shader '%s'", filename);
@@ -163,7 +163,7 @@ GLuint OpenGLShader::LoadSPV(const std::string& filename)
     return shader;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 GLuint OpenGLShader::LoadGLSL(const std::string& filename)
 {
     LogVerbose("Looking for GLSL shader '%s'", filename);
@@ -263,7 +263,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
     return shader;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 GLenum OpenGLShader::GetGLShaderType(const std::string& filename)
 {
     std::string ext = GetExtension(filename);
@@ -294,4 +294,4 @@ GLenum OpenGLShader::GetGLShaderType(const std::string& filename)
     return GL_INVALID_ENUM;
 }
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

@@ -1,6 +1,6 @@
-#include <Temporality/Cube.hpp>
+#include <Toon/Cube.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 Cube::Cube()
 {
@@ -13,4 +13,4 @@ void Cube::Update()
     _mRigidbody.UpdateFirstOrder(this, dt);
 }
 
-} // namespace Temporality
+} // namespace Toon

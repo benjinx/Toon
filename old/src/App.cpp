@@ -102,7 +102,7 @@ void App::Run()
         {
             static char buffer[128];
             float fps = (float)(frames / fpsElap.count()) * 1000.f;
-            sprintf(buffer, "Temporality ~ BC/DC Games - FPS: %0.2f", fps);
+            sprintf(buffer, "Toon ~ BC/DC Games - FPS: %0.2f", fps);
             SDL_SetWindowTitle(_mWindow->GetSDLWindow(), buffer);
 
             // These are important unless you want to go sanic mode.
@@ -115,7 +115,7 @@ void App::Run()
 bool App::Start()
 {
     // Welcome
-    printf("\nTemporality Engine v%s\n\n", VERSION);
+    printf("\nToon Engine v%s\n\n", VERSION);
 
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) > 0)

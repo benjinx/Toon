@@ -1,8 +1,8 @@
-#include <Temporality/PrimitiveData.hpp>
+#include <Toon/PrimitiveData.hpp>
 
-#include <Temporality/Log.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 void PrimitiveData::CalculateTBN()
 {
@@ -95,4 +95,4 @@ void PrimitiveData::CalculateTBN()
     }
 }
 
-} // namespace Temporality
+} // namespace Toon

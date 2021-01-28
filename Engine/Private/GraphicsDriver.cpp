@@ -1,6 +1,6 @@
-#include <Temporality/GraphicsDriver.hpp>
+#include <Toon/GraphicsDriver.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 static std::unique_ptr<GraphicsDriver> _GraphicsDriver(nullptr);
 
@@ -16,7 +16,7 @@ static std::unique_ptr<GraphicsDriver> _GraphicsDriver(nullptr);
 //     return dict;
 // }
 
-TEMPORALITY_ENGINE_API 
+TOON_ENGINE_API 
 void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver)
 {
     if (_GraphicsDriver) {
@@ -25,13 +25,13 @@ void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver)
     _GraphicsDriver = std::move(driver);
 }
 
-TEMPORALITY_ENGINE_API 
+TOON_ENGINE_API 
 GraphicsDriver * GetGraphicsDriver()
 {
     return _GraphicsDriver.get();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool GraphicsDriver::Initialize()
 {
     _updateContext.reset(new UpdateContext());
@@ -40,7 +40,7 @@ bool GraphicsDriver::Initialize()
     return true;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool GraphicsDriver::AddConstantBuffer(std::shared_ptr<Buffer> buffer, unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
@@ -52,7 +52,7 @@ bool GraphicsDriver::AddConstantBuffer(std::shared_ptr<Buffer> buffer, unsigned 
     return true;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool GraphicsDriver::RemoveConstantBuffer(unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
@@ -64,7 +64,7 @@ bool GraphicsDriver::RemoveConstantBuffer(unsigned binding)
     return true;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Buffer * GraphicsDriver::GetConstantBuffer(unsigned binding)
 {
     auto it = _constantBufferBindings.find(binding);
@@ -75,22 +75,22 @@ Buffer * GraphicsDriver::GetConstantBuffer(unsigned binding)
     return it->second.get();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void GraphicsDriver::TermConstantBuffers()
 {
     _constantBufferBindings.clear();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 UpdateContext * GraphicsDriver::GetUpdateContext()
 {
     return _updateContext.get();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 RenderContext * GraphicsDriver::GetRenderContext()
 {
     return _renderContext.get();
 }
 
-} // namespace Temporality
+} // namespace Toon

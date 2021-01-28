@@ -1,16 +1,16 @@
-#include <Temporality/OpenGL/OpenGLGraphicsDriver.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/OpenGL/OpenGLGraphicsDriver.hpp>
+#include <Toon/Log.hpp>
 
 #include <glad/gl.h>
 
-#include <Temporality/Temporality.hpp>
-#include <Temporality/OpenGL/OpenGLMesh.hpp>
-#include <Temporality/OpenGL/OpenGLShader.hpp>
-#include <Temporality/OpenGL/OpenGLTexture.hpp>
+#include <Toon/Toon.hpp>
+#include <Toon/OpenGL/OpenGLMesh.hpp>
+#include <Toon/OpenGL/OpenGLShader.hpp>
+#include <Toon/OpenGL/OpenGLTexture.hpp>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLGraphicsDriver::Initialize()
 {
     if (!SDL2GraphicsDriver::Initialize()) {
@@ -27,7 +27,7 @@ bool OpenGLGraphicsDriver::Initialize()
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-    #if defined(TEMPORALITY_BUILD_DEBUG)
+    #if defined(TOON_BUILD_DEBUG)
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
@@ -58,7 +58,7 @@ bool OpenGLGraphicsDriver::Initialize()
         return false;
     }
 
-    #if defined(TEMPORALITY_BUILD_DEBUG)
+    #if defined(TOON_BUILD_DEBUG)
 
         InitDebugMessageCallback();
 
@@ -129,7 +129,7 @@ bool OpenGLGraphicsDriver::Initialize()
     return true;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLGraphicsDriver::Terminate()
 {
     if (_glContext) {
@@ -140,7 +140,7 @@ void OpenGLGraphicsDriver::Terminate()
     SDL2GraphicsDriver::Terminate();
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLGraphicsDriver::Render()
 {
     glm::vec4 cc = GetClearColor();
@@ -157,7 +157,7 @@ void OpenGLGraphicsDriver::Render()
     SDL_GL_SwapWindow(GetSDL2Window());
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 std::shared_ptr<Pipeline> OpenGLGraphicsDriver::CreatePipeline(std::shared_ptr<Shader> shader)
 {
     auto ptr = std::shared_ptr<Pipeline>(new OpenGLPipeline());
@@ -165,13 +165,13 @@ std::shared_ptr<Pipeline> OpenGLGraphicsDriver::CreatePipeline(std::shared_ptr<S
     return ptr;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 std::shared_ptr<Texture> OpenGLGraphicsDriver::CreateTexture()
 {
     return std::shared_ptr<Texture>(new OpenGLTexture());
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 std::shared_ptr<Shader> OpenGLGraphicsDriver::CreateShader()
 {
     auto shader = std::shared_ptr<Shader>(new OpenGLShader());
@@ -179,23 +179,23 @@ std::shared_ptr<Shader> OpenGLGraphicsDriver::CreateShader()
     return shader;
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 std::shared_ptr<Mesh> OpenGLGraphicsDriver::CreateMesh()
 {
     return std::shared_ptr<Mesh>(new OpenGLMesh());
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 std::unique_ptr<Primitive> OpenGLGraphicsDriver::CreatePrimitive()
 {
     return std::unique_ptr<Primitive>(new OpenGLPrimitive());
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLGraphicsDriver::BindUniformBufferObjects()
 {
     for (const auto& it : _constantBufferBindings) {
-        OpenGLBuffer * buffer = TEMPORALITY_OPENGL_BUFFER(it.second.get());
+        OpenGLBuffer * buffer = TOON_OPENGL_BUFFER(it.second.get());
         if (!buffer) {
             continue;
         }
@@ -222,7 +222,7 @@ _OpenGLDebugMessageCallback(
             Log(LogLevel::Warning, "[WARN](OpenGLDebugMessage) %s\n", message);
             break;
 
-        #if defined(TEMPORALITY_ENABLE_VERBOSE_LOGGING)
+        #if defined(TOON_ENABLE_VERBOSE_LOGGING)
 
         case GL_DEBUG_SEVERITY_NOTIFICATION:
             Log(LogLevel::Verbose, "[VERB](OpenGLDebugMessage) %s\n", message);
@@ -234,11 +234,11 @@ _OpenGLDebugMessageCallback(
     }
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLGraphicsDriver::InitDebugMessageCallback()
 {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(_OpenGLDebugMessageCallback, nullptr);
 }
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

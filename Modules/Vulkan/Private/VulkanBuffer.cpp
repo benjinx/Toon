@@ -1,9 +1,9 @@
-#include <Temporality/Vulkan/VulkanBuffer.hpp>
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Vulkan/VulkanBuffer.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsage, MemoryUsage memoryUsage)
 {
     bool result;
@@ -18,7 +18,7 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
         return false;
     }
 
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
     auto vkBufferUsage = GetVkBufferUsage(_bufferUsage);
     auto vkMemoryUsage = GetVkMemoryUsage(_memoryUsage);
@@ -103,16 +103,16 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 void VulkanBuffer::Terminate()
 {
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
     vkDestroyBuffer(gfx->GetDevice(), _vkBuffer, nullptr);
     vmaFreeMemory(gfx->GetAllocator(), _vmaAllocation);
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
 {
     VkResult vkResult;
@@ -123,7 +123,7 @@ bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
         return false;
     }
 
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
     void * ptr;
     vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
@@ -139,7 +139,7 @@ bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
 {
     VkResult vkResult;
@@ -150,7 +150,7 @@ bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
         return false;
     }
 
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
     void * ptr;
     vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
@@ -166,4 +166,4 @@ bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     return true;
 }
 
-}; // namespace Temporality::Vulkan
+}; // namespace Toon::Vulkan

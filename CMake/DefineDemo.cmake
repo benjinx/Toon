@@ -65,7 +65,7 @@ MACRO(DEFINE_DEMO _target)
     TARGET_LINK_LIBRARIES(
         ${_target}
         PRIVATE
-            TemporalityEngine
+            ToonEngine
     )
 
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
@@ -87,7 +87,7 @@ MACRO(DEFINE_DEMO _target)
             # Disable VS "not secure" warnings
             $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
         PRIVATE
-            TEMPORALITY_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
+            TOON_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
     )
 
     TARGET_COMPILE_OPTIONS(
@@ -114,12 +114,12 @@ MACRO(DEFINE_DEMO _target)
             ${_target}
             PROPERTIES
                 VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}\nTEMPORALITY_ASSET_PATH=${ASSET_PATH}"
+                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}\nTOON_ASSET_PATH=${ASSET_PATH}"
         )
 
         ADD_CUSTOM_TARGET(
             run-${_target}
-            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
+            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
             DEPENDS ${_target}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
@@ -151,7 +151,7 @@ MACRO(DEFINE_DEMO _target)
                 ADD_CUSTOM_COMMAND(
                     TARGET ${_target} POST_BUILD
                     BYPRODUCTS ${_launch_json}
-                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} (${_driver}, $<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" "TEMPORALITY_GRAPHICS_DRIVER=${_driver}"
+                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} (${_driver}, $<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" "TOON_GRAPHICS_DRIVER=${_driver}"
                 )
             ENDFOREACH()
         ENDIF()
@@ -162,7 +162,7 @@ MACRO(DEFINE_DEMO _target)
 
         ADD_CUSTOM_TARGET(
             run-${_target}
-            COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
+            COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
             DEPENDS ${_target}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
@@ -176,7 +176,7 @@ MACRO(DEFINE_DEMO _target)
         IF(gdb_COMMAND)
             ADD_CUSTOM_TARGET(
                 gdb-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" gdb --args $<TARGET_FILE:${_target}>
+                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" gdb --args $<TARGET_FILE:${_target}>
                 DEPENDS ${_target}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
@@ -191,7 +191,7 @@ MACRO(DEFINE_DEMO _target)
         IF(valgrind_COMMAND)
             ADD_CUSTOM_TARGET(
                 valgrind-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" valgrind $<TARGET_FILE:${_target}>
+                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" valgrind $<TARGET_FILE:${_target}>
                 DEPENDS ${_target}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
@@ -219,7 +219,7 @@ MACRO(DEFINE_DEMO _target)
                 ADD_CUSTOM_COMMAND(
                     TARGET ${_target} POST_BUILD
                     BYPRODUCTS ${_launch_json}
-                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} \\(${_driver}\\)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TEMPORALITY_ASSET_PATH=${ASSET_PATH}" "TEMPORALITY_GRAPHICS_DRIVER=${_driver}"
+                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} \\(${_driver}\\)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" "TOON_GRAPHICS_DRIVER=${_driver}"
                 )
             ENDFOREACH()
         ENDIF()

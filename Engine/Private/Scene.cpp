@@ -1,20 +1,20 @@
-#include "Temporality/Scene.hpp"
+#include "Toon/Scene.hpp"
 
-//#include <Temporality/App.hpp>
-#include <Temporality/Camera.hpp>
-#include <Temporality/DevUI.hpp>
-//#include <Temporality/glTF2.hpp>
-#include <Temporality/Log.hpp>
-//#include <Temporality/Material.hpp>
-//#include <Temporality/StaticMeshComponent.hpp>
-//#include <Temporality/Shader.hpp>
-#include <Temporality/Utils.hpp>
+//#include <Toon/App.hpp>
+#include <Toon/Camera.hpp>
+#include <Toon/DevUI.hpp>
+//#include <Toon/glTF2.hpp>
+#include <Toon/Log.hpp>
+//#include <Toon/Material.hpp>
+//#include <Toon/StaticMeshComponent.hpp>
+//#include <Toon/Shader.hpp>
+#include <Toon/Utils.hpp>
 
 //#include <imgui/imgui.h>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Scene::Update(UpdateContext * ctx)
 {
     /*Entity::Update(dt);
@@ -31,7 +31,7 @@ void Scene::Update(UpdateContext * ctx)
     defaultLighting->SetVec4("lightPosition", defaultLightPosition);*/
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Scene::Render(RenderContext * ctx)
 {
     Entity::Render(ctx);
@@ -53,7 +53,7 @@ void Scene::Render(RenderContext * ctx)
     }*/
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool Scene::LoadScene(std::string filename)
 {
     /*std::vector<std::unique_ptr<Entity>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
@@ -71,7 +71,7 @@ bool Scene::LoadScene(std::string filename)
     return true;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Scene::CreateSkybox(std::vector<std::string> faces)
 {
     _mSkybox = std::make_unique<Skybox>();
@@ -79,10 +79,10 @@ void Scene::CreateSkybox(std::vector<std::string> faces)
     //_mSkybox->LoadCubemap(faces);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Scene::Options()
 {
     //ImGui::Checkbox("Show Entity Axis", &DevUI::showAxis);
 }
 
-} // namespace Temporality
+} // namespace Toon

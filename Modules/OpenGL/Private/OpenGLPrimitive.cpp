@@ -1,10 +1,10 @@
-#include <Temporality/OpenGL/OpenGLPrimitive.hpp>
+#include <Toon/OpenGL/OpenGLPrimitive.hpp>
 
-#include <Temporality/Log.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 void OpenGLPrimitive::Render()
 {
     glBindVertexArray(_glVAO);
@@ -19,7 +19,7 @@ void OpenGLPrimitive::Render()
     glBindVertexArray(0);
 }
 
-TEMPORALITY_OPENGL_API
+TOON_OPENGL_API
 bool OpenGLPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
 {
     BenchmarkStart();

@@ -1,4 +1,4 @@
-# Temporality Code Style Guidelines
+# Toon Code Style Guidelines
 
 ## Indentation
 
@@ -742,7 +742,7 @@ int *y;
 std::vector<Entitys *> entitys;
 ```
 
-`#include` statements should be grouped into the following categories: Temporality, System, and Third Party. Within those categories they should be alphabetized, except when order is important.
+`#include` statements should be grouped into the following categories: Toon, System, and Third Party. Within those categories they should be alphabetized, except when order is important.
 
 *Right*
 ```

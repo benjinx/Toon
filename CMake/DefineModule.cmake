@@ -48,11 +48,11 @@ MACRO(DEFINE_MODULE _target _prefix)
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_private}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
 
-    IF(NOT _target STREQUAL "TemporalityEngine")
+    IF(NOT _target STREQUAL "ToonEngine")
         TARGET_LINK_LIBRARIES(
             ${_target}
             PRIVATE
-                TemporalityEngine
+                ToonEngine
         )
     ENDIF()
 
@@ -73,7 +73,7 @@ MACRO(DEFINE_MODULE _target _prefix)
             # Disable VS "not secure" warnings
             $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
         PRIVATE
-            TEMPORALITY_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
+            TOON_SOURCE_PATH_LENGTH=${SOURCE_PATH_LENGTH}
     )
 
     TARGET_COMPILE_OPTIONS(
@@ -91,7 +91,7 @@ MACRO(DEFINE_MODULE _target _prefix)
     SET_TARGET_PROPERTIES(
         ${_target}
         PROPERTIES
-            DEFINE_SYMBOL "TEMPORALITY_${_prefix}_EXPORT"
+            DEFINE_SYMBOL "TOON_${_prefix}_EXPORT"
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")

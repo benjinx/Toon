@@ -1,7 +1,7 @@
-#include <Temporality/Module.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/Log.hpp>
 
-#if defined(TEMPORALITY_PLATFORM_WINDOWS)
+#if defined(TOON_PLATFORM_WINDOWS)
     typedef HMODULE ModuleHandle;
 #else
     #include <dlfcn.h>
@@ -10,7 +10,7 @@
 
 #include <unordered_map>
 
-namespace Temporality {
+namespace Toon {
 
 std::unordered_map<std::string, ModuleHandle> _gModules;
 
@@ -18,7 +18,7 @@ ModuleHandle _dlopen(const std::string& filename)
 {
     ModuleHandle handle = nullptr;
 
-    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+    #if defined(TOON_PLATFORM_WINDOWS)
 
         LogVerbose("Loading Module from PATH: '%s'", getenv("PATH"));
 
@@ -33,7 +33,7 @@ ModuleHandle _dlopen(const std::string& filename)
 
         LogVerbose("Loading Module from LD_LIBRARY_PATH: '%s'", getenv("LD_LIBRARY_PATH"));
 
-        #if defined(TEMPORALITY_PLATFORM_APPLE)
+        #if defined(TOON_PLATFORM_APPLE)
 
             std::string libFilename = "lib" + filename + ".dylib";
 
@@ -56,7 +56,7 @@ ModuleHandle _dlopen(const std::string& filename)
 
 void * _dlsym(ModuleHandle handle, const std::string& symbol)
 {
-    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+    #if defined(TOON_PLATFORM_WINDOWS)
 
         return GetProcAddress(handle, symbol.c_str());
 
@@ -69,7 +69,7 @@ void * _dlsym(ModuleHandle handle, const std::string& symbol)
 
 void _dlclose(ModuleHandle handle)
 {
-    #if defined(TEMPORALITY_PLATFORM_WINDOWS)
+    #if defined(TOON_PLATFORM_WINDOWS)
 
         FreeLibrary(handle);
 
@@ -89,7 +89,7 @@ bool LoadModule(const std::string& name)
         return false;
     }
 
-    TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
+    ToonModule * def = static_cast<ToonModule *>(_dlsym(handle, "_ToonModule"));
 
     if (!def) {
         LogError("Failed to find _Module symbol");
@@ -119,7 +119,7 @@ void FreeModule(const std::string& name)
     }
 
     ModuleHandle handle = it->second;
-    TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
+    ToonModule * def = static_cast<ToonModule *>(_dlsym(handle, "_ToonModule"));
 
     if (def && def->Terminate) {
         def->Terminate();
@@ -134,7 +134,7 @@ void FreeAllModules()
 {
     for (const auto& it : _gModules) {
         ModuleHandle handle = it.second;
-        TemporalityModule * def = static_cast<TemporalityModule *>(_dlsym(handle, "_TemporalityModule"));
+        ToonModule * def = static_cast<ToonModule *>(_dlsym(handle, "_ToonModule"));
         if (def && def->Terminate) {
             def->Terminate();
         }

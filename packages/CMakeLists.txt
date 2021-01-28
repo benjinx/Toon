@@ -5,7 +5,7 @@ FIND_PROGRAM(
 )
 
 IF (TAR_EXECUTABLE)
-    SET(_package "libTemporality-${PROJECT_VERSION}")
+    SET(_package "libToon-${PROJECT_VERSION}")
 
     FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_package})
     
@@ -29,7 +29,7 @@ FIND_PROGRAM(
 )
 
 IF (DPKG_DEB_EXECUTABLE)
-    SET(_package "libTemporality-dev_${PROJECT_VERSION}-1")
+    SET(_package "libToon-dev_${PROJECT_VERSION}-1")
 
     FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_package}/DEBIAN)
 

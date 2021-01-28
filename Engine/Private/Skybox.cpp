@@ -1,9 +1,9 @@
-#include <Temporality/Skybox.hpp>
+#include <Toon/Skybox.hpp>
 /*
-//#include <Temporality/App.hpp>
-//#include <Temporality/OpenGL.hpp>
-#include <Temporality/Log.hpp>
-#include <Temporality/Utils.hpp>
+//#include <Toon/App.hpp>
+//#include <Toon/OpenGL.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Utils.hpp>
 
 //#include "stb/stb_image.h"
 

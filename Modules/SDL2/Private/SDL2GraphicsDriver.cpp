@@ -1,11 +1,11 @@
-#include <Temporality/SDL2/SDL2GraphicsDriver.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/SDL2/SDL2GraphicsDriver.hpp>
+#include <Toon/Log.hpp>
 
-#include <Temporality/Temporality.hpp>
+#include <Toon/Toon.hpp>
 
-namespace Temporality::SDL2 {
+namespace Toon::SDL2 {
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 bool SDL2GraphicsDriver::Initialize()
 {
     if (!GraphicsDriver::Initialize()) {
@@ -22,7 +22,7 @@ bool SDL2GraphicsDriver::Initialize()
     return true;
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 void SDL2GraphicsDriver::Terminate()
 {
     if (_mWindow) {
@@ -33,7 +33,7 @@ void SDL2GraphicsDriver::Terminate()
     SDL_Quit();
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
 {
     if (_mWindow) {
@@ -42,7 +42,7 @@ bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
     }
 
     _mWindow = SDL_CreateWindow(
-        "Temporality", 
+        "Toon", 
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         800,
@@ -65,25 +65,25 @@ bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
     return true;
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 void SDL2GraphicsDriver::SetWindowTitle(const std::string& title)
 {
     SDL_SetWindowTitle(_mWindow, title.c_str());
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 std::string SDL2GraphicsDriver::GetWindowTitle()
 {
     return (std::string)SDL_GetWindowTitle(_mWindow);
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 void SDL2GraphicsDriver::SetWindowSize(const glm::ivec2& size)
 {
     SDL_SetWindowSize(_mWindow, size.x, size.y);
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 glm::ivec2 SDL2GraphicsDriver::GetWindowSize()
 {
     glm::ivec2 size;
@@ -91,7 +91,7 @@ glm::ivec2 SDL2GraphicsDriver::GetWindowSize()
     return size;
 }
 
-TEMPORALITY_SDL2_API
+TOON_SDL2_API
 void SDL2GraphicsDriver::ProcessEvents()
 {
     SDL_Event event;
@@ -117,4 +117,4 @@ void SDL2GraphicsDriver::ProcessEvents()
     }
 }
 
-} // namespace Temporality::SDL2
+} // namespace Toon::SDL2

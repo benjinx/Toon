@@ -1,8 +1,8 @@
-#include "Temporality/Axis.hpp"
+#include "Toon/Axis.hpp"
 /*
-//#include <Temporality/App.hpp>
-//#include <Temporality/StaticMeshComponent.hpp>
-//#include <Temporality/Shader.hpp>
+//#include <Toon/App.hpp>
+//#include <Toon/StaticMeshComponent.hpp>
+//#include <Toon/Shader.hpp>
 
 Axis::Axis()
 {

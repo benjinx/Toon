@@ -1,4 +1,4 @@
-#include <Temporality/Joint.hpp>
+#include <Toon/Joint.hpp>
 
 Joint::Joint(int index, std::string name, glm::mat4 localBindTransform)
 {

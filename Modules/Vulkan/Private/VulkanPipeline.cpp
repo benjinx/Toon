@@ -1,29 +1,29 @@
-#include <Temporality/Vulkan/VulkanPipeline.hpp>
+#include <Toon/Vulkan/VulkanPipeline.hpp>
 
-#include <Temporality/Log.hpp>
-#include <Temporality/Vertex.hpp>
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
-#include <Temporality/Vulkan/VulkanShader.hpp>
-#include <Temporality/Vulkan/VulkanMesh.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Vertex.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Vulkan/VulkanShader.hpp>
+#include <Toon/Vulkan/VulkanMesh.hpp>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 void VulkanPipeline::Terminate()
 {
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
  
     vkDestroyPipeline(gfx->GetDevice(), _vkPipeline, nullptr);
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanPipeline::Initialize()
 {
     VkResult vkResult;
 
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
-    VulkanShader * shader = TEMPORALITY_VULKAN_SHADER(_shader.get());
+    VulkanShader * shader = TOON_VULKAN_SHADER(_shader.get());
     if (!shader) {
         LogError("Trying to bind a Vulkan VulkanPipeline with no shader");
         return false;
@@ -214,10 +214,10 @@ bool VulkanPipeline::Initialize()
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 void VulkanPipeline::GenerateCommands(VkCommandBuffer vkCommandBuffer)
 {
     vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipeline);
 }
 
-} // namespace Temporality::Vulkan
+} // namespace Toon::Vulkan

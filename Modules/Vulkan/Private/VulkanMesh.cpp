@@ -1,11 +1,11 @@
-#include <Temporality/Vulkan/VulkanMesh.hpp>
+#include <Toon/Vulkan/VulkanMesh.hpp>
 
-#include <Temporality/Log.hpp>
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanMesh::Load(const std::vector<std::unique_ptr<PrimitiveData>>& data)
 {
     for (const auto& primitiveData : data) {
@@ -20,19 +20,19 @@ bool VulkanMesh::Load(const std::vector<std::unique_ptr<PrimitiveData>>& data)
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 void VulkanMesh::Render(RenderContext * ctx)
 {
-    VulkanRenderContext * vkRenderContext = TEMPORALITY_VULKAN_RENDER_CONTEXT(ctx);
+    VulkanRenderContext * vkRenderContext = TOON_VULKAN_RENDER_CONTEXT(ctx);
     VkCommandBuffer vkCommandBuffer = vkRenderContext->GetVkCommandBuffer();
 
-    // VulkanPipeline * vkPipeline = TEMPORALITY_VULKAN_PIPELINE(_pipeline.get());
+    // VulkanPipeline * vkPipeline = TOON_VULKAN_PIPELINE(_pipeline.get());
     // vkPipeline->GenerateCommands(vkCommandBuffer);
 
     for (auto& primitive : _primitiveList) {
-        VulkanPrimitive * vkPrimitive = TEMPORALITY_VULKAN_PRIMITIVE(primitive.get());
+        VulkanPrimitive * vkPrimitive = TOON_VULKAN_PRIMITIVE(primitive.get());
         vkPrimitive->GenerateCommands(vkCommandBuffer);
     }
 }
 
-} // namespace Temporality::Vulkan
+} // namespace Toon::Vulkan

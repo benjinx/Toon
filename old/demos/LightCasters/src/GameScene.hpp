@@ -1,7 +1,7 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include <Temporality.hpp>
+#include <Toon.hpp>
 
 class GameScene : public Scene
 {

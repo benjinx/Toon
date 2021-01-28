@@ -1,11 +1,11 @@
-#include <Temporality/Utils.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/Utils.hpp>
+#include <Toon/Log.hpp>
 
 #include <sstream>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 std::vector<std::string> GetAssetPaths()
 {
     static std::vector<std::string> paths;
@@ -15,13 +15,13 @@ std::vector<std::string> GetAssetPaths()
 
     paths.push_back(std::string());
 
-    const char * path = getenv("TEMPORALITY_ASSET_PATH");
-    LogVerbose("TEMPORALITY_ASSET_PATH=%s", path);
+    const char * path = getenv("TOON_ASSET_PATH");
+    LogVerbose("TOON_ASSET_PATH=%s", path);
 
     if (path) {
         std::istringstream iss(path);
         std::string p;
-        while (std::getline(iss, p, TEMPORALITY_PATH_SEPARATOR)) {
+        while (std::getline(iss, p, TOON_PATH_SEPARATOR)) {
             paths.push_back(p);
         }
     }
@@ -29,4 +29,4 @@ std::vector<std::string> GetAssetPaths()
     return paths;
 }
 
-} // namespace Temporality
+} // namespace Toon

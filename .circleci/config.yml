@@ -8,7 +8,7 @@ jobs:
         default: "clang"
       image:
         type: string
-        default: "whobrokethebuild/temporality:builder"
+        default: "whobrokethebuild/toon:builder"
       build-type:
         type: string
         default: Release
@@ -45,15 +45,15 @@ workflows:
       - build:
           name: "Clang, Release, System"
           compiler: "clang"
-          image: "whobrokethebuild/temporality:builder"
+          image: "whobrokethebuild/toon:builder"
           build-type: "Release"
       - build:
           name: "Clang, Debug, ThirdParty"
           compiler: "clang"
-          image: "whobrokethebuild/temporality:builder-minimal"
+          image: "whobrokethebuild/toon:builder-minimal"
           build-type: "Debug"
       - build:
           name: "GCC, Release, System"
           compiler: "gcc"
-          image: "whobrokethebuild/temporality:builder"
+          image: "whobrokethebuild/toon:builder"
           build-type: "Release"

@@ -9,7 +9,7 @@ INCLUDE(Policies)
 ### Project
 ###
 
-PROJECT(Temporality)
+PROJECT(Toon)
 INCLUDE(Version)
 
 ###
@@ -32,14 +32,9 @@ ENDIF()
 ### Options
 ###
 
-OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging"             OFF)
+OPTION(VERBOSE_LOGGING "Build Toon with Verbose Logging"             OFF)
 IF(VERBOSE_LOGGING)
-    ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
-ENDIF()
-
-OPTION(BINARY_SHADERS "Build Temporality with Binary Shader Support"        OFF)
-IF(BINARY_SHADERS)
-    ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_BINARY_SHADERS)
+    ADD_DEFINITIONS(-DTOON_ENABLE_VERBOSE_LOGGING)
 ENDIF()
 
 OPTION(BUILD_TESTS "Build Tests"                                            OFF)
@@ -148,6 +143,7 @@ IF(BUILD_THIRDPARTY)
         COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" 
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DREQUIRED_DEPENDENCIES=${_tmp}
             ${THIRDPARTY_SOURCE_DIR}
             WORKING_DIRECTORY ${THIRDPARTY_BINARY_DIR}
         RESULT_VARIABLE _result
@@ -266,15 +262,15 @@ FIND_PROGRAM(docker_COMMAND docker)
 IF(docker_COMMAND)
     ADD_CUSTOM_TARGET(
         build-docker-images
-        COMMAND ${docker_COMMAND} build --target builder-minimal -t whobrokethebuild/temporality:builder-minimal .
-        COMMAND ${docker_COMMAND} build --target builder -t whobrokethebuild/temporality:builder .
+        COMMAND ${docker_COMMAND} build --target builder-minimal -t whobrokethebuild/toon:builder-minimal .
+        COMMAND ${docker_COMMAND} build --target builder -t whobrokethebuild/toon:builder .
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
     ADD_CUSTOM_TARGET(
         push-docker-images
-        COMMAND ${docker_COMMAND} push whobrokethebuild/temporality:builder-minimal
-        COMMAND ${docker_COMMAND} push whobrokethebuild/temporality:builder
+        COMMAND ${docker_COMMAND} push whobrokethebuild/toon:builder-minimal
+        COMMAND ${docker_COMMAND} push whobrokethebuild/toon:builder
         DEPENDS build-docker-images
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )

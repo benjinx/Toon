@@ -1,15 +1,15 @@
-#include "Temporality/Camera.hpp"
+#include "Toon/Camera.hpp"
 
-//#include <Temporality/App.hpp>
-#include <Temporality/Log.hpp>
-#include <Temporality/Utils.hpp>
-//#include <Temporality/Window.hpp>
+//#include <Toon/App.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Utils.hpp>
+//#include <Toon/Window.hpp>
 
 //Camera * Camera::_sInst = nullptr;
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Camera::Camera()
 {
     /*const glm::ivec2& size = glm::ivec2(App::Inst()->GetWindow()->GetWidth(),
@@ -18,13 +18,13 @@ Camera::Camera()
     SetViewportSize(_mViewportSize);*/
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::mat4 Camera::GetView() const
 {
     return glm::lookAt(GetWorldPosition(), GetWorldPosition() + GetForward(), GetUp());
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::mat4 Camera::GetProjection() const
 {
     if (_mMode == CameraMode::Perspective)
@@ -40,49 +40,49 @@ glm::mat4 Camera::GetProjection() const
     return glm::mat4(1.0f);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetMode(CameraMode mode)
 {
     _mMode = mode;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetAspect(float aspect)
 {
     _mAspect = aspect;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetAspect(const glm::vec2& size)
 {
     _mAspect = size.x / size.y;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetFOVX(float fovx)
 {
     _mFovX = fovx;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetFOVY(float fovy)
 {
     _mFovX = 2.0f * atanf(tanf(fovy * 0.5f) * _mAspect);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetViewportScale(const glm::vec4& viewScale)
 {
     _mViewportScale = viewScale;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetViewportSize(const glm::vec2& viewSize)
 {
     _mViewportSize = viewSize;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::vec4 Camera::GetViewport() const
 {
     glm::vec4 scale = GetViewportScale();
@@ -102,19 +102,19 @@ glm::vec4 Camera::GetViewport() const
         size.y * scale[3]);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetClip(const glm::vec2& clip)
 {
     _mClip = clip;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetUp(const glm::vec3& up)
 {
     _mUp = up;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetForward(const glm::vec3& forward)
 {
     if ((normalize(forward) + _mUp) == glm::vec3(0.0f))
@@ -127,31 +127,31 @@ void Camera::SetForward(const glm::vec3& forward)
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::vec3 Camera::GetForward() const
 {
     return glm::rotate(GetWorldOrientation(), GetWorldForward());
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::vec3 Camera::GetRight() const
 {
     return glm::normalize(glm::cross(GetForward(), GetUp()));
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetLookAt(const glm::vec3& point)
 {
     SetForward(point - GetPosition());
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::SetDirection(glm::vec3 dir)
 {
     _mDirection = dir;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::HandleMovement(float dt)
 {
     float velocity = _mMovementSpeed * dt;
@@ -167,7 +167,7 @@ void Camera::HandleMovement(float dt)
     SetPosition(pos);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Camera::HandleRotation(float deltaX, float deltaY)
 {
     glm::vec2 delta(deltaX, deltaY);
@@ -188,4 +188,4 @@ void Camera::HandleRotation(float deltaX, float deltaY)
     SetOrientation(rotation);
 }
 
-} // namespace Temporality
+} // namespace Toon

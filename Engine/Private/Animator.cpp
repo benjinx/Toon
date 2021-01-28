@@ -1,6 +1,6 @@
-#include <Temporality/Animator.hpp>
+#include <Toon/Animator.hpp>
 
-//#include <Temporality/Mesh.hpp>
+//#include <Toon/Mesh.hpp>
 
 Animator::Animator(std::shared_ptr<Mesh> mesh)
 {

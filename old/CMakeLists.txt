@@ -9,7 +9,7 @@ INCLUDE(Policies)
 ### Project
 ###
 
-PROJECT(Temporality)
+PROJECT(Toon)
 
 ###
 ### Options
@@ -19,10 +19,10 @@ OPTION(BUILD_DEMOS      "Build Demo Projects"                               ON)
 OPTION(BUILD_THIRDPARTY "Build Missing ThirdParty Dependencies"             ON)
 OPTION(BUILD_PACKAGES   "Build Packages"                                    OFF)
 
-OPTION(VERBOSE_LOGGING "Build Temporality with Verbose Logging enabled" OFF)
+OPTION(VERBOSE_LOGGING "Build Toon with Verbose Logging enabled" OFF)
 IF(VERBOSE_LOGGING)
     MESSAGE(STATUS "Verbose On.")
-    ADD_DEFINITIONS(-DTEMPORALITY_ENABLE_VERBOSE_LOGGING)
+    ADD_DEFINITIONS(-DTOON_ENABLE_VERBOSE_LOGGING)
 ENDIF()
 
 ###
@@ -196,7 +196,7 @@ IF(TARGET SDL2::SDL2main)
 ENDIF()
 
 INSTALL(TARGETS ${PROJECT_NAME}
-    EXPORT TemporalityTargets
+    EXPORT ToonTargets
     INCLUDES DESTINATION include
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
@@ -205,44 +205,44 @@ INSTALL(TARGETS ${PROJECT_NAME}
 INCLUDE(CMakePackageConfigHelpers)
 
 WRITE_BASIC_package_VERSION_FILE(
-    "${CMAKE_BINARY_DIR}/TemporalityConfigVersion.cmake"
+    "${CMAKE_BINARY_DIR}/ToonConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
-INSTALL(EXPORT TemporalityTargets
-    FILE TemporalityTargets.cmake
-    NAMESPACE Temporality::
-    DESTINATION lib/cmake/Temporality
+INSTALL(EXPORT ToonTargets
+    FILE ToonTargets.cmake
+    NAMESPACE Toon::
+    DESTINATION lib/cmake/Toon
 )
 
 CONFIGURE_package_CONFIG_FILE(
-    "${CMAKE_SOURCE_DIR}/cmake/TemporalityConfig.cmake.in"
-    "${CMAKE_BINARY_DIR}/TemporalityConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/Temporality
+    "${CMAKE_SOURCE_DIR}/cmake/ToonConfig.cmake.in"
+    "${CMAKE_BINARY_DIR}/ToonConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/Toon
 )
 
-INSTALL(EXPORT TemporalityTargets 
-    DESTINATION lib/cmake/Temporality
+INSTALL(EXPORT ToonTargets 
+    DESTINATION lib/cmake/Toon
 )
 
 INSTALL(FILES 
-    "${CMAKE_BINARY_DIR}/TemporalityConfigVersion.cmake" 
-    "${CMAKE_BINARY_DIR}/TemporalityConfig.cmake"
-    DESTINATION lib/cmake/Temporality
+    "${CMAKE_BINARY_DIR}/ToonConfigVersion.cmake" 
+    "${CMAKE_BINARY_DIR}/ToonConfig.cmake"
+    DESTINATION lib/cmake/Toon
 )
 
 FIND_PACKAGE(PkgConfig QUIET)
 
 IF(PKG_CONFIG_FOUND)
     CONFIGURE_FILE(
-        "${CMAKE_SOURCE_DIR}/cmake/Temporality.pc.in"
-        "${CMAKE_BINARY_DIR}/Temporality.pc"
+        "${CMAKE_SOURCE_DIR}/cmake/Toon.pc.in"
+        "${CMAKE_BINARY_DIR}/Toon.pc"
         @ONLY
     )
 
     INSTALL(FILES
-        "${CMAKE_BINARY_DIR}/Temporality.pc"
+        "${CMAKE_BINARY_DIR}/Toon.pc"
         DESTINATION share/pkgconfig
     )
 ENDIF()

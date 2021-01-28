@@ -1,7 +1,7 @@
-#include <Temporality/Module.hpp>
-#include <Temporality/OpenGL/OpenGLGraphicsDriver.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/OpenGL/OpenGLGraphicsDriver.hpp>
 
-namespace Temporality::OpenGL {
+namespace Toon::OpenGL {
 
 bool ModuleInit() {
     SetGraphicsDriver(std::unique_ptr<GraphicsDriver>(new OpenGLGraphicsDriver()));
@@ -17,10 +17,10 @@ void ModuleTerm() {
     SetGraphicsDriver(nullptr);
 }
 
-TEMPORALITY_MODULE {
+TOON_MODULE {
     .Name       = "OpenGL",
     .Initialize = ModuleInit,
     .Terminate  = ModuleTerm,
 };
 
-} // namespace Temporality::OpenGL
+} // namespace Toon::OpenGL

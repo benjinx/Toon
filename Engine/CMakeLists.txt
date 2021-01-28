@@ -3,7 +3,7 @@ INCLUDE(DefineModule)
 INCLUDE(CompileShaders)
 INCLUDE(SetSourceGroups)
 
-SET(_target TemporalityEngine)
+SET(_target ToonEngine)
 
 DEFINE_MODULE(${_target} ENGINE)
 

@@ -1,13 +1,13 @@
-#include <Temporality/Vulkan/VulkanShader.hpp>
+#include <Toon/Vulkan/VulkanShader.hpp>
 
-#include <Temporality/Log.hpp>
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
 #include <fstream>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
 {
     BenchmarkStart();
@@ -25,10 +25,10 @@ bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 bool VulkanShader::LoadSPV(const std::string& filename)
 {
-    VulkanGraphicsDriver * gfx = TEMPORALITY_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
     const auto& assetPaths = GetAssetPaths();
 
@@ -92,7 +92,7 @@ bool VulkanShader::LoadSPV(const std::string& filename)
     return true;
 }
 
-TEMPORALITY_VULKAN_API
+TOON_VULKAN_API
 VkShaderStageFlagBits VulkanShader::GetVkShaderType(const std::string& filename)
 {
     std::string ext = GetExtension(filename);
@@ -121,4 +121,4 @@ VkShaderStageFlagBits VulkanShader::GetVkShaderType(const std::string& filename)
     return VK_SHADER_STAGE_ALL; // Invalid
 }
 
-} // namespace Temporality::Vulkan
+} // namespace Toon::Vulkan

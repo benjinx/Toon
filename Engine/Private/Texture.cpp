@@ -1,9 +1,9 @@
-#include <Temporality/Texture.hpp>
-#include <Temporality/Log.hpp>
+#include <Toon/Texture.hpp>
+#include <Toon/Log.hpp>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool Texture::LoadFromFile(const std::string& filename)
 {
     const auto& importers = GetAllTextureImporters();
@@ -18,7 +18,7 @@ bool Texture::LoadFromFile(const std::string& filename)
     return false;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 bool Texture::LoadFromMemory(const uint8_t* buffer, size_t length)
 {
     const auto& importers = GetAllTextureImporters();

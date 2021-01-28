@@ -1,8 +1,8 @@
-#include <Temporality/Light.hpp>
+#include <Toon/Light.hpp>
 
-#include <Temporality/Utils.hpp>
+#include <Toon/Utils.hpp>
 
-namespace Temporality {
+namespace Toon {
 
 //DirectionalLight::DirectionalLight(glm::vec3 direction)
 //{
@@ -82,4 +82,4 @@ void SpotLight::SetOuterCutOff(float outerCutOff)
     _mOuterCutOff = outerCutOff;
 }
 
-} // namespace Temporality
+} // namespace Toon

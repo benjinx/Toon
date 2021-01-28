@@ -1,14 +1,14 @@
-#include <Temporality/TinyOBJ/TinyOBJMeshImporter.hpp>
-#include <Temporality/Log.hpp>
-#include <Temporality/Utils.hpp>
-#include <Temporality/TinyOBJ/TinyOBJPrimitiveData.hpp>
+#include <Toon/TinyOBJ/TinyOBJMeshImporter.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Utils.hpp>
+#include <Toon/TinyOBJ/TinyOBJPrimitiveData.hpp>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-namespace Temporality::TinyOBJ {
+namespace Toon::TinyOBJ {
 
-TEMPORALITY_TINYOBJ_API
+TOON_TINYOBJ_API
 std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
 {
     BenchmarkStart();
@@ -106,4 +106,4 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
     return primitiveList;
 }
 
-} // namespace Temporality::TinyOBJ
+} // namespace Toon::TinyOBJ

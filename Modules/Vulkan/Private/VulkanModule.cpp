@@ -1,7 +1,7 @@
-#include <Temporality/Module.hpp>
-#include <Temporality/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
-namespace Temporality::Vulkan {
+namespace Toon::Vulkan {
 
 bool ModuleInit() {
     SetGraphicsDriver(std::unique_ptr<GraphicsDriver>(new VulkanGraphicsDriver()));
@@ -17,10 +17,10 @@ void ModuleTerm() {
     SetGraphicsDriver(nullptr);
 }
 
-TEMPORALITY_MODULE {
+TOON_MODULE {
     .Name       = "Vulkan",
     .Initialize = ModuleInit,
     .Terminate  = ModuleTerm,
 };
 
-} // namespace Temporality::Vulkan
+} // namespace Toon::Vulkan

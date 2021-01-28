@@ -1,4 +1,4 @@
 
-SET(_target TemporalitySTBI)
+SET(_target ToonSTBI)
 
 DEFINE_MODULE(${_target} STBI)

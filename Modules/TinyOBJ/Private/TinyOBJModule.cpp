@@ -1,7 +1,7 @@
-#include <Temporality/Module.hpp>
-#include <Temporality/TinyOBJ/TinyOBJMeshImporter.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/TinyOBJ/TinyOBJMeshImporter.hpp>
 
-namespace Temporality::TinyOBJ {
+namespace Toon::TinyOBJ {
 
 bool ModuleInit() {
     AddMeshImporter("TinyOBJ", std::make_unique<TinyOBJMeshImporter>());
@@ -13,10 +13,10 @@ void ModuleTerm() {
     RemoveMeshImporter("TinyOBJ");
 }
 
-TEMPORALITY_MODULE {
+TOON_MODULE {
     .Name       = "TinyOBJ",
     .Initialize = ModuleInit,
     .Terminate  = ModuleTerm,
 };
 
-} // namespace Temporality::TinyOBJ
+} // namespace Toon::TinyOBJ

@@ -1,35 +1,35 @@
-#include <Temporality/Scene/Entity.hpp>
+#include <Toon/Entity.hpp>
 
-//#include <Temporality/App.hpp>
-#include <Temporality/Camera.hpp>
-#include <Temporality/Light.hpp>
-#include <Temporality/Log.hpp>
-#include <Temporality/Mesh.hpp>
-//#include <Temporality/StaticMeshComponent.hpp>
-#include <Temporality/Utils.hpp>
+//#include <Toon/App.hpp>
+#include <Toon/Camera.hpp>
+#include <Toon/Light.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Mesh.hpp>
+//#include <Toon/StaticMeshComponent.hpp>
+#include <Toon/Utils.hpp>
 
-namespace Temporality {
+namespace Toon {
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Entity::Entity()
 {
     SetTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1));
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Entity::Entity(glm::vec3 position)
 {
     SetPosition(position);
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Entity::~Entity()
 {
     delete _mSceneAxis;
     _mChildren.clear();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Entity::Update(UpdateContext * ctx)
 {
     // Check if enabled
@@ -51,7 +51,7 @@ void Entity::Update(UpdateContext * ctx)
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Entity::Render(RenderContext * ctx)
 {
     // Check for visibility
@@ -73,7 +73,7 @@ void Entity::Render(RenderContext * ctx)
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Entity::RenderAxis()
 {
     if (_mSceneAxis == nullptr)
@@ -91,7 +91,7 @@ void Entity::RenderAxis()
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Entity* Entity::FindEntity(std::string name)
 {
     for (auto& entity : _mChildren)
@@ -114,7 +114,7 @@ Entity* Entity::FindEntity(std::string name)
     return nullptr;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 Component * Entity::AddComponent(std::unique_ptr<Component>&& component)
 {
     component->Attach(this);
@@ -124,14 +124,14 @@ Component * Entity::AddComponent(std::unique_ptr<Component>&& component)
     return _componentPtrs.back();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Entity::AddChild(std::unique_ptr<Entity>&& child)
 {
     child->SetParent(this);
     _mChildren.push_back(std::move(child));
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void Entity::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
 {
     _position = position;
@@ -139,7 +139,7 @@ void Entity::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scal
     _scale = scale;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::mat4 Entity::GetTransform() const {
     glm::mat4 transform = glm::mat4(1);
     transform = glm::translate(transform, GetPosition());
@@ -148,7 +148,7 @@ glm::mat4 Entity::GetTransform() const {
     return transform;
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::mat4 Entity::GetWorldTransform() const
 {
     if (GetParent())
@@ -159,7 +159,7 @@ glm::mat4 Entity::GetWorldTransform() const
     return GetTransform();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::vec3 Entity::GetWorldPosition() const
 {
     if (GetParent())
@@ -170,7 +170,7 @@ glm::vec3 Entity::GetWorldPosition() const
     return GetPosition();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::quat Entity::GetWorldOrientation() const
 {
     if (GetParent())
@@ -181,7 +181,7 @@ glm::quat Entity::GetWorldOrientation() const
     return GetOrientation();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 glm::vec3 Entity::GetWorldScale() const
 {
     if (GetParent())
@@ -192,4 +192,4 @@ glm::vec3 Entity::GetWorldScale() const
     return GetScale();
 }
 
-} // namespace Temporality
+} // namespace Toon

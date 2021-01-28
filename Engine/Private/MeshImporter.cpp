@@ -1,8 +1,8 @@
-#include <Temporality/MeshImporter.hpp>
+#include <Toon/MeshImporter.hpp>
 
 #include <unordered_map>
 
-namespace Temporality {
+namespace Toon {
 
 static std::unordered_map<std::string, std::unique_ptr<MeshImporter>> _MeshImporters;
 
@@ -17,14 +17,14 @@ void updateMeshImporterList()
     }
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void AddMeshImporter(const std::string& id, std::unique_ptr<MeshImporter> importer)
 {
     _MeshImporters[id] = std::move(importer);
     updateMeshImporterList();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 void RemoveMeshImporter(const std::string& id)
 {
     auto it = _MeshImporters.find(id);
@@ -36,10 +36,10 @@ void RemoveMeshImporter(const std::string& id)
     updateMeshImporterList();
 }
 
-TEMPORALITY_ENGINE_API
+TOON_ENGINE_API
 const std::vector<MeshImporter*>& GetAllMeshImporters()
 {
     return _MeshImporterList;
 }
 
-} // namespace Temporality
+} // namespace Toon
