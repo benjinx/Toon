@@ -104,7 +104,7 @@ MACRO(DEFINE_MODULE _target _prefix)
             CXX_STANDARD 20
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
-            DEFINE_SYMBOL "DUSK_${_prefix}_EXPORT"
+            DEFINE_SYMBOL "TOON_${_prefix}_EXPORT"
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")
