@@ -6,6 +6,12 @@
 
 #include <cstdio> // for printf, vsnprintf
 
+#if !defined(TOON_PLATFORM_WINDOWS)
+
+    #include <unistd.h>
+
+#endif
+
 /// Start Benchmark
 
 #include <chrono>
@@ -96,23 +102,23 @@ static inline void Log(LogLevel level, const char* format, Args... args)
         switch (level)
         {
         case LogLevel::Info:
-            color = 0;97; // White
+            color = "0;97"; // White
             break;
         case LogLevel::Warning:
-            color = 0;33; // Yellow
+            color = "0;33"; // Yellow
             break;
         case LogLevel::Error:
         case LogLevel::Fatal:
-            color = 0;31; // Red
+            color = "0;31"; // Red
             break;
         case LogLevel::Performance:
-            color = 0;35; // Magenta
+            color = "0;35"; // Magenta
             break;
         case LogLevel::Verbose:
-            color = 1;37; // Grey
+            color = "1;37"; // Grey
             break;
         case LogLevel::Load:
-            color = 0;32; // Green
+            color = "0;32"; // Green
             break;
         }
 
