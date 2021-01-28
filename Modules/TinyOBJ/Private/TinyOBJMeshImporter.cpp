@@ -102,7 +102,7 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
         primitiveList.push_back(std::unique_ptr<PrimitiveData>(primitiveData));
     }
 
-    BenchmarkEnd("TinyOBJ::MeshImporter::LoadFromFile");
+    BenchmarkEnd();
     return primitiveList;
 }
 

@@ -19,10 +19,10 @@
 #define BenchmarkStart() \
     auto toonBenchClockStart = std::chrono::high_resolution_clock::now();
 
-#define BenchmarkEnd(funcName)                                                      \
-    LogPerf("Function: %s took %.3f millis\n", TOON_FUNCTION_NAME(),         \
-        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(      \
-            std::chrono::high_resolution_clock::now() - toonBenchClockStart  \
+#define BenchmarkEnd()                                                          \
+    LogPerf("Function: %s took %.3f millis\n", TOON_FUNCTION_NAME(),            \
+        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(  \
+            std::chrono::high_resolution_clock::now() - toonBenchClockStart     \
         ).count());
 
 /// End Benchmark
@@ -95,7 +95,7 @@ static inline void Log(LogLevel level, const char* format, Args... args)
     
         static bool isTTY = isatty(fileno(stdout));
 
-        const char * Default = 0;39;
+        const char * Default = "0;39";
 
         const char * color = Default;
 

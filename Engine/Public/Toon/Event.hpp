@@ -27,14 +27,14 @@ public:
 
     //bool RemovePythonListener(PyObject* listener);
 
-    bool RemovePythonListener(unsigned id);
+    // bool RemovePythonListener(unsigned id);
 
-    void CallPython(const EventData* data);
+    // void CallPython(const EventData* data);
 
-    void RemoveAllPythonListeners();
+    // void RemoveAllPythonListeners();
 
 private:
-    unsigned _mMaxPythonListenerID = 0;
+    // unsigned _mMaxPythonListenerID = 0;
     
     //std::unordered_map<unsigned, PyObject*> _mPythonListeners;
 };
@@ -76,13 +76,13 @@ public:
             it.second(data);
         }
 
-        CallPython(static_cast<const EventData*>(data));
+        // CallPython(static_cast<const EventData*>(data));
     }
 
     void RemoveAllListeners() {
         _mListeners.clear();
 
-        RemoveAllPythonListeners();
+        // RemoveAllPythonListeners();
     }
 
 private:

@@ -46,7 +46,7 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string
 
     LogInfo("Loaded '%s'", filename);
 
-    BenchmarkEnd("STBI::TextureImporter::LoadFromFile");
+    BenchmarkEnd();
     return tex;
 }
 
@@ -67,7 +67,7 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
     tex->Size = size;
     tex->Components = components;
     
-    BenchmarkEnd("STBI::TextureImporter::LoadFromMemory");
+    BenchmarkEnd();
     return tex;
 }
 

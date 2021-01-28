@@ -15,7 +15,6 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
     BenchmarkStart();
 
     std::vector<GLuint> shaders;
-    const auto& shaderPaths = GetAssetPaths();
 
     for (const auto& filename : filenames) {
         GLuint shader = 0;
@@ -100,7 +99,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
         glDetachShader(_mglID, shader);
     }
 
-    BenchmarkEnd("OpenGL::Shader::LoadFromFiles");
+    BenchmarkEnd();
     return true;
 }
 

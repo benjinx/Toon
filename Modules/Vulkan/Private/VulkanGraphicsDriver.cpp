@@ -4,8 +4,12 @@
 
 #include <set>
 
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
+DISABLE_WARNINGS()
+
+    #define VMA_IMPLEMENTATION
+    #include <vk_mem_alloc.h>
+
+ENABLE_WARNINGS()
 
 namespace Toon::Vulkan {
 
@@ -52,7 +56,7 @@ bool VulkanGraphicsDriver::Initialize()
         return false;
     }
 
-    BenchmarkEnd("VulkanGraphicsDriver::Initialize()");
+    BenchmarkEnd();
 
     return true;
 }
@@ -70,7 +74,7 @@ void VulkanGraphicsDriver::Terminate()
 
     SDL2GraphicsDriver::Terminate();
 
-    BenchmarkEnd("VulkanGraphicsDriver::Terminate");
+    BenchmarkEnd();
 }
 
 TOON_VULKAN_API
@@ -1023,7 +1027,7 @@ bool VulkanGraphicsDriver::ResetSwapChain()
         return false;
     }
 
-    BenchmarkEnd("VulkanGraphicsDriver::ResetSwapChain()");
+    BenchmarkEnd();
     return true;
 }
 

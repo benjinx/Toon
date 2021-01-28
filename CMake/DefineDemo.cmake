@@ -62,16 +62,16 @@ MACRO(DEFINE_DEMO _target)
         ${_assets}
     )
 
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_in}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_out}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
+
     TARGET_LINK_LIBRARIES(
         ${_target}
         PRIVATE
             ToonEngine
     )
-
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_in}")
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_out}")
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
 
     TARGET_INCLUDE_DIRECTORIES(
         ${_target}
@@ -92,14 +92,32 @@ MACRO(DEFINE_DEMO _target)
 
     TARGET_COMPILE_OPTIONS(
         ${_target}
-        PUBLIC
-            # Configure VS to use C++20
+        PRIVATE
+            # Configure VS to use C++20, since it ignores CXX_STANDARD
             $<$<CXX_COMPILER_ID:MSVC>: /std:c++latest>
+
+            # Force windows to use UTF-8
+            $<$<CXX_COMPILER_ID:MSVC>: /utf-8>
 
             # Disable unknown pragmas warning, C++ exceptions
             $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
             $<$<CXX_COMPILER_ID:Clang>: -Wall -Wno-unknown-pragmas -fno-exceptions>
             $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc->
+    )
+
+    TARGET_LINK_OPTIONS(
+        ${_target}
+        PUBLIC
+            # Fix windows bug in looking for python38.lib
+            $<$<CXX_COMPILER_ID:MSVC>:/NODEFAULTLIB:python38.lib>
+    )
+
+    SET_TARGET_PROPERTIES(
+        ${_target} 
+        PROPERTIES
+            CXX_STANDARD 20
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")

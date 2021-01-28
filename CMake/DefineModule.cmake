@@ -78,9 +78,12 @@ MACRO(DEFINE_MODULE _target _prefix)
 
     TARGET_COMPILE_OPTIONS(
         ${_target}
-        PUBLIC
-            # Configure VS to use C++20
+        PRIVATE
+            # Configure VS to use C++20, since it ignores CXX_STANDARD
             $<$<CXX_COMPILER_ID:MSVC>: /std:c++latest>
+
+            # Force windows to use UTF-8
+            $<$<CXX_COMPILER_ID:MSVC>: /utf-8>
 
             # Disable unknown pragmas warning, C++ exceptions
             $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
@@ -88,10 +91,20 @@ MACRO(DEFINE_MODULE _target _prefix)
             $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc->
     )
 
+    TARGET_LINK_OPTIONS(
+        ${_target}
+        PUBLIC
+            # Fix windows bug in looking for python38.lib
+            $<$<CXX_COMPILER_ID:MSVC>:/NODEFAULTLIB:python38.lib>
+    )
+
     SET_TARGET_PROPERTIES(
         ${_target}
         PROPERTIES
-            DEFINE_SYMBOL "TOON_${_prefix}_EXPORT"
+            CXX_STANDARD 20
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
+            DEFINE_SYMBOL "DUSK_${_prefix}_EXPORT"
     )
 
     FILE(RELATIVE_PATH folder ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/..")

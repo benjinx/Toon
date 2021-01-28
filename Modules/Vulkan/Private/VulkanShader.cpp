@@ -21,7 +21,7 @@ bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
         }
     }
 
-    BenchmarkEnd("VulkanShader::LoadFromFiles");
+    BenchmarkEnd();
     return true;
 }
 
