@@ -33,7 +33,7 @@ bool VulkanPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
         _count = vertexList.size();
     }
     else {
-        LogFatal("UNTESTED");
+        ToonLogFatal("UNTESTED");
 
         _indexed = true;
         _count = indexList.size();

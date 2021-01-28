@@ -12,21 +12,6 @@
 
 #endif
 
-/// Start Benchmark
-
-#include <chrono>
-
-#define BenchmarkStart() \
-    auto toonBenchClockStart = std::chrono::high_resolution_clock::now();
-
-#define BenchmarkEnd()                                                          \
-    LogPerf("Function: %s took %.3f millis\n", TOON_FUNCTION_NAME(),            \
-        std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(  \
-            std::chrono::high_resolution_clock::now() - toonBenchClockStart     \
-        ).count());
-
-/// End Benchmark
-
 namespace Toon {
 
     enum class LogLevel {
@@ -168,28 +153,28 @@ static inline void Log(LogLevel level, const char* format, Args... args)
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 #endif
 
-#define LogInfo(M, ...) \
+#define ToonLogInfo(M, ...) \
     do { Log(Toon::LogLevel::Info, "[INFO](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
-#define LogWarn(M, ...) \
+#define ToonLogWarn(M, ...) \
     do { Log(Toon::LogLevel::Warning, "[WARN](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
-#define LogError(M, ...) \
+#define ToonLogError(M, ...) \
     do { Log(Toon::LogLevel::Error, "[ERRO](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
-#define LogFatal(M, ...) \
+#define ToonLogFatal(M, ...) \
     do { Log(Toon::LogLevel::Fatal, "[FATL](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); \
         std::terminate(); } while (0)
 
-#define LogPerf(M, ...) \
+#define ToonLogPerf(M, ...) \
     do { Log(Toon::LogLevel::Performance, "[PERF](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 
-#define LogLoad(M, ...) \
+#define ToonLogLoad(M, ...) \
     do { Log(Toon::LogLevel::Load, "[LOAD](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 

@@ -14,7 +14,7 @@ bool OpenGLBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
     _size = size;
 
     if (!data && _memoryUsage == MemoryUsage::GPU) {
-        LogError("Attempting to create an empty buffer with MemoryUsage GPU");
+        ToonLogError("Attempting to create an empty buffer with MemoryUsage GPU");
         return false;
     }
 
@@ -43,7 +43,7 @@ TOON_OPENGL_API
 bool OpenGLBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
 {
     if (_memoryUsage != MemoryUsage::Download) {
-        LogError("Unable to read data from buffer with MemoryUsage: %s",
+        ToonLogError("Unable to read data from buffer with MemoryUsage: %s",
             MemoryUsageToString(_memoryUsage));
         return false;
     }
@@ -55,7 +55,7 @@ bool OpenGLBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     void * ptr;
     ptr = glMapBufferRange(_glTarget, offset, length, flags);
     if (!ptr) {
-        LogError("glMapBufferRange() failed");
+        ToonLogError("glMapBufferRange() failed");
         return false;
     }
 
@@ -72,7 +72,7 @@ TOON_OPENGL_API
 bool OpenGLBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
 {
     if (_memoryUsage != MemoryUsage::UploadOnce && _memoryUsage != MemoryUsage::UploadOften) {
-        LogError("Unable to write data to buffer with MemoryUsage: %s",
+        ToonLogError("Unable to write data to buffer with MemoryUsage: %s",
             MemoryUsageToString(_memoryUsage));
         return false;
     }
@@ -84,7 +84,7 @@ bool OpenGLBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     void * ptr;
     ptr = glMapBufferRange(_glTarget, offset, length, flags);
     if (!ptr) {
-        LogError("glMapBufferRange() failed");
+        ToonLogError("glMapBufferRange() failed");
         return false;
     }
 

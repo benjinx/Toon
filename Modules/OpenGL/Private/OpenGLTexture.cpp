@@ -21,7 +21,7 @@ bool OpenGLTexture::Load(const TextureData * data)
     glGenTextures(1, &_mGLid);
     if (!_mGLid)
     {
-        LogError("Failed to create GL Texture");
+        ToonLogError("Failed to create GL Texture");
         return false;
     }
 

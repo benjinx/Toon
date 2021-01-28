@@ -5,7 +5,7 @@
 //unsigned ScriptEvent::AddPythonListener(PyObject* listener)
 //{
 //    if (!PyCallable_Check(listener)) {
-//        LogError("PyObject not callable");
+//        ToonLogError("PyObject not callable");
 //        return 0;
 //    }
 //
@@ -50,11 +50,11 @@
 //     PyObject* dict = data->GetPyObject();
 //     PyObject* arg = Py_BuildValue("(O)", dict);
 
-//     LogInfo("Calling Python Listeners");
+//     ToonLogInfo("Calling Python Listeners");
 //     for (const auto& it : _mPythonListeners) {
 //        PyObject* result = PyEval_CallObject(it.second, arg);
 //        if (!result) {
-//            LogError("Failed to call Python Event Listener");
+//            ToonLogError("Failed to call Python Event Listener");
 //            PyPrintStackTrace();
 //        }
 //     }

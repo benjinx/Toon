@@ -14,7 +14,7 @@ bool Texture::LoadFromFile(const std::string& filename)
         }
     }
 
-    LogError("Unable to find an importer for '%s'", filename);
+    ToonLogError("Unable to find an importer for '%s'", filename);
     return false;
 }
 

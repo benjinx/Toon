@@ -19,7 +19,7 @@ void Shader::CheckAttribs()
     // Check for max Attribs
     GLint nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    LogInfo("Maximum number of vertex attributes supported: ", nrAttributes);
+    ToonLogInfo("Maximum number of vertex attributes supported: ", nrAttributes);
 }
 
 void Shader::Load(std::initializer_list<std::string> files)
@@ -41,7 +41,7 @@ void Shader::Load(std::vector<std::string> files)
     for (auto& f : files)
     {
         // Output files loading
-        LogInfo("Loading: [%s]", f);
+        ToonLogInfo("Loading: [%s]", f);
 
         // Find shader type
         GLuint shaderType;
@@ -87,7 +87,7 @@ void Shader::Load(std::vector<std::string> files)
 
             if (shaderFile.is_open())
             {
-                LogLoad("Loaded:  [%s]", fullFilename);
+                ToonLogLoad("Loaded:  [%s]", fullFilename);
                 loaded = true;
                 break;
             }
@@ -95,7 +95,7 @@ void Shader::Load(std::vector<std::string> files)
 
         if (!loaded)
         {
-            LogError("Failed to load shaders [%s]", f);
+            ToonLogError("Failed to load shaders [%s]", f);
             return;
         }
 
@@ -120,7 +120,7 @@ void Shader::Load(std::vector<std::string> files)
         if (!success)
         {
             glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-            LogError("Failed to compile shaders [%s] \n%s", f, infoLog);
+            ToonLogError("Failed to compile shaders [%s] \n%s", f, infoLog);
             return;
         }
 
@@ -145,7 +145,7 @@ void Shader::Load(std::vector<std::string> files)
     if (!success)
     {
         glGetProgramInfoLog(_mID, sizeof(infoLog), NULL, infoLog);
-        LogError("Failed to link shader [%d]", _mID);
+        ToonLogError("Failed to link shader [%d]", _mID);
         return;
     }
 

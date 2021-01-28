@@ -54,12 +54,12 @@ void GameScene::Start()
 
     if (!LoadScene("models/LowPolyMale_Rigging_AnimationStomp2.glb"))
     {
-       LogWarn("Could not load scene!");
+       ToonLogWarn("Could not load scene!");
     }
     
     // if (!LoadScene("models/Donut_Texture_Displacement.glb"))
     // {
-    //    LogWarn("Could not load scene!");
+    //    ToonLogWarn("Could not load scene!");
     // }
 
     // Camera
@@ -101,10 +101,10 @@ void GameScene::LogTest()
 {
     // Log Test
     printf("\n");
-    LogInfo("Info");
-    LogWarn("Warning");
-    LogError("Error");
-    LogPerf("Perf");
+    ToonLogInfo("Info");
+    ToonLogWarn("Warning");
+    ToonLogError("Error");
+    ToonLogPerf("Perf");
     LogVerbose("Verb");
-    LogLoad("Load");
+    ToonLogLoad("Load");
 }

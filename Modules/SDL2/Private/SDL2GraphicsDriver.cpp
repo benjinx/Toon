@@ -13,11 +13,11 @@ bool SDL2GraphicsDriver::Initialize()
     }
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        LogError("Unable to initialize SDL: %s", SDL_GetError());
+        ToonLogError("Unable to initialize SDL: %s", SDL_GetError());
         return false;
     }
 
-    LogInfo("Creating SDL2 Window.");
+    ToonLogInfo("Creating SDL2 Window.");
 
     return true;
 }
@@ -51,7 +51,7 @@ bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
 
     if (!_mWindow)
     {
-        LogError("Failed to create SDL2 Window. %s", SDL_GetError());
+        ToonLogError("Failed to create SDL2 Window. %s", SDL_GetError());
         return false;
     }
 

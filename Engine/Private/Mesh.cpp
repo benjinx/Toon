@@ -41,7 +41,7 @@ std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename)
         return mesh;
     }
 
-    LogError("Failed to load mesh '%s'", filename);
+    ToonLogError("Failed to load mesh '%s'", filename);
     return nullptr;
 }
 

@@ -99,12 +99,12 @@ void Skybox::LoadCubemap(std::vector<std::string> faces)
             {
                 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
                 stbi_image_free(data);
-                LogLoad("Cubemap texture Loaded at path: %s", fullFilename.c_str());
+                ToonLogLoad("Cubemap texture Loaded at path: %s", fullFilename.c_str());
                 break;
             }
             else
             {
-                LogWarn("Cubemap texture failed to load at path: %s", fullFilename.c_str());
+                ToonLogWarn("Cubemap texture failed to load at path: %s", fullFilename.c_str());
                 stbi_image_free(data);
             }
         }

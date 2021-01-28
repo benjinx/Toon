@@ -7,14 +7,14 @@ namespace Toon::STBI {
 
 bool ModuleInit() {
     AddTextureImporter("STBI", std::unique_ptr<TextureImporter>(new STBITextureImporter()));
-    LogInfo("Init");
+    ToonLogInfo("Init");
 
     return true;
 }
 
 void ModuleTerm() {
     RemoveTextureImporter("STBI");
-    LogInfo("Term()");
+    ToonLogInfo("Term()");
 }
 
 TOON_MODULE {

@@ -25,7 +25,7 @@ ModuleHandle _dlopen(const std::string& filename)
         handle = LoadLibraryA(filename.c_str());
         if (!handle) {
             //WindowsErrorMessage msg(HRESULT_FROM_WIN32(GetLastError()));
-            //LogError("Failed to load '%s', %s", filename, msg);
+            //ToonLogError("Failed to load '%s', %s", filename, msg);
             return nullptr;
         }
         
@@ -45,7 +45,7 @@ ModuleHandle _dlopen(const std::string& filename)
 
         handle = dlopen(libFilename.c_str(), RTLD_GLOBAL | RTLD_NOW);
         if (!handle) {
-            LogError("Failed to load '%s', %s", libFilename, dlerror());
+            ToonLogError("Failed to load '%s', %s", libFilename, dlerror());
             return nullptr;
         }
 
@@ -82,7 +82,7 @@ void _dlclose(ModuleHandle handle)
 
 bool LoadModule(const std::string& name)
 {
-    LogLoad("Loading module '%s'", name);
+    ToonLogLoad("Loading module '%s'", name);
 
     ModuleHandle handle = _dlopen(name);
     if (!handle) {
@@ -92,7 +92,7 @@ bool LoadModule(const std::string& name)
     ToonModule * def = static_cast<ToonModule *>(_dlsym(handle, "_ToonModule"));
 
     if (!def) {
-        LogError("Failed to find _Module symbol");
+        ToonLogError("Failed to find _Module symbol");
         return false;
     }
 
@@ -100,7 +100,7 @@ bool LoadModule(const std::string& name)
         if (!def->Initialize()) {
             _dlclose(handle);
 
-            LogError("Failed to initialize module '%s'", name);
+            ToonLogError("Failed to initialize module '%s'", name);
             return false;
         }
     }
@@ -114,7 +114,7 @@ void FreeModule(const std::string& name)
 {
     auto it = _gModules.find(name);
     if (it == _gModules.end()) {
-        LogWarn("Failed to free module '%s', module is not loaded", name);
+        ToonLogWarn("Failed to free module '%s', module is not loaded", name);
         return;
     }
 

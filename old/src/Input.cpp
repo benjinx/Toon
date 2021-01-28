@@ -35,7 +35,7 @@ void Input::InitControllers(Sint32 controllerID)
     }
 
     for (size_t j = 0; j < _mGameControllers.size(); ++j)
-        LogInfo("Controller Added: %d, %s", controllerID, SDL_GameControllerName(_mGameControllers[j]));
+        ToonLogInfo("Controller Added: %d, %s", controllerID, SDL_GameControllerName(_mGameControllers[j]));
 
 }
 
@@ -43,7 +43,7 @@ void Input::RemoveControllers(Sint32 controllerID)
 {
     // Clear all controllers
     _mGameControllers.clear();
-    LogInfo("All Controllers removed.");
+    ToonLogInfo("All Controllers removed.");
 
     // Readd all controllers
     InitControllers(controllerID);
@@ -65,7 +65,7 @@ void Input::ProcessEvent(SDL_Event* event)
         switch (key)
         {
             case KEY_UNKNOWN:
-                //LogInfo("Unknown Key: %d", event->key.keysym.sym);
+                //ToonLogInfo("Unknown Key: %d", event->key.keysym.sym);
                 break;
             case KEY_RETURN:
                 break;
@@ -315,7 +315,7 @@ void Input::ProcessEvent(SDL_Event* event)
         switch (key)
         {
         case KEY_UNKNOWN:
-            //LogInfo("Unknown Key: %d", event->key.keysym.sym);
+            //ToonLogInfo("Unknown Key: %d", event->key.keysym.sym);
             break;
         case KEY_RETURN:
             break;
@@ -590,16 +590,16 @@ void Input::ProcessEvent(SDL_Event* event)
         switch (mouse)
         {
         case MOUSE_BUTTON_UNKNOWN:
-            //LogInfo("Unknown Mouse Button Down: %d", event->button.button);
+            //ToonLogInfo("Unknown Mouse Button Down: %d", event->button.button);
             break;
         case MOUSE_BUTTON_LEFT:
-            //LogInfo("Left Mouse Button Down: %d", event->button.button);
+            //ToonLogInfo("Left Mouse Button Down: %d", event->button.button);
             break;
         case MOUSE_BUTTON_MIDDLE:
-            //LogInfo("Middle Mouse Button Down: %d", event->button.button);
+            //ToonLogInfo("Middle Mouse Button Down: %d", event->button.button);
             break;
         case MOUSE_BUTTON_RIGHT:
-            //LogInfo("Right Mouse Button Down: %d", event->button.button);
+            //ToonLogInfo("Right Mouse Button Down: %d", event->button.button);
             _mRightButtonDown = true;
             break;
         }
@@ -614,13 +614,13 @@ void Input::ProcessEvent(SDL_Event* event)
         case MOUSE_BUTTON_UNKNOWN:
             break;
         case MOUSE_BUTTON_LEFT:
-            //LogInfo("Left Mouse Button Up: %d", event->button.button);
+            //ToonLogInfo("Left Mouse Button Up: %d", event->button.button);
             break;
         case MOUSE_BUTTON_MIDDLE:
-            //LogInfo("Middle Mouse Button Up: %d", event->button.button);
+            //ToonLogInfo("Middle Mouse Button Up: %d", event->button.button);
             break;
         case MOUSE_BUTTON_RIGHT:
-            //LogInfo("Right Mouse Button Up: %d", event->button.button);
+            //ToonLogInfo("Right Mouse Button Up: %d", event->button.button);
             _mRightButtonDown = false;
             break;
         }
@@ -645,55 +645,55 @@ void Input::ProcessEvent(SDL_Event* event)
         switch (gamepad)
         {
             case GAME_CONTROLLER_BUTTON_INVALID:
-                LogInfo("Controller Button Invalid: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Invalid: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_A:
-                LogInfo("Controller Button A: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button A: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_B:
-                LogInfo("Controller Button B: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button B: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_X:
-                LogInfo("Controller Button X: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button X: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_Y:
-                LogInfo("Controller Button Y: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Y: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_BACK:
-                LogInfo("Controller Button Back: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Back: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_GUIDE:
-                LogInfo("Controller Button Guide: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Guide: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_START:
-                LogInfo("Controller Button Start: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Start: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_LEFTSTICK:
-                LogInfo("Controller Button Left Stick: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Left Stick: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_RIGHTSTICK:
-                LogInfo("Controller Button Right Stick: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Right Stick: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_LEFTSHOULDER:
-                LogInfo("Controller Button Left Shoulder: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Left Shoulder: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                LogInfo("Controller Button Right Shoulder: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Right Shoulder: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_DPAD_UP:
-                LogInfo("Controller Button Dpad Up: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Dpad Up: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_DPAD_DOWN:
-                LogInfo("Controller Button Dpad Down: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Dpad Down: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_DPAD_LEFT:
-                LogInfo("Controller Button Dpad Left: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Dpad Left: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_DPAD_RIGHT:
-                LogInfo("Controller Button Dpad Right: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Dpad Right: %d", event->cbutton.button);
                 break;
             case GAME_CONTROLLER_BUTTON_MAX:
-                LogInfo("Controller Button Max: %d", event->cbutton.button);
+                ToonLogInfo("Controller Button Max: %d", event->cbutton.button);
                 break;
         }
     }
@@ -704,7 +704,7 @@ void Input::ProcessEvent(SDL_Event* event)
                     _mGameControllers[event->cdevice.which],
                     (SDL_GameControllerAxis)event->caxis.axis);
 
-        //LogInfo("Axis value: %d\n", axis);
+        //ToonLogInfo("Axis value: %d\n", axis);
         
         // handle x motion w/ dead zone.
         if ((SDL_GameControllerAxis)event->caxis.axis % 2 == 0)
@@ -724,7 +724,7 @@ void Input::ProcessEvent(SDL_Event* event)
                 _mXDir = 0;
             }
 
-            LogInfo("xDir = %d", _mXDir);
+            ToonLogInfo("xDir = %d", _mXDir);
         }
         // handle y motion w/ dead zone.
         else if ((SDL_GameControllerAxis)event->caxis.axis % 2 == 1)
@@ -744,7 +744,7 @@ void Input::ProcessEvent(SDL_Event* event)
                 _mYDir = 0;
             }
 
-            LogInfo("yDir = %d", _mYDir);
+            ToonLogInfo("yDir = %d", _mYDir);
         }
 
         // formula: angle = atan2((double)yDir, (double)xDir) * (180/PI);
@@ -754,7 +754,7 @@ void Input::ProcessEvent(SDL_Event* event)
         if (_mXDir == 0 && _mYDir == 0)
             angle = 0;
 
-        //LogInfo("Axis Angle: %d\n", angle);
+        //ToonLogInfo("Axis Angle: %d\n", angle);
     }
 
 }

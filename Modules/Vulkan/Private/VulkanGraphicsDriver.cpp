@@ -1,6 +1,7 @@
 #include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 #include <Toon/Log.hpp>
 #include <Toon/Toon.hpp>
+#include <Toon/Benchmark.hpp>
 
 #include <set>
 
@@ -16,7 +17,7 @@ namespace Toon::Vulkan {
 TOON_VULKAN_API
 bool VulkanGraphicsDriver::Initialize()
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     if (!SDL2GraphicsDriver::Initialize()) {
         return false;
@@ -31,7 +32,7 @@ bool VulkanGraphicsDriver::Initialize()
     #if defined(TOON_BUILD_DEBUG)
 
         if (!InitDebugUtilsMessenger()) {
-            LogWarn("Failed to initialize Vulkan Debug Utils Messenger");
+            ToonLogWarn("Failed to initialize Vulkan Debug Utils Messenger");
         }
 
     #endif
@@ -56,7 +57,7 @@ bool VulkanGraphicsDriver::Initialize()
         return false;
     }
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
 
     return true;
 }
@@ -64,7 +65,7 @@ bool VulkanGraphicsDriver::Initialize()
 TOON_VULKAN_API
 void VulkanGraphicsDriver::Terminate()
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     #if defined(TOON_BUILD_DEBUG)
         TermDebugUtilsMessenger();
@@ -74,7 +75,7 @@ void VulkanGraphicsDriver::Terminate()
 
     SDL2GraphicsDriver::Terminate();
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
 }
 
 TOON_VULKAN_API
@@ -133,7 +134,7 @@ uint32_t VulkanGraphicsDriver::FindMemoryType(uint32_t filter, VkMemoryPropertyF
         }
     }
 
-    LogError("Failed to find suitable memory type");
+    ToonLogError("Failed to find suitable memory type");
     return UINT32_MAX;
 }
 
@@ -161,7 +162,7 @@ bool VulkanGraphicsDriver::CreateBuffer(VkBuffer * buffer, VmaAllocation * vmaAl
 
     vkResult = vmaCreateBuffer(_vmaAllocator, &bufferCreateInfo, &allocationCreateInfo, buffer, vmaAllocation, &allocationInfo);
     if (vkResult != VK_SUCCESS) {
-        LogError("Failed to create buffer");
+        ToonLogError("Failed to create buffer");
         return false;
     }
 
@@ -184,7 +185,7 @@ bool VulkanGraphicsDriver::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, Vk
     VkCommandBuffer commandBuffer;
     vkResult = vkAllocateCommandBuffers(_vkDevice, &commandBufferAllocateInfo, &commandBuffer);
     if (vkResult != VK_SUCCESS) {
-        LogError("Failed to allocate command buffer");
+        ToonLogError("Failed to allocate command buffer");
         return false;
     }
 
@@ -205,7 +206,7 @@ bool VulkanGraphicsDriver::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, Vk
 
     vkResult = vkEndCommandBuffer(commandBuffer);
     if (vkResult != VK_SUCCESS) {
-        LogError("Failed to build command buffer");
+        ToonLogError("Failed to build command buffer");
         return false;
     }
 
@@ -290,7 +291,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
     std::vector<const char*> requiredExtensions(requiredExtensionCount);
     sdlResult = SDL_Vulkan_GetInstanceExtensions(GetSDL2Window(), &requiredExtensionCount, requiredExtensions.data());
     if (!sdlResult) {
-        LogError("SDL_Vulkan_GetInstanceExtensions() failed, %s", SDL_GetError());
+        ToonLogError("SDL_Vulkan_GetInstanceExtensions() failed, %s", SDL_GetError());
         return std::vector<const char *>();
     }
 
@@ -301,7 +302,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
             requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
         else {
-            LogWarn("Vulkan Extension '%s' not available", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            ToonLogWarn("Vulkan Extension '%s' not available", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
     #endif
 
@@ -315,7 +316,7 @@ bool VulkanGraphicsDriver::InitInstance()
 
     int vkVersion = gladLoaderLoadVulkan(nullptr, nullptr, nullptr);
     if (vkVersion == 0) {
-        LogError("gladLoaderLoadVulkan() failed");
+        ToonLogError("gladLoaderLoadVulkan() failed");
         return false;
     }
 
@@ -325,14 +326,14 @@ bool VulkanGraphicsDriver::InitInstance()
     vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
 
     if (availableLayerCount == 0) {
-        LogError("vkEnumerateInstanceLayerProperties() failed, no available layers");
+        ToonLogError("vkEnumerateInstanceLayerProperties() failed, no available layers");
         return false;
     }
 
     std::vector<VkLayerProperties> availableLayers(availableLayerCount);
     vkResult = vkEnumerateInstanceLayerProperties(&availableLayerCount, availableLayers.data());
     if (vkResult != VK_SUCCESS) {
-        LogError("vkEnumerateInstanceLayerProperties() failed");
+        ToonLogError("vkEnumerateInstanceLayerProperties() failed");
         return false;
     }
 
@@ -347,14 +348,14 @@ bool VulkanGraphicsDriver::InitInstance()
     vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
 
     if (availableExtensionCount == 0) {
-        LogError("vkEnumerateInstanceExtensionProperties() failed, no extensions available");
+        ToonLogError("vkEnumerateInstanceExtensionProperties() failed, no extensions available");
         return false;
     }
 
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
     vkResult = vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
     if (vkResult != VK_SUCCESS) {
-        LogError("vkEnumerateInstanceExtensionProperties() failed");
+        ToonLogError("vkEnumerateInstanceExtensionProperties() failed");
         return false;
     }
 
@@ -367,7 +368,7 @@ bool VulkanGraphicsDriver::InitInstance()
     const auto& requiredExtensions = GetRequiredInstanceExtensions();
     if (requiredExtensions.empty())
     {
-        LogError("Failed to get Required Instance Extensions");
+        ToonLogError("Failed to get Required Instance Extensions");
         return false;
     }
 
@@ -411,14 +412,14 @@ bool VulkanGraphicsDriver::InitInstance()
 
     vkResult = vkCreateInstance(&createInfo, nullptr, &_vkInstance);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateInstance() failed");
+        ToonLogError("vkCreateInstance() failed");
         return false;
     }
 
     // Reload glad to load instance pointers and populate available extensions
     vkVersion = gladLoaderLoadVulkan(_vkInstance, nullptr, nullptr);
     if (vkVersion == 0) {
-        LogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance");
+        ToonLogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance");
         return false;
     }
 
@@ -459,7 +460,7 @@ bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
 
     auto it = _vkAvailableLayers.find("VK_LAYER_KHRONOS_validation");
     if (it == _vkAvailableLayers.end()) {
-        LogWarn("Unable to find VK_LAYER_KHRONOS_validation");
+        ToonLogWarn("Unable to find VK_LAYER_KHRONOS_validation");
         return false;
     }
 
@@ -488,13 +489,13 @@ bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
     };
 
     if (!vkCreateDebugUtilsMessengerEXT) {
-        LogWarn("vkCreateDebugUtilsMessengerEXT() is not bound");
+        ToonLogWarn("vkCreateDebugUtilsMessengerEXT() is not bound");
         return false;
     }
 
     vkResult = vkCreateDebugUtilsMessengerEXT(_vkInstance, &debugUtilsMessengerCreateInfo, nullptr, &_vkDebugMessenger);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateDebugUtilsMessengerEXT() failed");
+        ToonLogError("vkCreateDebugUtilsMessengerEXT() failed");
         return false;
     }
 
@@ -509,7 +510,7 @@ void VulkanGraphicsDriver::TermDebugUtilsMessenger()
     }
 
     if (!vkDestroyDebugUtilsMessengerEXT) {
-        LogWarn("vkDestroyDebugUtilsMessengerEXT() is not bound");
+        ToonLogWarn("vkDestroyDebugUtilsMessengerEXT() is not bound");
         return;
     }
 
@@ -532,7 +533,7 @@ bool VulkanGraphicsDriver::InitSurface()
 
     sdlResult = SDL_Vulkan_CreateSurface(GetSDL2Window(), _vkInstance, &_vkSurface);
     if (!sdlResult) {
-        LogError("SDL_Vulkan_CreateSurface() failed, %s", SDL_GetError());
+        ToonLogError("SDL_Vulkan_CreateSurface() failed, %s", SDL_GetError());
         return false;
     }
 
@@ -557,14 +558,14 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, nullptr);
     
     if (deviceCount == 0) {
-        LogError("vkEnumeratePhysicalDevices() failed, no devices found");
+        ToonLogError("vkEnumeratePhysicalDevices() failed, no devices found");
         return false;
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkResult = vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, devices.data());
     if (vkResult != VK_SUCCESS) {
-        LogError("vkEnumeratePhysicalDevices() failed");
+        ToonLogError("vkEnumeratePhysicalDevices() failed");
         return false;
     }
 
@@ -576,7 +577,7 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     }
 
     if (_vkPhysicalDevice == VK_NULL_HANDLE) {
-        LogError("No suitable graphics device found");
+        ToonLogError("No suitable graphics device found");
         return false;
     }
 
@@ -585,7 +586,7 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     // Reload glad to load instance pointers and populate available extensions
     int vkVersion = gladLoaderLoadVulkan(_vkInstance, _vkPhysicalDevice, nullptr);
     if (vkVersion == 0) {
-        LogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance and VkPhysicalDevice");
+        ToonLogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance and VkPhysicalDevice");
         return false;
     }
 
@@ -593,14 +594,14 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &availableExtensionCount, nullptr);
 
     if (availableExtensionCount == 0) {
-        LogError("vkEnumerateDeviceExtensionProperties() failed, no extensions available");
+        ToonLogError("vkEnumerateDeviceExtensionProperties() failed, no extensions available");
         return false;
     }
 
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
     vkResult = vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &availableExtensionCount, availableExtensions.data());
     if (vkResult != VK_SUCCESS) {
-        LogError("vkEnumerateDeviceExtensionsProperties() failed");
+        ToonLogError("vkEnumerateDeviceExtensionsProperties() failed");
         return false;
     }
 
@@ -621,7 +622,7 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
     uint32_t queueFamilyCount;
     vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueFamilyCount, nullptr);
     if (queueFamilyCount == 0) {
-        LogError("vkGetPhysicalDeviceQueueFamilyProperties(), no queues found");
+        ToonLogError("vkGetPhysicalDeviceQueueFamilyProperties(), no queues found");
         return false;
     }
 
@@ -670,12 +671,12 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
     }
 
     if (_vkGraphicsQueueFamilyIndex == UINT32_MAX) {
-        LogError("No suitable graphics queue found");
+        ToonLogError("No suitable graphics queue found");
         return false;
     }
 
     if (_vkPresentQueueFamilyIndex == UINT32_MAX) {
-        LogError("No suitable present queue found");
+        ToonLogError("No suitable present queue found");
         return false;
     }
 
@@ -726,14 +727,14 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
 
     vkResult = vkCreateDevice(_vkPhysicalDevice, &deviceCreateInfo, nullptr, &_vkDevice);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateDevice() failed");
+        ToonLogError("vkCreateDevice() failed");
         return false;
     }
 
     // Reload glad to load instance pointers and populate available extensions
     int vkVersion = gladLoaderLoadVulkan(_vkInstance, _vkPhysicalDevice, _vkDevice);
     if (vkVersion == 0) {
-        LogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance, VkPhysicalDevice, and VkDevice");
+        ToonLogError("gladLoaderLoadVulkan() failed, unable to reload symbols with VkInstance, VkPhysicalDevice, and VkDevice");
         return false;
     }
 
@@ -784,7 +785,7 @@ bool VulkanGraphicsDriver::InitAllocator()
 
     vkResult = vmaCreateAllocator(&allocatorCreateInfo, &_vmaAllocator);
     if (vkResult != VK_SUCCESS) {
-        LogError("vmaCreateAllocator() failed");
+        ToonLogError("vmaCreateAllocator() failed");
         return false;
     }
 
@@ -887,7 +888,7 @@ bool VulkanGraphicsDriver::InitSwapChain()
 
     vkResult = vkCreateSwapchainKHR(_vkDevice, &swapChainCreateInfo, nullptr, &_vkSwapChain);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateSwapchainKHR() failed");
+        ToonLogError("vkCreateSwapchainKHR() failed");
         return false;
     }
 
@@ -917,7 +918,7 @@ bool VulkanGraphicsDriver::InitSwapChain()
 
         vkResult = vkCreateImageView(_vkDevice, &VkImageViewCreateInfo, nullptr, &_vkSwapChainImageViews[i]);
         if (vkResult != VK_SUCCESS) {
-            LogError("vkCreateImageView() failed");
+            ToonLogError("vkCreateImageView() failed");
             return false;
         }
     }
@@ -989,7 +990,7 @@ void VulkanGraphicsDriver::TermSwapChain()
 TOON_VULKAN_API
 bool VulkanGraphicsDriver::ResetSwapChain()
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     vkDeviceWaitIdle(_vkDevice);
 
@@ -1027,7 +1028,7 @@ bool VulkanGraphicsDriver::ResetSwapChain()
         return false;
     }
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return true;
 }
 
@@ -1111,7 +1112,7 @@ bool VulkanGraphicsDriver::InitRenderPass()
 
     vkResult = vkCreateRenderPass(_vkDevice, &renderPassCreateInfo, nullptr, &_vkRenderPass);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateRenderPass() failed");
+        ToonLogError("vkCreateRenderPass() failed");
         return false;
     }
 
@@ -1137,7 +1138,7 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
 
     vkResult = vkCreateDescriptorPool(_vkDevice, &descriptorPoolCreateInfo, nullptr, &_vkDescriptorPool);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateDescriptorPool() failed");
+        ToonLogError("vkCreateDescriptorPool() failed");
         return false;
     }
 
@@ -1165,7 +1166,7 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
 
     vkResult = vkCreateDescriptorSetLayout(_vkDevice, &descriptorLayoutCreateInfo, nullptr, &_vkDescriptorSetLayout);
     if (vkResult != VK_SUCCESS) {
-        LogError("vkCreateDescriptorSetLayout() failed");
+        ToonLogError("vkCreateDescriptorSetLayout() failed");
         return false;
     }
 
@@ -1185,7 +1186,7 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
 
     vkResult = vkCreatePipelineLayout(_vkDevice, &pipelineLayoutCreateInfo, nullptr, &_vkPipelineLayout);
     if (vkResult != VK_SUCCESS) {
-        LogFatal("vkCreatePipelineLayout() failed");
+        ToonLogFatal("vkCreatePipelineLayout() failed");
     }
 
     std::vector<VkDescriptorSetLayout> layouts(_vkSwapChainImages.size(), _vkDescriptorSetLayout);
@@ -1200,7 +1201,7 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
     _vkDescriptorSets.resize(_vkSwapChainImages.size());
     vkResult = vkAllocateDescriptorSets(_vkDevice, &allocateInfo, _vkDescriptorSets.data());
     if (vkResult != VK_SUCCESS) {
-        LogError("vkAllocateDescriptorSets() failed");
+        ToonLogError("vkAllocateDescriptorSets() failed");
         return false;
     }
 

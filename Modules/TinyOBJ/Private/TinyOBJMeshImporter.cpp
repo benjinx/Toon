@@ -1,5 +1,6 @@
 #include <Toon/TinyOBJ/TinyOBJMeshImporter.hpp>
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 #include <Toon/Utils.hpp>
 #include <Toon/TinyOBJ/TinyOBJPrimitiveData.hpp>
 
@@ -11,7 +12,7 @@ namespace Toon::TinyOBJ {
 TOON_TINYOBJ_API
 std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     //const std::string& dir = GetDirname(filename);
 
@@ -29,7 +30,7 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
     for (const auto& path : assetPaths)
     {
         std::string fullPath = path + filename;
-        LogInfo("Loading from File: %s", fullPath);
+        ToonLogInfo("Loading from File: %s", fullPath);
 
         std::string dir = GetDirname(fullPath);
 
@@ -45,11 +46,11 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
 
 
     if (!warn.empty()) {
-        LogWarn("tinyobj: %s", warn);
+        ToonLogWarn("tinyobj: %s", warn);
     }
 
     if (!err.empty()) {
-        LogError("tinyobj: %s", err);
+        ToonLogError("tinyobj: %s", err);
     }
 
     bool hasNormals = (!attrib.normals.empty());
@@ -102,7 +103,7 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
         primitiveList.push_back(std::unique_ptr<PrimitiveData>(primitiveData));
     }
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return primitiveList;
 }
 

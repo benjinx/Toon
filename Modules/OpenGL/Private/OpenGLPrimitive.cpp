@@ -1,6 +1,7 @@
 #include <Toon/OpenGL/OpenGLPrimitive.hpp>
 
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 
 namespace Toon::OpenGL {
 
@@ -22,7 +23,7 @@ void OpenGLPrimitive::Render()
 TOON_OPENGL_API
 bool OpenGLPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     glGenVertexArrays(1, &_glVAO);
     glBindVertexArray(_glVAO);
@@ -98,7 +99,7 @@ bool OpenGLPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
 
     glBindVertexArray(0);
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return true;
 }
 

@@ -1,5 +1,6 @@
 #include <Toon/STBI/STBITextureImporter.hpp>
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 
 #define STB_NO_HDR
 #define STB_NO_PSD
@@ -19,7 +20,7 @@ STBITextureData::~STBITextureData()
 TOON_STBI_API
 std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string& filename)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
     glm::ivec2 size;
     int components;
     uint8_t* data = nullptr;
@@ -44,16 +45,16 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string
     tex->Size = size;
     tex->Components = components;
 
-    LogInfo("Loaded '%s'", filename);
+    ToonLogInfo("Loaded '%s'", filename);
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return tex;
 }
 
 TOON_STBI_API
 std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t * buffer, size_t length)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
     glm::ivec2 size;
     int components;
 
@@ -67,7 +68,7 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
     tex->Size = size;
     tex->Components = components;
     
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return tex;
 }
 

@@ -1,6 +1,6 @@
 #include "glTF2.hpp"
 
-//#include <Benchmark.hpp>
+//#include <ToonBenchmark.hpp>
 #include <Utils.hpp>
 #include <nlohmann/json.hpp>
 #include <Material.hpp>
@@ -88,7 +88,7 @@ namespace glTF2 {
 
 							std::ifstream bufferFile(dir + "/" + uri, std::ios::in | std::ios::binary);
 							if (!bufferFile.is_open()) {
-								LogError("Failed to open glTF data file '%s'", uri);
+								ToonLogError("Failed to open glTF data file '%s'", uri);
 								continue;
 							}
 
@@ -98,10 +98,10 @@ namespace glTF2 {
 							bufferFile.read(reinterpret_cast<char *>(buffer.data()), byteLength);
 							bufferFile.close();
 
-							LogLoad("glTF data file '%s'", uri);
+							ToonLogLoad("glTF data file '%s'", uri);
 
 							if (buffer.size() != byteLength) {
-								LogWarn("Buffer size mismatch %zu != %zu", buffer.size(), byteLength);
+								ToonLogWarn("Buffer size mismatch %zu != %zu", buffer.size(), byteLength);
 							}
 						}
 					}
@@ -224,11 +224,11 @@ namespace glTF2 {
 							image.components = STBI_rgb_alpha;
 
 							if (!image.data) {
-								LogError("Failed to load glTF image file '%s'", imageFilename);
+								ToonLogError("Failed to load glTF image file '%s'", imageFilename);
 								continue;
 							}
 
-							LogLoad("glTF image file '%s'", uri);
+							ToonLogLoad("glTF image file '%s'", uri);
 						}
 						else {
 							int bufferViewIndex = object.value("bufferView", -1);
@@ -299,7 +299,7 @@ namespace glTF2 {
 						int source = object.value("source", -1);
 
 						if (source < 0) {
-							LogError("Invalid glTF texture source %d", source);
+							ToonLogError("Invalid glTF texture source %d", source);
 							continue;
 						}
 
@@ -438,7 +438,7 @@ namespace glTF2 {
 							}
 						}
 						else {
-							LogWarn("Unknown camera type '%s'", camera.type);
+							ToonLogWarn("Unknown camera type '%s'", camera.type);
 						}
 					}
 				}
@@ -460,12 +460,12 @@ namespace glTF2 {
 				int texCoord = value.value("texCoord", 0);
 
 				if (index < 0 || index >(int)textures.size()) {
-					LogError("Invalid glTF texture index %d", index);
+					ToonLogError("Invalid glTF texture index %d", index);
 					return nullptr;
 				}
 
 				if (texCoord > 0) {
-					LogWarn("Multiple TEXCOORDs not supported");
+					ToonLogWarn("Multiple TEXCOORDs not supported");
 				}
 
 				return textures[index];
@@ -576,7 +576,7 @@ namespace glTF2 {
 						int indices = primitive.value("indices", -1);
 						if (indices < 0) {
 							// TODO: glDrawArrays support
-							LogError("glDrawArrays not supported");
+							ToonLogError("glDrawArrays not supported");
 							continue;
 						}
 
@@ -665,7 +665,7 @@ namespace glTF2 {
 											);
 									}
 									else {
-										LogWarn("Ignoring glTF attribute %s", attrib);
+										ToonLogWarn("Ignoring glTF attribute %s", attrib);
 									}
 								}
 							}
@@ -883,37 +883,37 @@ namespace glTF2 {
 			it = data.find("name");
 			if (it != data.end()) {
 				entity->SetName(it.value());
-				LogWarn("Name: %s", entity->GetName());
+				ToonLogWarn("Name: %s", entity->GetName());
 				if (it.value() == "Armature")
 				{
-					LogError("Armature");
+					ToonLogError("Armature");
 				}
 				//if (it.value() == "Hair")
 				//{
-				//	LogError("Hair");
+				//	ToonLogError("Hair");
 				//}
 				//if (it.value() == "Character")
 				//{
-				//	LogError("Character");
+				//	ToonLogError("Character");
 				//}
 			}
 
 			it = data.find("translation");
 			if (it != data.end()) {
 				entity->SetPosition(parseVec3(it.value(), entity->GetPosition()));
-				LogWarn("Position: %f, %f, %f", entity->GetPosition().x, entity->GetPosition().y, entity->GetPosition().z);
+				ToonLogWarn("Position: %f, %f, %f", entity->GetPosition().x, entity->GetPosition().y, entity->GetPosition().z);
 			}
 
 			it = data.find("rotation");
 			if (it != data.end()) {
 				entity->SetRotation(parseQuat(it.value(), entity->GetRotation()));
-				LogWarn("Rotation: %f, %f, %f", entity->GetRotation().x, entity->GetRotation().y, entity->GetRotation().z);
+				ToonLogWarn("Rotation: %f, %f, %f", entity->GetRotation().x, entity->GetRotation().y, entity->GetRotation().z);
 			}
 
 			it = data.find("scale");
 			if (it != data.end()) {
 				entity->SetScale(parseVec3(it.value(), entity->GetScale()));
-				LogWarn("Scale: %f, %f, %f", entity->GetScale().x, entity->GetScale().y, entity->GetScale().z);
+				ToonLogWarn("Scale: %f, %f, %f", entity->GetScale().x, entity->GetScale().y, entity->GetScale().z);
 			}
 
             it = data.find("children");
@@ -934,7 +934,7 @@ namespace glTF2 {
 						continue;
 					}
 
-					LogInfo("Parent: %s", entity->GetName());
+					ToonLogInfo("Parent: %s", entity->GetName());
                     entity->AddChild(loadNode(nodes, nodes[child.get<int>()]));
                 }
             }
@@ -1010,7 +1010,7 @@ namespace glTF2 {
 		}
 
 		if (!file.is_open()) {
-			LogError("Failed to load glTF, '%s'", filename);
+			ToonLogError("Failed to load glTF, '%s'", filename);
 			return error;
 		}
 
@@ -1030,13 +1030,13 @@ namespace glTF2 {
 
 			file.read(reinterpret_cast<char *>(&magic), sizeof(magic));
 			if (magic != Magic) {
-				LogError("Invalid binary glTF file");
+				ToonLogError("Invalid binary glTF file");
 				return error;
 			}
 
 			file.read(reinterpret_cast<char *>(&version), sizeof(version));
 			if (version != 2) {
-				LogError("Invalid binary glTF container version %d", version);
+				ToonLogError("Invalid binary glTF container version %d", version);
 				return error;
 			}
 
@@ -1049,7 +1049,7 @@ namespace glTF2 {
 			file.read(reinterpret_cast<char *>(&jsonChunkType), sizeof(jsonChunkType));
 
 			if ((ChunkType)jsonChunkType != ChunkType::JSON) {
-				LogError("The first chunk of a binary glTF must be JSON, found %08x", jsonChunkType);
+				ToonLogError("The first chunk of a binary glTF must be JSON, found %08x", jsonChunkType);
 				return error;
 			}
 
@@ -1065,7 +1065,7 @@ namespace glTF2 {
 				file.read(reinterpret_cast<char *>(&dataChunkType), sizeof(dataChunkType));
 
 				if ((ChunkType)dataChunkType != ChunkType::BIN) {
-					LogError("The second chunk of a binary glTF must be BIN, found %08x", dataChunkType);
+					ToonLogError("The second chunk of a binary glTF must be BIN, found %08x", dataChunkType);
 					return error;
 				}
 
@@ -1090,12 +1090,12 @@ namespace glTF2 {
 				LogVerbose("glTF Version %s", object.value("version", ""));
 
 				if (version != "2.0") {
-					LogError("only glTF 2.0 is supported");
+					ToonLogError("only glTF 2.0 is supported");
 					return error;
 				}
 			}
 			else {
-				LogError("glTF missing required asset entry");
+				ToonLogError("glTF missing required asset entry");
 				return error;
 			}
 		}
@@ -1106,8 +1106,8 @@ namespace glTF2 {
 			const auto& array = it.value();
 			if (array.is_array()) {
 				for (const auto& extension : array) {
-					//LogError("Missing glTF required extension '%s'", extension);
-                    LogInfo("glTF Required Extension found: %s", extension);
+					//ToonLogError("Missing glTF required extension '%s'", extension);
+                    ToonLogInfo("glTF Required Extension found: %s", extension);
 				}
 			}
 		}
@@ -1116,8 +1116,8 @@ namespace glTF2 {
 			const auto& array = it.value();
 			if (array.is_array()) {
 				for (const auto& extension : array) {
-					//LogWarn("Missing glTF extension '%s'", extension);
-                    LogInfo("glTF Extension found: %s", extension);
+					//ToonLogWarn("Missing glTF extension '%s'", extension);
+                    ToonLogInfo("glTF Extension found: %s", extension);
 				}
 			}
 		}

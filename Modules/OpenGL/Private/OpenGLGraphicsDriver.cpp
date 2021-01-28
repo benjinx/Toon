@@ -33,28 +33,28 @@ bool OpenGLGraphicsDriver::Initialize()
 
     #endif
 
-    LogInfo("Creating SDL2 Window.");
+    ToonLogInfo("Creating SDL2 Window.");
 
     if (!SDL2GraphicsDriver::CreateWindow(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE)) {
         return false;
     }
 
-    LogInfo("SDL2 Window Created Successfully.");
+    ToonLogInfo("SDL2 Window Created Successfully.");
 
-    LogInfo("Creating SDL2 GL Context.");
+    ToonLogInfo("Creating SDL2 GL Context.");
 
     _glContext = SDL_GL_CreateContext(GetSDL2Window());
 
     if (!_glContext)
     {
-        LogError("Failed to create SDL2 GL Context. %s", SDL_GetError());
+        ToonLogError("Failed to create SDL2 GL Context. %s", SDL_GetError());
         return false;
     }
 
-    LogLoad("SDL2 GL Context created successfully.\n");
+    ToonLogLoad("SDL2 GL Context created successfully.\n");
 
     if (!gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress)) {
-        LogError("Failed to initialize OpenGL context.");
+        ToonLogError("Failed to initialize OpenGL context.");
         return false;
     }
 
@@ -121,7 +121,7 @@ bool OpenGLGraphicsDriver::Initialize()
     );
 
     if (!result) {
-        LogError("Freak out");
+        ToonLogError("Freak out");
     }
 
     AddConstantBuffer(transformDataBuffer, TRANSFORM_DATA_BINDING);

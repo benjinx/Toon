@@ -1,6 +1,7 @@
 #include <Toon/OpenGL/OpenGLShader.hpp>
 #include <Toon/Log.hpp>
 #include <Toon/Utils.hpp>
+#include <Toon/Benchmark.hpp>
 
 #include <fstream>
 #include <vector>
@@ -12,7 +13,7 @@ namespace Toon::OpenGL {
 TOON_OPENGL_API
 bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     std::vector<GLuint> shaders;
 
@@ -39,7 +40,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
                 glDeleteShader(shader);
             }
 
-            LogError("Failed to load '%s'", filename);
+            ToonLogError("Failed to load '%s'", filename);
             return false;
         }
 
@@ -56,7 +57,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
                 glDeleteShader(shader);
             }
 
-            LogError("Failed to compile shader '%s'\n%s", filename, log.data());
+            ToonLogError("Failed to compile shader '%s'\n%s", filename, log.data());
             return false;
         }
 
@@ -65,7 +66,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
 
     _mglID = glCreateProgram();
     if (!_mglID) {
-        LogError("Failed to create shader program");
+        ToonLogError("Failed to create shader program");
         return false;
     }
 
@@ -91,7 +92,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
             glDeleteShader(shader);
         }
 
-        LogError("Failed to link shader\n%s", log.data());
+        ToonLogError("Failed to link shader\n%s", log.data());
         return false;
     }
 
@@ -99,7 +100,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
         glDetachShader(_mglID, shader);
     }
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return true;
 }
 
@@ -140,7 +141,7 @@ GLuint OpenGLShader::LoadSPV(const std::string& filename)
 
     file.unsetf(std::ios::skipws);
 
-    LogLoad("Loading SPIR-V shader '%s'", filename);
+    ToonLogLoad("Loading SPIR-V shader '%s'", filename);
 
     std::vector<uint8_t> data(
         (std::istreambuf_iterator<char>(file)),
@@ -149,7 +150,7 @@ GLuint OpenGLShader::LoadSPV(const std::string& filename)
 
     GLenum type = GetGLShaderType(filename);
     if (type == GL_INVALID_ENUM) {
-        LogError("Failed to deteremine shader type of '%s'", filename);
+        ToonLogError("Failed to deteremine shader type of '%s'", filename);
         return 0;
     }
 
@@ -184,7 +185,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
         return 0;
     }
 
-    LogLoad("Loading GLSL shader '%s'", filename);
+    ToonLogLoad("Loading GLSL shader '%s'", filename);
 
     std::string code(
         (std::istreambuf_iterator<char>(file)),
@@ -207,7 +208,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
                         right = line.rfind('>');
 
                         if (left == std::string::npos || right == std::string::npos) {
-                            LogError("Unable to parse filename from shader include");
+                            ToonLogError("Unable to parse filename from shader include");
                             return "";
                         }
                     }
@@ -225,7 +226,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
                     }
 
                     if (!incFile.is_open()) {
-                        LogError("Unable to find shader include '%s'", incFilename);
+                        ToonLogError("Unable to find shader include '%s'", incFilename);
                         return "";
                     }
 
@@ -248,7 +249,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
 
     GLenum type = GetGLShaderType(filename);
     if (type == GL_INVALID_ENUM) {
-        LogError("Unable to determine shader type of '%s'", filename);
+        ToonLogError("Unable to determine shader type of '%s'", filename);
         return 0;
     }
 

@@ -14,7 +14,7 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
     _size = static_cast<VkDeviceSize>(size);
 
     if (!data && _memoryUsage == MemoryUsage::GPU) {
-        LogError("Attempting to create an empty buffer with MemoryUsage GPU");
+        ToonLogError("Attempting to create an empty buffer with MemoryUsage GPU");
         return false;
     }
 
@@ -37,14 +37,14 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
             VMA_MEMORY_USAGE_CPU_ONLY);
 
         if (!result) {
-            LogError("CreateBuffer() failed, unable to create staging buffer");
+            ToonLogError("CreateBuffer() failed, unable to create staging buffer");
             return false;
         }
 
         void * ptr;
         vkResult = vmaMapMemory(gfx->GetAllocator(), stagingAllocation, &ptr);
         if (vkResult != VK_SUCCESS) {
-            LogError("vmaMapMemory() failed");
+            ToonLogError("vmaMapMemory() failed");
             return false;
         }
 
@@ -57,14 +57,14 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
             VMA_MEMORY_USAGE_GPU_ONLY);
             
         if (!result) {
-            LogError("CreateBuffer() failed, unable to create buffer");
+            ToonLogError("CreateBuffer() failed, unable to create buffer");
             return false;
         }
 
         result = gfx->CopyBuffer(stagingBuffer, _vkBuffer, _size);
 
         if (!result) {
-            LogError("CopyBuffer() failed, unable to copy staging buffer to buffer");
+            ToonLogError("CopyBuffer() failed, unable to copy staging buffer to buffer");
         }
 
         vkDestroyBuffer(gfx->GetDevice(), stagingBuffer, nullptr);
@@ -78,7 +78,7 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
             vkMemoryUsage.value());
             
         if (!result) {
-            LogError("CreateBuffer() failed, unable to create buffer");
+            ToonLogError("CreateBuffer() failed, unable to create buffer");
             return false;
         }
 
@@ -86,7 +86,7 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
             void * ptr;
             vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
             if (vkResult != VK_SUCCESS) {
-                LogError("vmaMapMemory() failed");
+                ToonLogError("vmaMapMemory() failed");
                 return false;
             }
 
@@ -96,7 +96,7 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
         }
     }
     else {
-        LogError("MemoryUsage::Download is not yet supported");
+        ToonLogError("MemoryUsage::Download is not yet supported");
         return false;
     }
 
@@ -118,7 +118,7 @@ bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     VkResult vkResult;
 
     if (_memoryUsage != MemoryUsage::Download) {
-        LogError("Unable to read data from buffer with MemoryUsage: %s",
+        ToonLogError("Unable to read data from buffer with MemoryUsage: %s",
             MemoryUsageToString(_memoryUsage));
         return false;
     }
@@ -128,7 +128,7 @@ bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
     void * ptr;
     vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
     if (vkResult != VK_SUCCESS) {
-        LogError("vmaMapMemory() failed");
+        ToonLogError("vmaMapMemory() failed");
         return false;
     }
 
@@ -145,7 +145,7 @@ bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     VkResult vkResult;
     
     if (_memoryUsage != MemoryUsage::UploadOnce && _memoryUsage != MemoryUsage::UploadOften) {
-        LogError("Unable to write data to buffer with MemoryUsage: %s",
+        ToonLogError("Unable to write data to buffer with MemoryUsage: %s",
             MemoryUsageToString(_memoryUsage));
         return false;
     }
@@ -155,7 +155,7 @@ bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
     void * ptr;
     vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
     if (vkResult != VK_SUCCESS) {
-        LogError("vmaMapMemory() failed");
+        ToonLogError("vmaMapMemory() failed");
         return false;
     }
 

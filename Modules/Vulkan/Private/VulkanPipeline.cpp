@@ -25,7 +25,7 @@ bool VulkanPipeline::Initialize()
 
     VulkanShader * shader = TOON_VULKAN_SHADER(_shader.get());
     if (!shader) {
-        LogError("Trying to bind a Vulkan VulkanPipeline with no shader");
+        ToonLogError("Trying to bind a Vulkan VulkanPipeline with no shader");
         return false;
     }
 
@@ -207,7 +207,7 @@ bool VulkanPipeline::Initialize()
 
     vkResult = vkCreateGraphicsPipelines(gfx->GetDevice(), nullptr, 1, &pipelineCreateInfo, nullptr, &_vkPipeline);
     if (vkResult != VK_SUCCESS) {
-        LogError("Failed to create graphics pipeline");
+        ToonLogError("Failed to create graphics pipeline");
         return false;
     }
 

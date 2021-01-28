@@ -120,7 +120,7 @@ bool App::Start()
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) > 0)
     {
-        LogError("Failed to init SDL!");
+        ToonLogError("Failed to init SDL!");
         return false;
     }
 
@@ -187,46 +187,46 @@ void App::Render()
 void App::OpenGLInfo()
 {
     // OpenGL Basic Info
-    LogInfo("OpenGL Vendor: %s", glGetString(GL_VENDOR));
-    LogInfo("OpenGL Renderer: %s", glGetString(GL_RENDERER));
-    LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
-    LogInfo("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    ToonLogInfo("OpenGL Vendor: %s", glGetString(GL_VENDOR));
+    ToonLogInfo("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+    ToonLogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
+    ToonLogInfo("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // Anti-Aliasing
     int samples;
     glGetIntegerv(GL_SAMPLES, &samples);
-    LogInfo("Anti-Aliasing: %dx", samples);
+    ToonLogInfo("Anti-Aliasing: %dx", samples);
 
     // Binary Shader Formats
     GLint formats = 0;
     glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats);
-    LogInfo("Binary Shader Formats: %d", formats);
+    ToonLogInfo("Binary Shader Formats: %d", formats);
 
     // Max UBO Size
     int tmp;
     glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &tmp);
-    LogInfo("Max UBO Size: %d", tmp);
+    ToonLogInfo("Max UBO Size: %d", tmp);
 
     // Max Vertex Attributes
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &tmp);
-    LogInfo("Max Vertex Attributes: %d\n", tmp);
+    ToonLogInfo("Max Vertex Attributes: %d\n", tmp);
     
     // Max Vertex UBOs
     glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &tmp);
-    LogInfo("Max Vertex UBOs: %d", tmp);
+    ToonLogInfo("Max Vertex UBOs: %d", tmp);
 
     // Max Fragment UBOs
     glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS, &tmp);
-    LogInfo("Max Fragment UBOs: %d", tmp);
+    ToonLogInfo("Max Fragment UBOs: %d", tmp);
 
     // Max Geometry UBOs
     glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, &tmp);
-    LogInfo("Max Geometry UBOs: %d", tmp);
+    ToonLogInfo("Max Geometry UBOs: %d", tmp);
 
     // Max UBO Bindings
     int maxBindings;
     glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxBindings);
-    LogInfo("Max UBO Bindings: %d", maxBindings);
+    ToonLogInfo("Max UBO Bindings: %d", maxBindings);
 }
 
 void App::Screenshot()
@@ -248,9 +248,9 @@ void App::Screenshot()
     int screenshot = stbi_write_png(name.c_str(), GetWindow()->GetWidth(), GetWindow()->GetHeight(), 3, pixels.data(), 3 * GetWindow()->GetWidth());
 
     if (screenshot)
-        LogInfo("Screenshot successful!");
+        ToonLogInfo("Screenshot successful!");
     else
-        LogInfo("Screenshot unsuccessful.");
+        ToonLogInfo("Screenshot unsuccessful.");
 }
 
 void App::AddShader(std::string name, Shader* shader)

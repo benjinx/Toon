@@ -7,7 +7,7 @@ int main(int argc, char * argv[])
     Utils::SetAssetPath(RESOURCE_PATH);
     const auto& paths = Utils::GetResourcePaths();
     for (auto& p : paths) {
-        LogInfo("%s", p);
+        ToonLogInfo("%s", p);
     }
 
     App app;

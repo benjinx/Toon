@@ -1,6 +1,7 @@
 #include <Toon/Vulkan/VulkanShader.hpp>
 
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 #include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 
 #include <fstream>
@@ -10,18 +11,18 @@ namespace Toon::Vulkan {
 TOON_VULKAN_API
 bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
 {
-    BenchmarkStart();
+    ToonBenchmarkStart();
 
     for (const auto& filename : filenames) {
         if (!LoadSPV(filename)) {
             if (!LoadSPV(filename + ".spv")) {
-                LogError("Failed to load '%s'", filename);
+                ToonLogError("Failed to load '%s'", filename);
                 return false;
             }
         }
     }
 
-    BenchmarkEnd();
+    ToonBenchmarkEnd();
     return true;
 }
 
@@ -50,7 +51,7 @@ bool VulkanShader::LoadSPV(const std::string& filename)
 
     file.unsetf(std::ios::skipws);
 
-    LogLoad("Loading SPIR-V shader '%s'", filename);
+    ToonLogLoad("Loading SPIR-V shader '%s'", filename);
 
     std::vector<uint8_t> data(
         (std::istreambuf_iterator<char>(file)),
@@ -59,7 +60,7 @@ bool VulkanShader::LoadSPV(const std::string& filename)
 
     VkShaderStageFlagBits type = GetVkShaderType(filename);
     if (type == VK_SHADER_STAGE_ALL) {
-        LogError("Failed to determine shader type of '%s'", filename);
+        ToonLogError("Failed to determine shader type of '%s'", filename);
         return false;
     }
 
@@ -73,7 +74,7 @@ bool VulkanShader::LoadSPV(const std::string& filename)
 
     VkShaderModule shaderModule;
     if (vkCreateShaderModule(gfx->GetDevice(), &shaderModuleCreateInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-        LogError("Failed to create shader module");
+        ToonLogError("Failed to create shader module");
         return false;
     }
 
