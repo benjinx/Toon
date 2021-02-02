@@ -32,18 +32,35 @@ ENDIF()
 ### Options
 ###
 
-OPTION(VERBOSE_LOGGING "Build Toon with Verbose Logging"             OFF)
+OPTION(
+    VERBOSE_LOGGING
+    "Build Toon with Verbose Logging"
+    OFF
+)
 IF(VERBOSE_LOGGING)
     ADD_DEFINITIONS(-DTOON_ENABLE_VERBOSE_LOGGING)
 ENDIF()
 
-OPTION(BUILD_TESTS "Build Tests"                                            OFF)
+OPTION(
+    BUILD_TESTS
+    "Build Tests"
+    OFF
+)
 IF(BUILD_TESTS)
     ENABLE_TESTING()
 ENDIF()
 
-OPTION(BUILD_DEMOS "Build Demo Projects"                                    ON)
-OPTION(BUILD_THIRDPARTY "Build Missing ThirdParty Dependencies"             ON)
+OPTION(
+    BUILD_DEMOS
+    "Build Demo Projects"
+    ON
+)
+
+OPTION(
+    BUILD_THIRDPARTY
+    "Build Missing ThirdParty Dependencies"
+    ON
+)
 
 ###
 ### Modules and Dependencies

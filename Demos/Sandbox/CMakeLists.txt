@@ -1,5 +1,5 @@
 
-SET(_target HelloWorld)
+SET(_target Sandbox)
 
 DEFINE_DEMO(${_target})
 
