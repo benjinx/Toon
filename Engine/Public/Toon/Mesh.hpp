@@ -6,6 +6,7 @@
 #include <Toon/PrimitiveData.hpp>
 #include <Toon/Pipeline.hpp>
 #include <Toon/RenderContext.hpp>
+#include <Toon/Texture.hpp>
 
 #include <vector>
 #include <memory>
@@ -29,6 +30,8 @@ public:
     virtual void SetPipeline(std::shared_ptr<Pipeline> pipeline) {
         _pipeline = pipeline;
     }
+
+    std::shared_ptr<Texture> _texture;
 
 protected:
 

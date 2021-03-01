@@ -28,7 +28,7 @@ MACRO(DEFINE_DEMO _target)
         ${CMAKE_CURRENT_BINARY_DIR}/Assets
     )
 
-    COMPILE_SHADERS("${_shaders_in}" _shaders_out)
+    ##COMPILE_SHADERS("${_shaders_in}" _shaders_out)
 
     ###
     ### Asset Processing

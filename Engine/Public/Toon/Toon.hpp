@@ -12,7 +12,7 @@
 #include <Toon/Component.hpp>
 #include <Toon/MeshComponent.hpp>
 //#include <Toon/Input.hpp>
-//#include <Toon/Light.hpp>
+#include <Toon/Light.hpp>
 #include <Toon/Log.hpp>
 //#include <Toon/Material.hpp>
 #include <Toon/Mesh.hpp>

@@ -1,0 +1,2 @@
+uniform sampler2D texture1; // GL_TEXTURE0
+uniform sampler2D texture2; // GL_TEXTURE1

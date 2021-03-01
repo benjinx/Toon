@@ -1,12 +1,21 @@
-#version 330 core
+#version 450 core
+
 // Varyings
-in vertexData
+layout (location = 0) in vertexData
 {
     vec3 fragPos;
     vec3 normal;
 } pass;
 
 // Uniforms
+/*layout (binding = 1, std140) uniform shaderData
+{
+    uniform vec4 eyePos;
+    uniform vec4 lightPos;
+    uniform vec3 objectColor;
+    uniform vec3 lightColor;
+};*/
+
 uniform vec4 eyePos;
 uniform vec4 lightPos;
 uniform vec3 objectColor;

@@ -3,6 +3,8 @@
 
 #include <Toon/OpenGL/OpenGLConfig.hpp>
 #include <Toon/Mesh.hpp>
+#include <Toon/OpenGl/OpenGLTexture.hpp>
+#include <memory>
 
 namespace Toon::OpenGL {
 

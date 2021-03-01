@@ -6,6 +6,8 @@
 
 namespace Toon::OpenGL {
 
+#define TOON_OPENGL_TEXTURE(x) (dynamic_cast<Toon::OpenGL::OpenGLTexture *>(x))
+
 class TOON_OPENGL_API OpenGLTexture : public Texture
 {
 public:
