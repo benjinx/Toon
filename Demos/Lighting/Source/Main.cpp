@@ -76,7 +76,9 @@ void Run()
 
     // Light Source
     Light* light = new Light();
-    light->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    light->SetPosition(glm::vec3(10.0f, 10.0f, 10.0f));
+    light->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+    light->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
     scene.AddChild(std::unique_ptr<Entity>(light));
 
     // make buffer
@@ -88,8 +90,8 @@ void Run()
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "Toon/DebugNormalColor.vert",
-        "Toon/DebugNormalColor.frag",
+        "BasicLighting.vert",
+        "BasicLighting.frag",
     })) {
         ToonLogError("lol");
         return;
@@ -130,10 +132,17 @@ void Run()
     mesh->_texture = gfx->CreateTexture();
 
     // Add the new entity to the scene
-    scene.AddChild(std::move(entity));
+    auto e = scene.AddChild(std::move(entity));
 
     shaderTransform->View = camera.GetView();
     shaderTransform->Projection = camera.GetProjection();
+
+    auto globals = renderCtx->GetShaderGlobals();
+    globals->CameraPosition = glm::vec4(camera.GetPosition(), 1.0f);
+    globals->LightCount++;
+    globals->Lights[0].Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    globals->Lights[0].Direction = glm::vec4(GetWorldForward() * light->GetOrientation(), 1.0f);
+    globals->Lights[0].Position = glm::vec4(light->GetPosition(), 1.0f);
 
     // Game loop
     Toon::Run([&]() {
@@ -143,6 +152,8 @@ void Run()
 
         // How do i pass in a uniform for things such as light direction or
         // A color or something
+
+        e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f), GetWorldUp()));
 
         std::this_thread::sleep_for(16ms);
     });

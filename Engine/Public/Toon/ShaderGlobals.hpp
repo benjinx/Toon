@@ -8,6 +8,13 @@ namespace Toon {
 
 #define TOON_SHADER_GLOBALS_BINDING 0
 
+struct LightData
+{
+    alignas(16) glm::vec4 Position;
+    alignas(16) glm::vec4 Direction;
+    alignas(16) glm::vec4 Color;
+};
+
 struct TOON_ENGINE_API ShaderGlobals
 {
 public:
@@ -17,6 +24,9 @@ public:
     alignas(4) int FrameCount;
     alignas(4) float TotalTime;
     alignas(4) float FrameSpeedRatio;
+    alignas(16) glm::vec4 CameraPosition;
+    alignas(4) int LightCount;
+    LightData Lights[10];
 
 }; // struct ShaderGlobals
 

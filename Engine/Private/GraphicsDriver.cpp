@@ -28,6 +28,7 @@ void GraphicsDriver::InitializeRenderContext()
     globals->FrameCount = 0;
     globals->TotalTime = 0;
     globals->FrameSpeedRatio = 0.0f;
+    globals->LightCount = 0;
 
     auto transform = _renderContext->GetShaderTransform();
     transform->Model = glm::mat4(1.0f);
