@@ -8,18 +8,6 @@
 namespace Toon::OpenGL {
 
 TOON_OPENGL_API
-bool OpenGLPipeline::Initialize()
-{
-    return true;
-}
-
-TOON_OPENGL_API
-void OpenGLPipeline::Terminate()
-{
-
-}
-
-TOON_OPENGL_API
 bool OpenGLPipeline::Bind()
 {
     auto gfx = GetGraphicsDriver();

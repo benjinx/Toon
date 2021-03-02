@@ -2,21 +2,40 @@
 INCLUDE(SetSourceGroups)
 
 MACRO(DEFINE_MODULE _target _prefix)
-    FILE(
-        GLOB_RECURSE
-        _public
-        Public/*.h
-        Public/*.hpp
+    FILE(GLOB_RECURSE
+        _sources
+        "Public/*.h"
+        "Public/*.hpp"
+        "Private/*.h"
+        "Private/*.hpp"
+        "Private/*.c"
+        "Private/*.cpp"
     )
 
-    FILE(
-        GLOB_RECURSE
-        _private
-        Private/*.h
-        Private/*.hpp
-        Private/*.c
-        Private/*.cpp
+    FILE(GLOB_RECURSE
+        _sources_in
+        "Public/*.in"
+        "Private/*.in"
     )
+
+    ###
+    ### Template Files
+    ###
+
+    FOREACH(file ${_sources_in})
+        STRING(REPLACE 
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}
+            file_out
+            ${file}
+        )
+
+        string(REGEX MATCH "^(.*)\\.[^.]*$" file_out ${file_out})
+        set(file_out ${CMAKE_MATCH_1})
+
+        CONFIGURE_FILE(${file} ${file_out})
+        LIST(APPEND _sources_out ${file_out})
+    ENDFOREACH()
 
     ###
     ### Asset Processing
@@ -40,12 +59,14 @@ MACRO(DEFINE_MODULE _target _prefix)
 
     ADD_LIBRARY(
         ${_target} SHARED
-        ${_public}
-        ${_private}
+        ${_sources}
+        ${_sources_in}
+        ${_sources_out}
     )
 
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_public}")
-    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_private}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources_in}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_BINARY_DIR} "${_sources_out}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
 
     IF(NOT _target STREQUAL "ToonEngine")
@@ -61,8 +82,10 @@ MACRO(DEFINE_MODULE _target _prefix)
         PUBLIC
             $<INSTALL_INTERFACE:include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Public>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/Public>
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/Private
+            ${CMAKE_CURRENT_BINARY_DIR}/Private
     )
 
     STRING(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_LENGTH)

@@ -2,9 +2,8 @@
 #define TOON_OPENGL_MESH_HPP
 
 #include <Toon/OpenGL/OpenGLConfig.hpp>
+
 #include <Toon/Mesh.hpp>
-#include <Toon/OpenGl/OpenGLTexture.hpp>
-#include <memory>
 
 namespace Toon::OpenGL {
 
@@ -16,8 +15,6 @@ public:
     OpenGLMesh() = default;
     
     virtual ~OpenGLMesh() = default;
-
-    bool Load(const std::vector<std::unique_ptr<PrimitiveData>>& data) override;
 
     void Render(RenderContext * ctx) override;
 

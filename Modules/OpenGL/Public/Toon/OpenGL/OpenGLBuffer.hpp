@@ -24,10 +24,6 @@ public:
 
     void Terminate() override;
 
-    bool ReadFrom(size_t offset, size_t length, uint8_t * data) override;
-
-    bool WriteTo(size_t offset, size_t length, uint8_t * data) override;
-
     void Bind();
 
     GLuint GetGLID() const {

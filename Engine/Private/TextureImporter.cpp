@@ -2,7 +2,7 @@
 
 namespace Toon {
 
-static std::unordered_map<std::string, std::unique_ptr<TextureImporter>> _TextureImporters;
+static std::unordered_map<string, std::unique_ptr<TextureImporter>> _TextureImporters;
 
 static std::vector<TextureImporter *> _TextureImporterList;
 
@@ -15,14 +15,14 @@ void updateTextureImporterList()
 }
 
 TOON_ENGINE_API
-void AddTextureImporter(const std::string& id, std::unique_ptr<TextureImporter> importer)
+void AddTextureImporter(const string& id, std::unique_ptr<TextureImporter> importer)
 {
     _TextureImporters[id] = std::move(importer);
     updateTextureImporterList();
 }
 
 TOON_ENGINE_API
-void RemoveTextureImporter(const std::string& id)
+void RemoveTextureImporter(const string& id)
 {
     auto it = _TextureImporters.find(id);
     if (it != _TextureImporters.end()) {

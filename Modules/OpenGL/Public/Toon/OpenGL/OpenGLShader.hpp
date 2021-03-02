@@ -15,20 +15,20 @@ public:
 
     OpenGLShader() = default;
 
-    bool LoadFromFiles(const std::vector<std::string>& filenames) override;
+    bool LoadFromFiles(const std::vector<std::string>& filenames, bool useAssetPath = true) override;
 
     void Bind();
 
     GLuint GetID();
 
 private:
-    GLuint LoadSPV(const std::string& filename);
+    GLuint LoadSPV(const std::string& filename, bool useAssetPath);
 
-    GLuint LoadGLSL(const std::string& filename);
+    GLuint LoadGLSL(const std::string& filename, bool useAssetPath);
 
     GLenum GetGLShaderType(const std::string& filename);
 
-    GLuint _mglID = 0;
+    GLuint _glID = 0;
 
 }; // class OpenGLShader
 

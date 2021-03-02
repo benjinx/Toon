@@ -9,4 +9,10 @@
     #define TOON_STBI_API TOON_API_IMPORT
 #endif
 
+#define STB_NO_HDR
+#define STB_NO_PSD
+#define STB_NO_PIC
+#define STB_NO_PNM
+#include <stb/stb_image.h>
+
 #endif // TOON_STBI_CONFIG_HPP

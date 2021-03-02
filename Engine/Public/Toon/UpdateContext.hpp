@@ -2,6 +2,7 @@
 #define TOON_UPDATE_CONTEXT_HPP
 
 #include <Toon/Config.hpp>
+#include <Toon/Time.hpp>
 #include <cstdint>
 
 namespace Toon {
@@ -22,45 +23,57 @@ public:
 
     virtual inline void SetTargetFPS(float fps) {
         _mTargetFPS = fps;
-    }
-
-    // Current Frames/Second
-    virtual inline float GetCurrentFPS() const {
-        return _mCurrentFPS;
-    }
-
-    virtual inline void SetCurrentFPS(float fps) {
-        _mCurrentFPS = fps;
-        _mFpsRatio = _mTargetFPS / _mCurrentFPS;
+        _expectedFrameDuration = microseconds((int64_t)(1000000.0f / GetTargetFPS()));
     }
 
     // Ratio between Target FPS and Current FPS
     // > 1.0 means Current is less than Target
     // < 1.0 means Current is greater than Target
-    virtual inline float GetFPSRatio() const {
-        return _mFpsRatio;
+    virtual inline float GetFrameSpeedRatio() const {
+        return _frameSpeedRatio;
     }
 
-    // Time since last update in Milliseconds
-    virtual inline uintmax_t GetTotalTime() const {
-        return _mTotalTime;
+    // Time since program start in Milliseconds
+    virtual inline milliseconds GetTotalDuration() const {
+        return _totalDuration;
     }
 
-    virtual inline void AddElapsedTime(uintmax_t time) {
-        _mElapsedTime = time;
-        _mTotalTime += time;
+    // Time that a frame should take in Milliseconds
+    virtual inline microseconds GetExpectedFrameDuration() const {
+        return _expectedFrameDuration;
+    }
+
+    // Time the previous frame took in Milliseconds
+    virtual inline microseconds GetPreviousFrameDuration() const {
+        return _previousFrameDuration;
+    }
+
+    virtual inline void ResetTime() {
+        _totalDuration = 0ms;
+        _previousFrameDuration = 0ms;
+        _frameSpeedRatio = 1.0f;
+    }
+
+    virtual inline void SetTotalDuration(milliseconds totalFrameDuration) {
+        _totalDuration = totalFrameDuration;
+    }
+
+    virtual inline void SetPreviousFrameDuration(microseconds previousFrameDuration)
+    {
+        _previousFrameDuration = previousFrameDuration;
+        _frameSpeedRatio = previousFrameDuration / _expectedFrameDuration;
     }
 
 private:
     float _mTargetFPS = 0.0f;
 
-    float _mCurrentFPS = 0.0f;
+    float _frameSpeedRatio = 1.0f;
 
-    float _mFpsRatio = 0.0f;
+    milliseconds _totalDuration = 0ms;
 
-    uintmax_t _mElapsedTime = 0;
+    microseconds _expectedFrameDuration = 1ms;
 
-    uintmax_t _mTotalTime = 0;
+    microseconds _previousFrameDuration = 0ms;
 
 }; // class UpdateContext
 

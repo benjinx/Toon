@@ -1,6 +1,6 @@
 #include <Toon/OpenGL/OpenGLShader.hpp>
 #include <Toon/Log.hpp>
-#include <Toon/Utils.hpp>
+#include <Toon/Util.hpp>
 #include <Toon/Benchmark.hpp>
 
 #include <fstream>
@@ -11,7 +11,7 @@
 namespace Toon::OpenGL {
 
 TOON_OPENGL_API
-bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
+bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames, bool useAssetPath /*= true*/)
 {
     ToonBenchmarkStart();
 
@@ -20,18 +20,18 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
     for (const auto& filename : filenames) {
         GLuint shader = 0;
 
-        const std::string& ext = GetExtension(filename);
+        const string& ext = GetExtension(filename);
 
         if (ext == "spv") {
-            shader = LoadSPV(filename);
+            shader = LoadSPV(filename, useAssetPath);
         }
         else if (ext == "glsl") {
-            shader = LoadGLSL(filename);
+            shader = LoadGLSL(filename, useAssetPath);
         }
         else {
-            shader = LoadSPV(filename + ".spv");
+            shader = LoadSPV(filename + ".spv", useAssetPath);
             if (shader == 0) {
-                shader = LoadGLSL(filename + ".glsl");
+                shader = LoadGLSL(filename + ".glsl", useAssetPath);
             }
         }
 
@@ -64,29 +64,29 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
         shaders.push_back(shader);
     }
 
-    _mglID = glCreateProgram();
-    if (!_mglID) {
+    _glID = glCreateProgram();
+    if (!_glID) {
         ToonLogError("Failed to create shader program");
         return false;
     }
 
     for (GLuint shader : shaders) {
-        glAttachShader(_mglID, shader);
+        glAttachShader(_glID, shader);
     }
 
-    glLinkProgram(_mglID);
-
+    glLinkProgram(_glID);
+    
     GLint linked = GL_FALSE;
-    glGetProgramiv(_mglID, GL_LINK_STATUS, &linked);
+    glGetProgramiv(_glID, GL_LINK_STATUS, &linked);
     if (!linked) {
         GLint logLength = 0;
-        glGetProgramiv(_mglID, GL_INFO_LOG_LENGTH, &logLength);
+        glGetProgramiv(_glID, GL_INFO_LOG_LENGTH, &logLength);
 
         std::vector<GLchar> log(logLength);
-        glGetProgramInfoLog(_mglID, logLength, &logLength, log.data());
+        glGetProgramInfoLog(_glID, logLength, &logLength, log.data());
 
-        glDeleteProgram(_mglID);
-        _mglID = 0;
+        glDeleteProgram(_glID);
+        _glID = 0;
 
         for (GLuint shader : shaders) {
             glDeleteShader(shader);
@@ -97,7 +97,7 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
     }
 
     for (GLuint shader : shaders) {
-        glDetachShader(_mglID, shader);
+        glDetachShader(_glID, shader);
     }
 
     ToonBenchmarkEnd();
@@ -107,32 +107,37 @@ bool OpenGLShader::LoadFromFiles(const std::vector<std::string>& filenames)
 TOON_OPENGL_API
 void OpenGLShader::Bind()
 {
-    glUseProgram(_mglID);
+    glUseProgram(_glID);
 }
 
 TOON_OPENGL_API
 GLuint OpenGLShader::GetID()
 {
-    return _mglID;
+    return _glID;
 }
 
 TOON_OPENGL_API
-GLuint OpenGLShader::LoadSPV(const std::string& filename)
+GLuint OpenGLShader::LoadSPV(const std::string& filename, bool useAssetPath)
 {
-    LogVerbose("Looking for SPIR-V shader '%s'", filename);
+    ToonLogVerbose("Looking for SPIR-V shader '%s'", filename);
 
-    const auto& shaderPaths = GetAssetPaths();
+    const auto& assetPathList = GetAssetPathList();
 
     std::ifstream file;
 
-    for (const auto& path : shaderPaths) {
-        const std::string& fullPath = path + filename;
-        LogVerbose("Checking '%s'", fullPath);
-
-        file.open(fullPath, std::ios::binary);
-        if (file.is_open()) {
-            break;
+    if (useAssetPath) {
+        for (const auto& path : assetPathList) {
+            Path fullPath = path / "Shaders" / filename;
+            ToonLogVerbose("Checking '%s'", fullPath);
+            
+            file.open(fullPath.ToString(), std::ios::binary);
+            if (file.is_open()) {
+                break;
+            }
         }
+    }
+    else {
+        file.open(filename, std::ios::binary);
     }
 
     if (!file.is_open()) {
@@ -150,12 +155,12 @@ GLuint OpenGLShader::LoadSPV(const std::string& filename)
 
     GLenum type = GetGLShaderType(filename);
     if (type == GL_INVALID_ENUM) {
-        ToonLogError("Failed to deteremine shader type of '%s'", filename);
+        ToonLogError("Failed to determine shader type of '%s'", filename);
         return 0;
     }
 
     GLuint shader = glCreateShader(type);
-    
+
     glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), data.size());
 
     glSpecializeShader(shader, "main", 0, nullptr, nullptr);
@@ -164,62 +169,71 @@ GLuint OpenGLShader::LoadSPV(const std::string& filename)
 }
 
 TOON_OPENGL_API
-GLuint OpenGLShader::LoadGLSL(const std::string& filename)
+GLuint OpenGLShader::LoadGLSL(const std::string& filename, bool useAssetPath)
 {
-    LogVerbose("Looking for GLSL shader '%s'", filename);
+    ToonLogVerbose("Looking for GLSL shader '%s'", filename);
 
-    const auto& shaderPaths = GetAssetPaths();
+    const auto& assetPaths = GetAssetPathList();
 
     std::ifstream file;
 
-    for (const auto& path : shaderPaths) {
-        LogVerbose("Checking '%s'", path + filename);
-
-        file.open(path + filename);
-        if (file.is_open()) {
-            break;
+    if (useAssetPath) {
+        for (const auto& path : assetPaths) {
+            Path fullPath = path / "Shaders" / filename;
+            ToonLogVerbose("Checking '%s'", fullPath);
+            
+            file.open(fullPath.ToString());
+            if (file.is_open()) {
+                break;
+            }
         }
+    }
+    else {
+        file.open(filename);
     }
 
     if (!file.is_open()) {
         return 0;
     }
-
+    
     ToonLogLoad("Loading GLSL shader '%s'", filename);
 
-    std::string code(
+    string code(
         (std::istreambuf_iterator<char>(file)),
         std::istreambuf_iterator<char>()
     );
 
-    std::function<std::string(std::string)> preprocessGLSL =
-        [&](std::string code) -> std::string {
+    // TODO: Support relative includes, without asset path
+
+    std::function<string(string)> preprocessGLSL = 
+        [&](string code) -> string {
             std::istringstream iss(code);
-            std::string outCode;
-            std::string line;
+            string outCode;
+            string line;
 
             while (std::getline(iss, line)) {
                 if (line.compare(0, sizeof("#include")-1, "#include") == 0) {
                     size_t left = line.find('"');
                     size_t right = line.rfind('"');
 
-                    if (left == std::string::npos || right == std::string::npos) {
+                    if (left == string::npos || right == string::npos) {
                         left = line.find('<');
                         right = line.rfind('>');
 
-                        if (left == std::string::npos || right == std::string::npos) {
+                        if (left == string::npos || right == string::npos) {
                             ToonLogError("Unable to parse filename from shader include");
                             return "";
                         }
                     }
 
-                    std::string incFilename = line.substr(left + 1, right - left - 1);
+                    string incFilename = line.substr(left + 1, right - left - 1);
                     std::ifstream incFile;
 
-                    for (const auto& path : shaderPaths) {
-                        LogVerbose("Checking '%s'", path + incFilename);
-
-                        incFile.open(path + incFilename);
+                    for (const auto& path : assetPaths) {
+                        Path fullPath = path / "Shaders" / incFilename;
+                        ToonLogVerbose("Checking '%s'", fullPath);
+                        
+                        incFile.open(fullPath);
                         if (incFile.is_open()) {
                             break;
                         }
@@ -230,7 +244,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
                         return "";
                     }
 
-                    std::string incCode(
+                    string incCode(
                         (std::istreambuf_iterator<char>(incFile)),
                         std::istreambuf_iterator<char>()
                     );
@@ -254,7 +268,7 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename)
     }
 
     GLuint shader = glCreateShader(type);
-
+    
     const char * ptr = code.c_str();
     glShaderSource(shader, 1, (const GLchar **)&ptr, nullptr);
 

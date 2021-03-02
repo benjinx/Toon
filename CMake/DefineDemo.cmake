@@ -3,14 +3,37 @@ INCLUDE(CompileShaders)
 INCLUDE(SetSourceGroups)
 
 MACRO(DEFINE_DEMO _target)
-    FILE(
-        GLOB_RECURSE
+    FILE(GLOB_RECURSE
         _sources
-        Source/*.h
-        Source/*.hpp
-        Source/*.c
-        Source/*.cpp
+        "Source/*.h"
+        "Source/*.hpp"
+        "Source/*.c"
+        "Source/*.cpp"
     )
+
+    FILE(GLOB_RECURSE
+        _sources_in
+        "Source/*.in"
+    )
+
+    ###
+    ### Template Files
+    ###
+
+    FOREACH(file ${_sources_in})
+        STRING(REPLACE 
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}
+            file_out
+            ${file}
+        )
+
+        string(REGEX MATCH "^(.*)\\.[^.]*$" file_out ${file_out})
+        set(file_out ${CMAKE_MATCH_1})
+
+        CONFIGURE_FILE(${file} ${file_out})
+        LIST(APPEND _sources_out ${file_out})
+    ENDFOREACH()
 
     ###
     ### Shader Processing
@@ -28,7 +51,7 @@ MACRO(DEFINE_DEMO _target)
         ${CMAKE_CURRENT_BINARY_DIR}/Assets
     )
 
-    ##COMPILE_SHADERS("${_shaders_in}" _shaders_out)
+    COMPILE_SHADERS("${_shaders_in}" _shaders_out)
 
     ###
     ### Asset Processing
@@ -57,12 +80,16 @@ MACRO(DEFINE_DEMO _target)
     ADD_EXECUTABLE(
         ${_target}
         ${_sources}
+        ${_sources_in}
+        ${_sources_out}
         ${_shaders_in}
         ${_shaders_out}
         ${_assets}
     )
 
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_sources_in}")
+    SET_SOURCE_GROUPS(${CMAKE_CURRENT_BINARY_DIR} "${_sources_out}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_in}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_shaders_out}")
     SET_SOURCE_GROUPS(${CMAKE_CURRENT_SOURCE_DIR} "${_assets}")
@@ -77,6 +104,7 @@ MACRO(DEFINE_DEMO _target)
         ${_target}
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/Source
+            ${CMAKE_CURRENT_BINARY_DIR}/Source
     )
 
     STRING(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_LENGTH)

@@ -19,10 +19,6 @@ public:
 
     virtual ~OpenGLPipeline() = default;
 
-    bool Initialize() override;
-
-    void Terminate() override;
-
     bool Bind();
 
 private:

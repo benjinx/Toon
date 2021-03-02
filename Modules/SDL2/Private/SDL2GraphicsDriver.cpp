@@ -1,23 +1,24 @@
 #include <Toon/SDL2/SDL2GraphicsDriver.hpp>
-#include <Toon/Log.hpp>
 
 #include <Toon/Toon.hpp>
+#include <Toon/Log.hpp>
 
 namespace Toon::SDL2 {
 
 TOON_SDL2_API
 bool SDL2GraphicsDriver::Initialize()
 {
-    if (!GraphicsDriver::Initialize()) {
-        return false;
-    }
-
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        ToonLogError("Unable to initialize SDL: %s", SDL_GetError());
+        ToonLogError("Failed to initialize SDL, %s", SDL_GetError());
         return false;
     }
 
-    ToonLogInfo("Creating SDL2 Window.");
+    SDL_version version;
+    SDL_GetVersion(&version);
+    ToonLogVerbose("SDL Version: %d.%d.%d", (int)version.major, (int)version.minor, (int)version.patch);
+
+    _inputDriver = new SDL2InputDriver();
+    SetInputDriver(std::unique_ptr<InputDriver>(_inputDriver));
 
     return true;
 }
@@ -25,10 +26,11 @@ bool SDL2GraphicsDriver::Initialize()
 TOON_SDL2_API
 void SDL2GraphicsDriver::Terminate()
 {
-    if (_mWindow) {
-        SDL_DestroyWindow(_mWindow);
-        _mWindow = nullptr;
-    }
+    _inputDriver = nullptr;
+    SetInputDriver(nullptr);
+
+    SDL_DestroyWindow(_sdlWindow);
+    _sdlWindow = nullptr;
 
     SDL_Quit();
 }
@@ -36,85 +38,78 @@ void SDL2GraphicsDriver::Terminate()
 TOON_SDL2_API
 bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
 {
-    if (_mWindow) {
-        SDL_DestroyWindow(_mWindow);
-        _mWindow = nullptr;
+    _windowTitle = GetApplicationName() + " (" + GetApplicationVersion().GetString() + ")";
+
+    glm::ivec2 size = GetWindowSize();
+
+    if (_sdlWindow) {
+        SDL_DestroyWindow(_sdlWindow);
+        _sdlWindow = nullptr;
     }
 
-    _mWindow = SDL_CreateWindow(
-        "Toon", 
+    _sdlWindow = SDL_CreateWindow(_windowTitle.c_str(),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        800,
-        600,
-        flags);
+        size.x, size.y, 
+        flags | SDL_WINDOW_RESIZABLE);
 
-    if (!_mWindow)
-    {
-        ToonLogError("Failed to create SDL2 Window. %s", SDL_GetError());
+    if (!_sdlWindow) {
+        ToonLogError("SDL_CreateWindow() failed, %s", SDL_GetError());
         return false;
     }
 
-    // Makes an icon
     Uint16 pixels[16 * 16] = { 0xFFFF };
     SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, 16, 16, 16, 16 * 2,
-        0x0f00, 0x00f0, 0x000f, 0xf000);
-    SDL_SetWindowIcon(_mWindow, surface);
+                                                     0x0f00, 0x00f0, 0x000f, 0xf000);
+    SDL_SetWindowIcon(_sdlWindow, surface);
     SDL_FreeSurface(surface);
 
     return true;
 }
 
 TOON_SDL2_API
-void SDL2GraphicsDriver::SetWindowTitle(const std::string& title)
-{
-    SDL_SetWindowTitle(_mWindow, title.c_str());
-}
-
-TOON_SDL2_API
-std::string SDL2GraphicsDriver::GetWindowTitle()
-{
-    return (std::string)SDL_GetWindowTitle(_mWindow);
-}
-
-TOON_SDL2_API
-void SDL2GraphicsDriver::SetWindowSize(const glm::ivec2& size)
-{
-    SDL_SetWindowSize(_mWindow, size.x, size.y);
-}
-
-TOON_SDL2_API
-glm::ivec2 SDL2GraphicsDriver::GetWindowSize()
-{
-    glm::ivec2 size;
-    SDL_GetWindowSize(_mWindow, &size.x, &size.y);
-    return size;
-}
-
-TOON_SDL2_API
 void SDL2GraphicsDriver::ProcessEvents()
 {
     SDL_Event event;
-
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-        case SDL_QUIT:
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
             SetRunning(false);
-            break;
-        case SDL_WINDOWEVENT:
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-            {
-                //_mWindow->OnWindowResize({ event.window.data1, event.window.data2 });
-                //_mCurrentCamera->SetAspect({ event.window.data1, event.window.data2 });
-            }
-            break;
         }
 
-        // Input
-        //_mInput.ProcessEvent(&event);
+        _inputDriver->ProcessEvent(&event);
+
+        if (event.type == SDL_WINDOWEVENT)
+        {
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_RESIZED:
+            {
+                glm::ivec2 size = { event.window.data1, event.window.data2 };
+                GraphicsDriver::SetWindowSize(size);
+
+                //WindowResizedEventData data;
+                //data.Size = size;
+                //WindowResizedEvent.Call(&data);
+
+                break;
+            }
+            }
+        }
     }
+}
+
+void SDL2GraphicsDriver::UpdateWindowTitle(const string& title)
+{
+    SDL_SetWindowTitle(_sdlWindow, title.c_str());
+}
+
+void SDL2GraphicsDriver::UpdateWindowSize(const glm::ivec2& size) 
+{
+    SDL_SetWindowSize(_sdlWindow, size.x, size.y);
+
+    // TODO: Investigate why this wasn't done automatically from the ProcessEvents loop
+    //WindowResizedEventData data;
+    //data.Size = size;
+    //WindowResizedEvent.Call(&data);
 }
 
 } // namespace Toon::SDL2

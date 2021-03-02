@@ -4,7 +4,7 @@
 namespace Toon::TinyOBJ {
 
 bool ModuleInit() {
-    AddMeshImporter("TinyOBJ", std::make_unique<TinyOBJMeshImporter>());
+    AddMeshImporter("TinyOBJ", std::unique_ptr<TinyOBJMeshImporter>(new TinyOBJMeshImporter));
     
     return true;
 }

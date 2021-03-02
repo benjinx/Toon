@@ -2,6 +2,7 @@
 #define TOON_TINYOBJ_MESH_IMPORTER_HPP
 
 #include <Toon/TinyOBJ/TinyOBJConfig.hpp>
+
 #include <Toon/MeshImporter.hpp>
 
 #include <vector>
@@ -16,7 +17,7 @@ public:
 
     TinyOBJMeshImporter() = default;
 
-    std::vector<std::unique_ptr<PrimitiveData>> LoadFromFile(const std::string& filename) override;
+    std::vector<std::unique_ptr<PrimitiveData>> LoadFromFile(const std::string& filename, bool useAssetPath = true) override;
     
 }; // class TinyOBJMeshImporter
 

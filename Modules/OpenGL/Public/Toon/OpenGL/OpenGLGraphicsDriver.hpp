@@ -21,6 +21,8 @@ struct ShaderDataBindingInfo
     size_t size;
 };
 
+#define TOON_OPENGL_GRAPHICS_DRIVER(x) (dynamic_cast<Toon::OpenGL::OpenGLGraphicsDriver *>(x))
+
 class TOON_OPENGL_API OpenGLGraphicsDriver : public SDL2::SDL2GraphicsDriver
 {
 public:
@@ -37,6 +39,8 @@ public:
 
     void Render() override;
 
+    std::shared_ptr<Buffer> CreateBuffer() override;
+
     std::shared_ptr<Pipeline> CreatePipeline(std::shared_ptr<Shader> shader) override;
 
     std::shared_ptr<Texture> CreateTexture() override;
@@ -45,7 +49,7 @@ public:
 
     std::shared_ptr<Mesh> CreateMesh() override;
 
-    std::unique_ptr<Primitive> CreatePrimitive() override;
+    std::shared_ptr<Primitive> CreatePrimitive() override;
 
 private:
 
@@ -55,9 +59,7 @@ private:
 
     SDL_GLContext _glContext = nullptr;
 
-    std::unordered_map<std::string, GLuint> _shaderDataBindings;
-
-    std::vector<std::weak_ptr<Shader>> _shaders;
+    std::vector<std::weak_ptr<Shader>> _shaderList;
 }; // class OpenGLGraphicsDriver
 
 } // namespace Toon::OpenGL

@@ -1,12 +1,29 @@
 #include <Toon/Toon.hpp>
+#include <Toon/Module.hpp>
+
+#include <Toon/Camera.hpp>
+#include <Toon/Entity.hpp>
+#include <Toon/RenderContext.hpp>
+#include <Toon/UpdateContext.hpp>
+#include <Toon/Component.hpp>
+#include <Toon/MeshComponent.hpp>
+#include <Toon/Light.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Mesh.hpp>
+#include <Toon/Scene.hpp>
+#include <Toon/Shader.hpp>
+#include <Toon/Texture.hpp>
+#include <Toon/Time.hpp>
+#include <Toon/Util.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/TextureImporter.hpp>
+#include <Toon/MeshImporter.hpp>
+#include <Toon/Version.hpp>
 
 #include <cstdio>
 #include <memory>
 #include <thread>
 
-#include <chrono>
-
-using namespace std::chrono;
 using namespace Toon;
 
 void Run()
@@ -43,11 +60,11 @@ void Run()
 
     // Create our scene
     Scene scene;
-    gfx->SetCurrentScene(&scene);
+    SetCurrentScene(&scene);
 
     // Create a render context and transform data
     RenderContext * renderCtx = gfx->GetRenderContext();
-    TransformData * transformData = renderCtx->GetTransformData();
+    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
 
     // Create camera
     Camera camera;
@@ -71,8 +88,8 @@ void Run()
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "shaders/basicLighting.vert.glsl",
-        "shaders/basicLighting.frag.glsl",
+        "passThruColor.vert",
+        "passThruColor.frag",
     })) {
         return;
     }
@@ -81,7 +98,7 @@ void Run()
     auto pipeline = gfx->CreatePipeline(shader);
 
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("models/Primitives/Obj/pMonkey.obj");
+    auto mesh = LoadMeshFromFile("Primitives/Obj/pMonkey.obj");
     if (!mesh) {
         return;
     }
@@ -114,26 +131,27 @@ void Run()
     // Add the new entity to the scene
     scene.AddChild(std::move(entity));
 
+    shaderTransform->View = camera.GetView();
+    shaderTransform->Projection = camera.GetProjection();
+
     // Game loop
-    while (IsRunning()) {
+    Toon::Run([&]() {
         gfx->Render();
 
         gfx->ProcessEvents();
 
-        transformData->View = camera.GetView();
-        transformData->Projection = camera.GetProjection();
-        
         // How do i pass in a uniform for things such as light direction or
         // A color or something
 
         std::this_thread::sleep_for(16ms);
-    }
-
+    });
 }
 
 
 int main(int argc, char ** argv)
 {
+    AddLogFile("lastrun.log");
+
     // Set application info
     SetApplicationName("HelloWorld");
     SetApplicationVersion({1, 0, 0});
@@ -148,6 +166,8 @@ int main(int argc, char ** argv)
 
     // Terminate
     Terminate();
+
+    CloseAllLogFiles();
 
     return 0;
 }

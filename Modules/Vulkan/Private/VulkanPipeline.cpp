@@ -1,6 +1,7 @@
 #include <Toon/Vulkan/VulkanPipeline.hpp>
 
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 #include <Toon/Vertex.hpp>
 #include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
 #include <Toon/Vulkan/VulkanShader.hpp>
@@ -9,33 +10,45 @@
 namespace Toon::Vulkan {
 
 TOON_VULKAN_API
-void VulkanPipeline::Terminate()
+bool VulkanPipeline::Initialize(std::shared_ptr<Shader> shader)
 {
-    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
- 
-    vkDestroyPipeline(gfx->GetDevice(), _vkPipeline, nullptr);
+    if (!Pipeline::Initialize(shader)) {
+        return false;
+    }
+
+    return Create();
 }
 
 TOON_VULKAN_API
-bool VulkanPipeline::Initialize()
+void VulkanPipeline::Terminate()
+{
+    _shader.reset();
+
+    Destroy();
+}
+
+TOON_VULKAN_API
+bool VulkanPipeline::Create()
 {
     VkResult vkResult;
 
     VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
-    VulkanShader * shader = TOON_VULKAN_SHADER(_shader.get());
-    if (!shader) {
+    VulkanShader * vkShader = TOON_VULKAN_SHADER(_shader.get());
+    if (!vkShader) {
         ToonLogError("Trying to bind a Vulkan VulkanPipeline with no shader");
         return false;
     }
 
-    const auto& stages = shader->GetStages();
+    const auto& stageList = vkShader->GetStageList();
 
     VkExtent2D extent = gfx->GetSwapChainExtent();
 
     VkViewport viewport = {
+        .x = 0,
+        .y = static_cast<float>(extent.height),
         .width = static_cast<float>(extent.width),
-        .height = static_cast<float>(extent.height),
+        .height = -1.0f * static_cast<float>(extent.height),
         .minDepth = 0.0f,
         .maxDepth = 1.0f,
     };
@@ -160,6 +173,57 @@ bool VulkanPipeline::Initialize()
     std::array<VkVertexInputAttributeDescription, 9> attributes = {
         VkVertexInputAttributeDescription {
             .location = GetVertexAttributeLocation(VertexAttribute::Position),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Position),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Normal),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Normal),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Tangent),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Tangent),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Bitangent),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Bitangent),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Color),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Color),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::TexCoord1),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32_SFLOAT,
+            .offset = offsetof(Vertex, TexCoord1),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::TexCoord2),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32_SFLOAT,
+            .offset = offsetof(Vertex, TexCoord2),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Joints),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_UINT,
+            .offset = offsetof(Vertex, Joints),
+        },
+        VkVertexInputAttributeDescription {
+            .location = GetVertexAttributeLocation(VertexAttribute::Weights),
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = offsetof(Vertex, Weights),
         },
     };
 
@@ -187,8 +251,8 @@ bool VulkanPipeline::Initialize()
         .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .stageCount = static_cast<uint32_t>(stages.size()),
-        .pStages = stages.data(),
+        .stageCount = static_cast<uint32_t>(stageList.size()),
+        .pStages = stageList.data(),
         .pVertexInputState = &vertexInputStateCreateInfo,
         .pInputAssemblyState = &vertexInputAssemblyStateCreateInfo,
         .pTessellationState = nullptr,
@@ -205,6 +269,10 @@ bool VulkanPipeline::Initialize()
         .basePipelineIndex = 0,
     };
 
+    if (_vkPipeline) {
+        vkDestroyPipeline(gfx->GetDevice(), _vkPipeline, nullptr);
+    }
+
     vkResult = vkCreateGraphicsPipelines(gfx->GetDevice(), nullptr, 1, &pipelineCreateInfo, nullptr, &_vkPipeline);
     if (vkResult != VK_SUCCESS) {
         ToonLogError("Failed to create graphics pipeline");
@@ -212,6 +280,17 @@ bool VulkanPipeline::Initialize()
     }
 
     return true;
+}
+
+TOON_VULKAN_API
+void VulkanPipeline::Destroy()
+{
+    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+ 
+    if (_vkPipeline) {
+        vkDestroyPipeline(gfx->GetDevice(), _vkPipeline, nullptr);
+        _vkPipeline = nullptr;
+    }
 }
 
 TOON_VULKAN_API

@@ -20,17 +20,11 @@ public:
 
     VulkanBuffer() = default;
 
-    virtual inline ~VulkanBuffer() {
-        Terminate();
-    };
+    virtual inline ~VulkanBuffer() = default;
 
     bool Initialize(size_t size, uint8_t * data, BufferUsage bufferUsage, MemoryUsage memoryUsage) override;
 
     void Terminate() override;
-
-    bool ReadFrom(size_t offset, size_t length, uint8_t * data) override;
-
-    bool WriteTo(size_t offset, size_t length, uint8_t * data) override;
 
     inline VkBuffer GetVkBuffer() {
         return _vkBuffer;
@@ -43,6 +37,7 @@ private:
     VmaAllocation _vmaAllocation;
 
     VkDeviceSize _size;
+    
 }; // class VulkanBuffer
 
 inline std::optional<VkBufferUsageFlagBits> GetVkBufferUsage(BufferUsage bufferUsage)

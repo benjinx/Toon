@@ -1,7 +1,7 @@
 #ifndef TOON_LOG_HPP
 #define TOON_LOG_HPP
 
-#include <Toon/Utils.hpp>
+#include <Toon/Util.hpp>
 #include <Toon/Macros.hpp>
 
 #include <cstdio> // for printf, vsnprintf
@@ -24,6 +24,15 @@ namespace Toon {
         Verbose,
     };
 
+    TOON_ENGINE_API
+    bool AddLogFile(const string& filename);
+
+    TOON_ENGINE_API
+    std::vector<FILE *> GetAllLogFiles();
+
+    TOON_ENGINE_API
+    void CloseAllLogFiles();
+
 
     template <class T>
     static auto LogWrap(const T& v) {
@@ -34,9 +43,23 @@ namespace Toon {
 #pragma clang diagnostic ignored "-Wunused-function"
 
     template <>
-    auto LogWrap<std::string>(const std::string& v) {
+    auto LogWrap<string>(const string& v) {
         return v.c_str();
     }
+
+    template <>
+    inline auto LogWrap<Path>(const Path& v) {
+        return v.ToCString();
+    }
+
+    #if defined(DUSK_PLATFORM_WINDOWS)
+
+        template <>
+        inline auto LogWrap<WindowsErrorMessage>(const WindowsErrorMessage& v) {
+            return v.GetMessage();
+        }
+
+    #endif
 
 #pragma clang diagnostic pop
 
@@ -122,6 +145,12 @@ static inline void Log(LogLevel level, const char* format, Args... args)
         
     printf(format, LogWrap(args)...);
 
+    const auto& logFiles = GetAllLogFiles();
+    for (FILE * file : logFiles) {
+        fprintf(file, format, LogWrap(args)...);
+        fflush(file);
+    }
+
 #pragma clang diagnostic pop
 
 #pragma GCC diagnostic pop
@@ -146,9 +175,9 @@ static inline void Log(LogLevel level, const char* format, Args... args)
 #define TOON_FILENAME (&__FILE__[TOON_SOURCE_PATH_LENGTH])
 
 #ifndef TOON_ENABLE_VERBOSE_LOGGING
-#   define LogVerbose(M, ...)  do { } while(0)
+#   define ToonLogVerbose(M, ...)  do { } while(0)
 #else
-#   define LogVerbose(M, ...) \
+#   define ToonLogVerbose(M, ...) \
         do { Log(Toon::LogLevel::Verbose, "[VERB](%s:%d) " M "\n", \
         TOON_FILENAME, __LINE__, ##__VA_ARGS__); } while (0)
 #endif

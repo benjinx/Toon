@@ -2,8 +2,11 @@
 #define TOON_MODULE_HPP
 
 #include <Toon/Config.hpp>
+#include <Toon/Version.hpp>
 
-#include <string>
+#include <Toon/String.hpp>
+
+#include <initializer_list>
 
 namespace Toon {
 
@@ -14,10 +17,10 @@ struct TOON_ENGINE_API ToonModule {
 };
 
 TOON_ENGINE_API
-bool LoadModule(const std::string& name);
+bool LoadModule(const string& name);
 
 TOON_ENGINE_API
-void FreeModule(const std::string& name);
+void FreeModule(const string& name);
 
 TOON_ENGINE_API
 void FreeAllModules();

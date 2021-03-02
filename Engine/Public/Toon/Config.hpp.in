@@ -1,0 +1,36 @@
+#ifndef TOON_CONFIG_HPP
+#define TOON_CONFIG_HPP
+
+#include <Toon/Macros.hpp>
+
+#define TOON_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define TOON_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define TOON_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define TOON_REVISION "@PROJECT_VERSION_GIT_HASH@"
+
+#define TOON_VERSION_NUMBER(MAJOR, MINOR, PATCH) \
+    (((MAJOR << 16) | (MINOR << 8) | PATCH))
+
+#define TOON_VERSION \
+    TOON_VERSION_NUMBER(TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH)
+
+#define TOON_VERSION_STRING "@PROJECT_VERSION@-@PROJECT_VERSION_GIT_HASH@"
+
+#if defined(TOON_COMPILER_MSVC)
+    #define TOON_API_EXPORT __declspec(dllexport)
+    #define TOON_API_IMPORT __declspec(dllimport)
+#else
+    #if TOON_COMPILER_GCC >= 4 || defined(TOON_COMPILER_CLANG)
+        #define TOON_API_EXPORT __attribute__ ((__visibility__ ("default")))
+        #define TOON_API_IMPORT __attribute__ ((__visibility__ ("default")))
+    #endif
+#endif
+
+#if defined(TOON_ENGINE_EXPORT)
+    #define TOON_ENGINE_API TOON_API_EXPORT
+#else
+    #define TOON_ENGINE_API TOON_API_IMPORT
+#endif
+
+
+#endif // TOON_CONFIG_HPP

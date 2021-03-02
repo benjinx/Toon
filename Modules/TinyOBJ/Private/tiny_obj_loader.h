@@ -60,7 +60,7 @@ THE SOFTWARE.
 #define TINY_OBJ_LOADER_H_
 
 #include <map>
-#include <string>
+#include <Toon/String.hpp>
 #include <vector>
 
 namespace tinyobj {

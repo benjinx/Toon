@@ -16,13 +16,10 @@ TOON_ENGINE_API
 void MeshComponent::Render(RenderContext * ctx)
 {
     auto gfx = GetGraphicsDriver();
-    auto transformData = ctx->GetTransformData();
+    auto transformData = ctx->GetShaderTransform();
 
     transformData->Model = GetEntity()->GetWorldTransform();
     transformData->UpdateMVP();
-    
-    Buffer * buffer = GetGraphicsDriver()->GetConstantBuffer(0);
-    buffer->WriteTo(0, sizeof(TransformData), reinterpret_cast<uint8_t *>(ctx->GetTransformData()));
 
     _mesh->Render(ctx);
 }

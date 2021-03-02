@@ -1,4 +1,23 @@
 #include <Toon/Toon.hpp>
+#include <Toon/Module.hpp>
+
+#include <Toon/Camera.hpp>
+#include <Toon/Entity.hpp>
+#include <Toon/RenderContext.hpp>
+#include <Toon/UpdateContext.hpp>
+#include <Toon/Component.hpp>
+#include <Toon/MeshComponent.hpp>
+#include <Toon/Light.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Mesh.hpp>
+#include <Toon/Scene.hpp>
+#include <Toon/Shader.hpp>
+#include <Toon/Texture.hpp>
+#include <Toon/Util.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/TextureImporter.hpp>
+#include <Toon/MeshImporter.hpp>
+#include <Toon/Version.hpp>
 
 #include <cstdio>
 #include <memory>
@@ -7,11 +26,12 @@
 #include <chrono>
 
 using namespace std::chrono;
+using namespace Toon;
 
 void run()
 {
-    Toon::LoadModule("ToonSTBI");
-    Toon::LoadModule("ToonTinyOBJ");
+    LoadModule("ToonSTBI");
+    LoadModule("ToonTinyOBJ");
 
     const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
     
@@ -20,54 +40,54 @@ void run()
     }
 
     if (strcmp(graphicsDriver, "OpenGL") == 0) {
-        Toon::LoadModule("ToonOpenGL");
+        LoadModule("ToonOpenGL");
     }
     else if (strcmp(graphicsDriver, "DirectX") == 0) {
-        Toon::LoadModule("ToonDirectX");
+        LoadModule("ToonDirectX");
     }
     else {
-        Toon::LoadModule("ToonVulkan");
+        LoadModule("ToonVulkan");
     }
 
-    auto gfx = Toon::GetGraphicsDriver();
+    auto gfx = GetGraphicsDriver();
     if (!gfx) {
         return;
     }
 
-    Toon::RenderContext * renderCtx = gfx->GetRenderContext();
-    Toon::TransformData * transformData = renderCtx->GetTransformData();
+    RenderContext * renderCtx = gfx->GetRenderContext();
+    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
 
-    Toon::Camera camera;
+    Camera camera;
     camera.SetAspect(glm::vec2(640.0f, 480.0f));
     camera.SetFOVX(45.0f);
-    camera.SetMode(Toon::CameraMode::Perspective);
+    camera.SetMode(CameraMode::Perspective);
     camera.SetPosition({ 3, 3, 3 });
     camera.SetLookAt({ 0, 0, 0 });
 
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "shaders/passThruColor.vert.glsl",
-        "shaders/passThruColor.frag.glsl",
+        "passThruColor.vert.glsl",
+        "passThruColor.frag.glsl",
     })) {
         return;
     }
 
     auto pipeline = gfx->CreatePipeline(shader);
 
-    Toon::Scene scene;
-    gfx->SetCurrentScene(&scene);
+    Scene scene;
+    SetCurrentScene(&scene);
 
-    auto mesh = Toon::LoadMeshFromFile("models/cube.obj");
+    auto mesh = LoadMeshFromFile("models/cube.obj");
     if (!mesh) {
         return;
     }
     
     mesh->SetPipeline(pipeline);
 
-    auto entity = std::unique_ptr<Toon::Entity>(new Toon::Entity());
-    Toon::Entity * tmpEntity = entity.get();
+    auto entity = std::unique_ptr<Entity>(new Entity());
+    Entity * tmpEntity = entity.get();
 
-    auto meshComponent = std::unique_ptr<Toon::MeshComponent>(new Toon::MeshComponent());
+    auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
     meshComponent->SetMesh(mesh);
     entity->AddComponent(std::move(meshComponent));
 
@@ -80,17 +100,19 @@ void run()
 
     // //e.AddComponent());
 
-    Toon::RenderContext* rc = new Toon::RenderContext();
+    shaderTransform->View = camera.GetView();
+    shaderTransform->Projection = camera.GetProjection();
+
+    RenderContext* rc = new RenderContext();
 
     gfx->SetWindowTitle("HelloWorld ~ Toon");
     gfx->SetWindowSize({ 1024, 768 });
-    while (Toon::IsRunning()) {
+    while (IsRunning()) {
         gfx->Render();
 
         gfx->ProcessEvents();
 
-        transformData->View = camera.GetView();
-        transformData->Projection = camera.GetProjection();
+
         
 
         std::this_thread::sleep_for(16ms);
@@ -102,17 +124,17 @@ void run()
 int main(int argc, char ** argv)
 {
 
-    Toon::SetApplicationName("HelloWorld");
-    Toon::SetApplicationVersion({1, 0, 0});
+    SetApplicationName("HelloWorld");
+    SetApplicationVersion({1, 0, 0});
 
 
-    if (!Toon::Initialize(argc, argv)) {
+    if (!Initialize(argc, argv)) {
         return 1;
     }
 
     run();
 
-    Toon::Terminate();
+    Terminate();
 
     return 0;
 }

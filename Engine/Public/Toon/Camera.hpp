@@ -5,14 +5,14 @@
 #include <Toon/Entity.hpp>
 #include <Toon/Math.hpp>
 
-//class Window;
+#include <Toon/String.hpp>
 
 namespace Toon {
 
 enum CameraMode {
     Perspective,
     Orthographic,
-};
+}; // enum CameraMode
 
 class TOON_ENGINE_API Camera : public Entity
 {
@@ -22,92 +22,107 @@ public:
         
     Camera();
 
-    virtual ~Camera() = default;
-
-    // Methods
+    virtual ~Camera();
 
     glm::mat4 GetView() const;
+
     glm::mat4 GetProjection() const;
 
     void SetMode(CameraMode mode);
+
     inline CameraMode GetMode() const {
-        return _mMode;
+        return _mode;
     }
-
-    void SetAspect(float aspect);
-    void SetAspect(const glm::vec2& size);
-
-    inline float GetAspect() const {
-        return _mAspect;
-    }
-
-    void SetFOVX(float fovx);
-    void SetFOVY(float fovy);
-
-    void SetViewportScale(const glm::vec4& viewScale);
-    void SetViewportSize(const glm::vec2& viewSize);
-
-    inline glm::vec4 GetViewportScale() const {
-        return _mViewportScale;
-    }
-
-    inline glm::vec2 GetViewportSize() const {
-        return _mViewportSize;
-    }
-
-    glm::vec4 GetViewport() const;
 
     void SetClip(const glm::vec2& clip);
 
     inline glm::vec2 GetClip() const {
-        return _mClip;
+        return _clip;
     }
 
     void SetUp(const glm::vec3& up);
 
     inline glm::vec3 GetUp() const {
-        return _mUp;
+        return _up;
     }
-
-    glm::vec3 GetRight() const;
 
     void SetForward(const glm::vec3& forward);
 
     glm::vec3 GetForward() const;
 
+    glm::vec3 GetRight() const;
+
+    void SetAspect (float aspect);
+    
+    void SetAspect(const glm::vec2& size);
+
+    inline float GetAspect() const {
+        return _aspect;
+    }
+
+    // Perspective
+
+    void SetFOVX(float fovx);
+
+    inline float GetFOVX() const {
+        return _fovX;
+    }
+
+    void SetFOVY(float fovy);
+
     void SetLookAt(const glm::vec3& point);
 
+    // Orthographic
+
+    void SetViewportSize(const glm::vec2& viewSize);
+
+    inline glm::vec2 GetViewportSize() const {
+        return _viewportSize;
+    }
+
+    void SetViewportScale(const glm::vec4& viewScale);
+
+    inline glm::vec4 GetViewportScale() const {
+        return _viewportScale;
+    }
+
+    glm::vec4 GetViewport() const;
+
+    // Movement
     void HandleMovement(float dt);
     void HandleRotation(float xoffset, float yoffset);
 
-    //void SetCameraDirection(Direction direction);
-
     void SetDirection(glm::vec3 dir);
-    glm::vec3& GetDirection() { return _mDirection; }
+    glm::vec3& GetDirection() { return _direction; }
 
 private:
 
-    CameraMode _mMode = CameraMode::Perspective;
+    CameraMode _mode = CameraMode::Perspective;
 
-    glm::vec2 _mClip = glm::vec2(0.1f, 10000.0f);
+    glm::vec2 _clip = { 0.1f, 10000.0f };
 
-    glm::vec3 _mUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 _up = GetWorldUp();
 
-    float _mAspect = 16.0f / 9.0f; // 16:9
+    float _aspect = 16.0f / 9.0f; // 16:9
+
+    unsigned _windowResizedEventHandlerID;
 
     // Perspective
-    float _mFovX = glm::radians(45.0f);
+    float _fovX = glm::radians(45.0f);
 
     // Orthographic
-    glm::vec2 _mViewportSize = glm::vec2(10.0f, 10.0f);
-    glm::vec4 _mViewportScale = glm::vec4(-0.5f, 0.5f, 0.5f, -0.5f);
+    glm::vec2 _viewportSize = glm::vec2(1920.0f, 1080.0f);
 
-    float _mMovementSpeed = 0.25f;
-    float _mRotateSpeed = 0.001f;
+    glm::vec4 _viewportScale = glm::vec4(-0.5f, 0.5f, 0.5f, -0.5f);
 
-    bool _mInverse = false;
+    // Movement
+    float _movementSpeed = 0.25f;
 
-    glm::vec3 _mDirection = glm::vec3(0);
+    float _rotateSpeed = 0.001f;
+
+    bool _invserse = false;
+
+    glm::vec3 _direction = glm::vec3(0);
 };
 
 } // namespace Toon

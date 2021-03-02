@@ -3,7 +3,7 @@
 
 #include <Toon/Config.hpp>
 
-#include <string>
+#include <Toon/String.hpp>
 
 namespace Toon {
 
@@ -65,7 +65,7 @@ struct TOON_ENGINE_API Version
         return (res == 0 || res == -1);
     }
 
-    inline std::string GetString() const
+    inline string GetString() const
     {
         return std::to_string(Major) +
             "." +

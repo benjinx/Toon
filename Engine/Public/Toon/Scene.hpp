@@ -1,15 +1,12 @@
 #ifndef TOON_SCENE_H
 #define TOON_SCENE_H
 
-#include <Toon/Axis.hpp>
 #include <Toon/Config.hpp>
 #include <Toon/Entity.hpp>
-#include <Toon/Mesh.hpp>
-#include <Toon/Skybox.hpp>
-//#include <Toon/Shader.hpp>
+#include <Toon/System.hpp>
 
 #include <memory>
-#include <unordered_map>
+#include <vector>
 
 namespace Toon {
 
@@ -17,29 +14,28 @@ class TOON_ENGINE_API Scene : public Entity
 {
 public:
 
+    DISALLOW_COPY_AND_ASSIGN(Scene)
+
     Scene() = default;
+
     virtual ~Scene() = default;
     
-    virtual void Start() {}
-    virtual void Pause() {}
-    virtual void Resume() {}
+    System * AddSystem(std::unique_ptr<System> && sys);
 
-    virtual void Update(UpdateContext * ctx);
-    virtual void Render(RenderContext * ctx);
-
-    bool LoadScene(std::string filename);
-
-    // Ui Options.
-    static void Options();
-
-    void CreateSkybox(std::vector<std::string> faces);
-    Skybox* GetSkybox() { return _mSkybox.get(); }
+    std::vector<System *> GetSystems() const;
 
 private:
-    glm::mat4 _mSceneTransform = glm::mat4(1);
+    std::vector<std::unique_ptr<System>> _systems;
 
-    std::unique_ptr<Skybox> _mSkybox;
-};
+    std::vector<System *> _systemPtrs;
+
+}; // class Scene
+
+TOON_ENGINE_API
+void SetCurrentScene(Scene * scene);
+
+TOON_ENGINE_API
+Scene * GetCurrentScene();
 
 } // namespace Toon
 

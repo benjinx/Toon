@@ -1,88 +1,34 @@
 #include "Toon/Scene.hpp"
 
-//#include <Toon/App.hpp>
-#include <Toon/Camera.hpp>
-#include <Toon/DevUI.hpp>
-//#include <Toon/glTF2.hpp>
-#include <Toon/Log.hpp>
-//#include <Toon/Material.hpp>
-//#include <Toon/StaticMeshComponent.hpp>
-//#include <Toon/Shader.hpp>
-#include <Toon/Utils.hpp>
-
-//#include <imgui/imgui.h>
-
 namespace Toon {
 
+static Toon::Scene * _CurrentScene = nullptr;
+
 TOON_ENGINE_API
-void Scene::Update(UpdateContext * ctx)
+System * Scene::AddSystem(std::unique_ptr<System> && sys)
 {
-    /*Entity::Update(dt);
+    _systemPtrs.push_back(sys.get());
+    _systems.push_back(std::move(sys));
 
-    // Use our default shaders and set the color & light position.
-    App* app = App::Inst();
-    Shader* defaultLighting = app->GetShader("defaultLighting");
-
-    defaultLighting->Use();
-    glm::vec3 defaultLightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-    defaultLighting->SetVec3("lightColor", defaultLightColor);
-
-    glm::vec4 defaultLightPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    defaultLighting->SetVec4("lightPosition", defaultLightPosition);*/
+    return _systemPtrs.back();
 }
 
 TOON_ENGINE_API
-void Scene::Render(RenderContext * ctx)
+std::vector<System *> Scene::GetSystems() const
 {
-    Entity::Render(ctx);
-
-    if (_mSkybox != nullptr)
-    {
-        _mSkybox->Render(ctx);
-    }
-
-    /*if (DevUI::showAxis)
-    {
-        RenderAxis();
-
-        // Render the childrens
-        for (auto& entity : _mChildren)
-        {
-            RenderAxis();
-        }
-    }*/
+    return _systemPtrs;
 }
 
 TOON_ENGINE_API
-bool Scene::LoadScene(std::string filename)
+void SetCurrentScene(Scene * scene)
 {
-    /*std::vector<std::unique_ptr<Entity>> loadedGobjs = glTF2::LoadSceneFromFile(filename);
-
-    for (unsigned int i = 0; i < loadedGobjs.size(); ++i)
-    {
-        AddEntity(std::move(loadedGobjs[i]));
-    }
-
-    if (loadedGobjs.empty())
-    {
-        return false;
-    }
-    */
-    return true;
+    _CurrentScene = scene;
 }
 
 TOON_ENGINE_API
-void Scene::CreateSkybox(std::vector<std::string> faces)
+Scene * GetCurrentScene()
 {
-    _mSkybox = std::make_unique<Skybox>();
-
-    //_mSkybox->LoadCubemap(faces);
-}
-
-TOON_ENGINE_API
-void Scene::Options()
-{
-    //ImGui::Checkbox("Show Entity Axis", &DevUI::showAxis);
+    return _CurrentScene;
 }
 
 } // namespace Toon

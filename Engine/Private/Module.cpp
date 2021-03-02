@@ -12,15 +12,15 @@
 
 namespace Toon {
 
-std::unordered_map<std::string, ModuleHandle> _gModules;
+std::unordered_map<string, ModuleHandle> _gModules;
 
-ModuleHandle _dlopen(const std::string& filename)
+ModuleHandle _dlopen(const string& filename)
 {
     ModuleHandle handle = nullptr;
 
     #if defined(TOON_PLATFORM_WINDOWS)
 
-        LogVerbose("Loading Module from PATH: '%s'", getenv("PATH"));
+        ToonLogVerbose("Loading Module from PATH: '%s'", getenv("PATH"));
 
         handle = LoadLibraryA(filename.c_str());
         if (!handle) {
@@ -31,15 +31,15 @@ ModuleHandle _dlopen(const std::string& filename)
         
     #else
 
-        LogVerbose("Loading Module from LD_LIBRARY_PATH: '%s'", getenv("LD_LIBRARY_PATH"));
+        ToonLogVerbose("Loading Module from LD_LIBRARY_PATH: '%s'", getenv("LD_LIBRARY_PATH"));
 
         #if defined(TOON_PLATFORM_APPLE)
 
-            std::string libFilename = "lib" + filename + ".dylib";
+            string libFilename = "lib" + filename + ".dylib";
 
         #else
 
-            std::string libFilename = "lib" + filename + ".so";
+            string libFilename = "lib" + filename + ".so";
 
         #endif
 
@@ -54,7 +54,7 @@ ModuleHandle _dlopen(const std::string& filename)
     return handle;
 }
 
-void * _dlsym(ModuleHandle handle, const std::string& symbol)
+void * _dlsym(ModuleHandle handle, const string& symbol)
 {
     #if defined(TOON_PLATFORM_WINDOWS)
 
@@ -80,7 +80,7 @@ void _dlclose(ModuleHandle handle)
     #endif
 }
 
-bool LoadModule(const std::string& name)
+bool LoadModule(const string& name)
 {
     ToonLogLoad("Loading module '%s'", name);
 
@@ -110,7 +110,7 @@ bool LoadModule(const std::string& name)
     return true;
 }
 
-void FreeModule(const std::string& name)
+void FreeModule(const string& name)
 {
     auto it = _gModules.find(name);
     if (it == _gModules.end()) {

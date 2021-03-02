@@ -6,8 +6,20 @@
     // Windows
     #define TOON_PLATFORM_WINDOWS
 
+    #ifdef __has_include
+        #if __has_include(<winapifamily.h>)
+            #include <winapifamily.h>
+            #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+                // Universal Windows Platform
+                #define DUSK_PLATFORM_UWP
+            #endif
+        #endif
+    #endif
+
 #elif defined(__APPLE__) && defined(__MACH__)
 
+    #define TOON_PLATFORM_APPLE
+    
     // Apple
     #include "TargetConditionals.h"
 
@@ -86,6 +98,7 @@
 
     #include <Windows.h>
 
+    #undef LoadModule
     #undef FreeModule
     #undef CreateWindow
     

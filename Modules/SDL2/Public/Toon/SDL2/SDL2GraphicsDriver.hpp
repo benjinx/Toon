@@ -2,9 +2,9 @@
 #define TOON_SDL2_GRAPHICS_DRIVER_HPP
 
 #include <Toon/SDL2/SDL2Config.hpp>
-#include <Toon/GraphicsDriver.hpp>
 
-#include <SDL.h>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/SDL2/SDL2InputDriver.hpp>
 
 namespace Toon::SDL2 {
 
@@ -17,23 +17,25 @@ public:
     void Terminate() override;
 
     virtual bool CreateWindow(unsigned flags);
-    
-    void SetWindowTitle(const std::string& title) override;
-
-    std::string GetWindowTitle() override;
-
-    void SetWindowSize(const glm::ivec2& size) override;
-
-    glm::ivec2 GetWindowSize() override;
 
     void ProcessEvents() override;
 
     SDL_Window * GetSDL2Window() const {
-        return _mWindow;
+        return _sdlWindow;
     }
 
+protected:
+
+    void UpdateWindowTitle(const string& title) override;
+
+    void UpdateWindowSize(const glm::ivec2& size) override;
+
 private:
-    SDL_Window* _mWindow = nullptr;
+
+    SDL_Window * _sdlWindow = nullptr;
+
+    SDL2InputDriver * _inputDriver = nullptr;
+
 }; // class SDL2GraphicsDriver
 
 } // namespace Toon::SDL2

@@ -2,11 +2,12 @@
 #define TOON_RENDER_CONTEXT_HPP
 
 #include <Toon/Config.hpp>
-#include <Toon/TransformData.hpp>
+#include <Toon/ShaderGlobals.hpp>
+#include <Toon/ShaderTransform.hpp>
 
 namespace Toon {
 
-class RenderContext
+class TOON_ENGINE_API RenderContext
 {
 public:
 
@@ -16,13 +17,19 @@ public:
 
     virtual ~RenderContext() = default;
 
-    virtual TransformData* GetTransformData() {
-        return &_mTransformData;
+    virtual ShaderGlobals * GetShaderGlobals() {
+        return &_shaderGlobals;
+    }
+
+    virtual ShaderTransform* GetShaderTransform() {
+        return &_shaderTransform;
     }
 
 private:
 
-    TransformData _mTransformData;
+    ShaderGlobals _shaderGlobals;
+
+    ShaderTransform _shaderTransform;
     
 }; // class RenderContext
 

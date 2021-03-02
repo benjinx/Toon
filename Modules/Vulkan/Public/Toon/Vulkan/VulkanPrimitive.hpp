@@ -6,7 +6,7 @@
 #include <Toon/Log.hpp>
 #include <Toon/Primitive.hpp>
 #include <Toon/PrimitiveData.hpp>
-#include <Toon/Buffer.hpp>
+#include <Toon/Vulkan/VulkanBuffer.hpp>
 
 #include <vector>
 #include <optional>
@@ -23,7 +23,9 @@ public:
 
     VulkanPrimitive() = default;
 
-    virtual ~VulkanPrimitive();
+    virtual ~VulkanPrimitive() = default;
+
+    void Terminate() override;
 
     bool Load(const std::unique_ptr<PrimitiveData>& data) override;
 

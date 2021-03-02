@@ -5,9 +5,15 @@
 namespace Toon::Vulkan {
 
 TOON_VULKAN_API
-VulkanPrimitive::~VulkanPrimitive()
+void VulkanPrimitive::Terminate()
 {
-    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+    if (_vertexBuffer) {
+        _vertexBuffer->Terminate();
+    }
+
+    if (_indexBuffer) {
+        _indexBuffer->Terminate();
+    }
 }
 
 bool VulkanPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)

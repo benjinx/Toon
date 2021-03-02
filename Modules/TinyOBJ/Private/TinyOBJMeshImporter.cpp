@@ -1,7 +1,7 @@
 #include <Toon/TinyOBJ/TinyOBJMeshImporter.hpp>
 #include <Toon/Log.hpp>
 #include <Toon/Benchmark.hpp>
-#include <Toon/Utils.hpp>
+#include <Toon/Util.hpp>
 #include <Toon/TinyOBJ/TinyOBJPrimitiveData.hpp>
 
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -10,38 +10,47 @@
 namespace Toon::TinyOBJ {
 
 TOON_TINYOBJ_API
-std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename)
+std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(const std::string& filename, bool useAssetPath /*= true*/)
 {
     ToonBenchmarkStart();
-
-    //const std::string& dir = GetDirname(filename);
 
     std::vector<std::unique_ptr<PrimitiveData>> primitiveList;
 
     tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
+    std::vector<tinyobj::shape_t> shapeList;
+    std::vector<tinyobj::material_t> materialList;
 
     std::string warn, err;
     bool result = false;
 
-    const auto& assetPaths = GetAssetPaths();
+    if (useAssetPath) {
+        const auto& assetPaths = GetAssetPathList();
 
-    for (const auto& path : assetPaths)
-    {
-        std::string fullPath = path + filename;
-        ToonLogInfo("Loading from File: %s", fullPath);
+        for (const auto& path : assetPaths) {
+            std::string fullPath = path / "Models" / filename;
+            ToonLogInfo("Loading from File: %s", fullPath);
 
-        std::string dir = GetDirname(fullPath);
+            std::string dir = GetDirname(fullPath);
 
-        warn = "";
-        err = "";
+            warn = "";
+            err = "";
 
-        result = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, fullPath.c_str(), dir.c_str());
+            result = tinyobj::LoadObj(&attrib, &shapeList, &materialList, &warn, &err, fullPath.c_str(), dir.c_str());
 
-        if (result) {
-            break;
+            // If the error isn't 'Cannot open file', the .obj file is probably
+            // broken, and we should fail
+            if (!err.empty() && err.rfind("Cannot open file", 0) != 0) {
+                break;
+            }
+
+            if (result) {
+                break;
+            }
         }
+    }
+    else {
+        string dir = GetDirname(filename);
+        result = tinyobj::LoadObj(&attrib, &shapeList, &materialList, &warn, &err, filename.c_str(), dir.c_str());
     }
 
 
@@ -57,7 +66,7 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
     bool hasTexCoords = (!attrib.texcoords.empty());
     bool hasColors = (!attrib.colors.empty());
 
-    for (auto& shape : shapes) {
+    for (auto& shape : shapeList) {
         TinyOBJPrimitiveData * primitiveData = new TinyOBJPrimitiveData();
         
         primitiveData->VertexList.resize(shape.mesh.indices.size());

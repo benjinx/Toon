@@ -1,12 +1,14 @@
-#ifndef TOON_TRANSFORM_DATA_HPP
-#define TOON_TRANSFORM_DATA_HPP
+#ifndef TOON_SHADER_TRANSFORM_HPP
+#define TOON_SHADER_TRANSFORM_HPP
 
 #include <Toon/Config.hpp>
 #include <Toon/Math.hpp>
 
 namespace Toon {
 
-struct TOON_ENGINE_API TransformData
+#define TOON_SHADER_TRANSFORM_BINDING 1
+
+struct TOON_ENGINE_API ShaderTransform
 {
 public:
     alignas(64) glm::mat4 Model;
@@ -18,8 +20,8 @@ public:
         MVP = Projection * View * Model;
     }
 
-}; // struct TransformData
+}; // struct ShaderTransform
 
 } // namespace Toon
 
-#endif // TOON_TRANSFORM_DATA_HPP
+#endif // TOON_SHADER_TRANSFORM_HPP

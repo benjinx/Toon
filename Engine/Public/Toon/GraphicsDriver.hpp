@@ -2,18 +2,19 @@
 #define TOON_GRAPHICS_DRIVER_HPP
 
 #include <Toon/Config.hpp>
-#include <Toon/Math.hpp>
-#include <Toon/UpdateContext.hpp>
-#include <Toon/RenderContext.hpp>
-#include <Toon/Pipeline.hpp>
-#include <Toon/Texture.hpp>
-#include <Toon/Shader.hpp>
-#include <Toon/Mesh.hpp>
-#include <Toon/Event.hpp>
 #include <Toon/Buffer.hpp>
-#include <Toon/Scene.hpp>
+#include <Toon/Event.hpp>
+#include <Toon/Pipeline.hpp>
+#include <Toon/InputDriver.hpp>
+#include <Toon/Math.hpp>
+#include <Toon/Mesh.hpp>
+#include <Toon/RenderContext.hpp>
+#include <Toon/Shader.hpp>
+#include <Toon/String.hpp>
+#include <Toon/Texture.hpp>
+#include <Toon/Time.hpp>
+#include <Toon/UpdateContext.hpp>
 
-#include <string>
 #include <vector>
 #include <memory>
 
@@ -39,17 +40,33 @@ public:
 
     virtual ~GraphicsDriver() = default;
 
-    virtual bool Initialize();
+    virtual bool Initialize() = 0;
 
     virtual void Terminate() = 0;
 
-    virtual void SetWindowTitle(const std::string& title) = 0;
+    virtual void InitializeUpdateContext();
 
-    virtual std::string GetWindowTitle() = 0;
+    virtual void InitializeRenderContext();
 
-    virtual void SetWindowSize(const glm::ivec2& size) = 0;
+    virtual bool InitializeConstantBuffers();
 
-    virtual glm::ivec2 GetWindowSize() = 0;
+    virtual void SetWindowTitle(const string& title) {
+        _windowTitle = title;
+        UpdateWindowTitle(title);
+    }
+
+    virtual string GetWindowTitle() {
+        return _windowTitle;
+    }
+
+    virtual void SetWindowSize(const glm::ivec2& size) {
+        _windowSize = size;
+        UpdateWindowSize(size);
+    }
+
+    virtual glm::ivec2 GetWindowSize() {
+        return _windowSize;
+    }
 
     virtual void SetBackbufferCount(unsigned backbufferCount) {
         _backbufferCount = backbufferCount;
@@ -67,15 +84,11 @@ public:
         return _clearColor;
     }
 
-    virtual bool AddConstantBuffer(std::shared_ptr<Buffer> buffer, unsigned binding);
-
-    virtual bool RemoveConstantBuffer(unsigned binding);
-
-    virtual Buffer * GetConstantBuffer(unsigned binding);
-
     virtual void ProcessEvents() = 0;
     
     virtual void Render() = 0;
+
+    virtual std::shared_ptr<Buffer> CreateBuffer() = 0;
 
     virtual std::shared_ptr<Pipeline> CreatePipeline(std::shared_ptr<Shader> shader) = 0;
 
@@ -85,7 +98,7 @@ public:
 
     virtual std::shared_ptr<Mesh> CreateMesh() = 0;
 
-    virtual std::unique_ptr<Primitive> CreatePrimitive() = 0;
+    virtual std::shared_ptr<Primitive> CreatePrimitive() = 0;
 
     virtual UpdateContext * GetUpdateContext();
 
@@ -93,14 +106,24 @@ public:
 
     //Event<Toon::WindowResizedEventData> WindowResizedEvent;
 
-    inline void SetCurrentScene(Scene * currentScene) {
-        _currentScene = currentScene;
+    std::shared_ptr<Buffer> GetShaderGlobalsBuffer() {
+        return _shaderGlobalsBuffer;
     }
 
 protected:
 
-    virtual void TermConstantBuffers();
+    virtual void UpdateWindowTitle(const string& title) = 0;
 
+    virtual void UpdateWindowSize(const glm::ivec2& size) = 0;
+
+    string _windowTitle = "Toon";
+
+    glm::ivec2 _windowSize = { 640, 480 };
+
+    microseconds _fpsUpdateElaspedTime = 0us;
+
+    uintmax_t _fpsUpdateFrameCount = 0;
+    
     // Push Constants?
 
     glm::vec4 _clearColor = glm::vec4(0.392f, 0.584f, 0.929f, 1.0f);
@@ -113,13 +136,15 @@ protected:
 
     std::unordered_map<unsigned, std::shared_ptr<Buffer>> _constantBufferBindings;
 
-    Scene * _currentScene = nullptr;
+    std::shared_ptr<Buffer> _shaderGlobalsBuffer;
 
 }; // class GraphicsDriver
 
-TOON_ENGINE_API void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver);
+TOON_ENGINE_API
+void SetGraphicsDriver(std::unique_ptr<GraphicsDriver> && driver);
 
-TOON_ENGINE_API GraphicsDriver * GetGraphicsDriver();
+TOON_ENGINE_API
+GraphicsDriver * GetGraphicsDriver();
 
 } // namespace Toon
 

@@ -19,14 +19,19 @@ public:
 
     virtual ~VulkanMesh() = default;
 
-    bool Load(const std::vector<std::unique_ptr<PrimitiveData>>& data) override;
-    
-    void Render(RenderContext * ctx) override;
+    bool Initialize() override;
 
-    void GenerateCommands(VkCommandBuffer vkCommandBuffer);
+    void Terminate() override;
+
+    bool Create();
+
+    void Destroy();
+
+    void Render(RenderContext * ctx) override;
 
 private:
 
+    VkDescriptorSet _vkDescriptorSet;
 
 }; // class VulkanMesh
 

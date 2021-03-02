@@ -4,6 +4,7 @@
 #include <Toon/Vulkan/VulkanConfig.hpp>
 
 #include <Toon/Shader.hpp>
+#include <vector>
 
 namespace Toon::Vulkan {
 
@@ -19,19 +20,23 @@ public:
 
     virtual ~VulkanShader() = default;
 
-    bool LoadFromFiles(const std::vector<std::string>& filenames) override;
+    void Terminate() override;
 
-    inline std::vector<VkPipelineShaderStageCreateInfo>& GetStages() {
-        return _shaderStages;
+    bool LoadFromFiles(const std::vector<std::string>& filenames, bool useAssetPath = true) override;
+
+    inline std::vector<VkPipelineShaderStageCreateInfo>& GetStageList() {
+        return _shaderStageList;
     }
 
 private:
 
-    bool LoadSPV(const std::string& filename);
+    bool LoadSPV(const std::string& filename, bool useAssetPath);
 
     VkShaderStageFlagBits GetVkShaderType(const std::string& filename);
 
-    std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
+    std::vector<VkShaderModule> _shaderModuleList;
+
+    std::vector<VkPipelineShaderStageCreateInfo> _shaderStageList;
     
 }; // class VulkanShader
 

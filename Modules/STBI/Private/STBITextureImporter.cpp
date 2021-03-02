@@ -1,60 +1,70 @@
 #include <Toon/STBI/STBITextureImporter.hpp>
-#include <Toon/Log.hpp>
-#include <Toon/Benchmark.hpp>
 
-#define STB_NO_HDR
-#define STB_NO_PSD
-#define STB_NO_PIC
-#define STB_NO_PNM
+#include <Toon/Log.hpp>
+#include <Toon/Math.hpp>
+#include <Toon/Benchmark.hpp>
+#include <Toon/GraphicsDriver.hpp>
+#include <Toon/STBI/STBITextureData.hpp>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+
+#pragma clang diagnostic pop
+
+#pragma GCC diagnostic pop
 
 namespace Toon::STBI {
 
 TOON_STBI_API
-STBITextureData::~STBITextureData()
-{
-    stbi_image_free(Data);
-}
-
-TOON_STBI_API
-std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string& filename)
+std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string& filename, bool useAssetPath)
 {
     ToonBenchmarkStart();
+
     glm::ivec2 size;
     int components;
     uint8_t* data = nullptr;
 
-    const auto& assetPaths = GetAssetPaths();
+    if (useAssetPath) {
+        const auto& assetPathList = GetAssetPathList();
 
-    for (const auto& path : assetPaths)
-    {
-        std::string fullPath = path + filename;
-        data = stbi_load(fullPath.c_str(), &size.x, &size.y, &components, STBI_rgb_alpha);
-        if (data) {
-            break;
+        for (const auto& path : assetPathList) {
+            Path fullPath = path / "Textures" / filename;
+            data = stbi_load(fullPath.ToCString(), &size.x, &size.y, &components, 0);
+            if (data) {
+                break;
+            }
         }
+    }
+    else {
+        data = stbi_load(filename.c_str(), &size.x, &size.y, &components, 0);
     }
 
     if (!data) {
         return nullptr;
     }
 
-    auto tex = std::make_unique<STBITextureData>();
-    tex->Data = data;
-    tex->Size = size;
-    tex->Components = components;
+    ToonLogLoad("Loaded texture from '%s'", filename);
 
-    ToonLogInfo("Loaded '%s'", filename);
+    STBITextureData * textureData = new STBITextureData();
+    textureData->Data = data;
+    textureData->Size = size;
+    textureData->Components = components;
 
     ToonBenchmarkEnd();
-    return tex;
+    return std::unique_ptr<TextureData>(textureData);
 }
 
 TOON_STBI_API
 std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t * buffer, size_t length)
 {
     ToonBenchmarkStart();
+
     glm::ivec2 size;
     int components;
 
@@ -63,13 +73,13 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
         return nullptr;
     }
 
-    auto tex = std::make_unique<STBITextureData>();
-    tex->Data = data;
-    tex->Size = size;
-    tex->Components = components;
+    STBITextureData * textureData = new STBITextureData();
+    textureData->Data = data;
+    textureData->Size = size;
+    textureData->Components = components;
     
     ToonBenchmarkEnd();
-    return tex;
+    return std::unique_ptr<TextureData>(textureData);
 }
 
 } // namespace Toon::STBI

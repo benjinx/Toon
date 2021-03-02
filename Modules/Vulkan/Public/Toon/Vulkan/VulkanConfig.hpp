@@ -16,4 +16,10 @@
 #include <Toon/SDL2/SDL2Config.hpp>
 #include <SDL_vulkan.h>
 
+DISABLE_WARNINGS()
+
+    #include <vk_mem_alloc.h>
+
+ENABLE_WARNINGS()
+
 #endif // TOON_VULKAN_CONFIG_HPP

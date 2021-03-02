@@ -3,8 +3,8 @@
 
 #include <Toon/Config.hpp>
 #include <Toon/Mesh.hpp>
-#include <Toon/PrimitiveData.hpp>
 
+#include <Toon/String.hpp>
 #include <memory>
 #include <vector>
 
@@ -19,14 +19,15 @@ public:
 
     virtual ~MeshImporter() = default;
 
-    virtual std::vector<std::unique_ptr<PrimitiveData>> LoadFromFile(const std::string& filename) = 0;
+    virtual std::vector<std::unique_ptr<PrimitiveData>> LoadFromFile(const string& filename, bool useAssetPath = true) = 0;
+    
 }; // class MeshImporter
 
 TOON_ENGINE_API
-void AddMeshImporter(const std::string& id, std::unique_ptr<MeshImporter> importer);
+void AddMeshImporter(const string& id, std::unique_ptr<MeshImporter> importer);
 
 TOON_ENGINE_API
-void RemoveMeshImporter(const std::string& id);
+void RemoveMeshImporter(const string& id);
 
 TOON_ENGINE_API
 const std::vector<MeshImporter*>& GetAllMeshImporters();

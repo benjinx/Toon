@@ -9,4 +9,6 @@
     #define TOON_SDL2_API TOON_API_IMPORT
 #endif
 
+#include <SDL.h>
+
 #endif // TOON_SDL2_CONFIG_HPP

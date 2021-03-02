@@ -1,6 +1,6 @@
 #include <Toon/Light.hpp>
 
-#include <Toon/Utils.hpp>
+#include <Toon/Util.hpp>
 
 namespace Toon {
 

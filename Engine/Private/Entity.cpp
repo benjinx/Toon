@@ -1,52 +1,142 @@
 #include <Toon/Entity.hpp>
 
-//#include <Toon/App.hpp>
-#include <Toon/Camera.hpp>
-#include <Toon/Light.hpp>
-#include <Toon/Log.hpp>
-#include <Toon/Mesh.hpp>
-//#include <Toon/StaticMeshComponent.hpp>
-#include <Toon/Utils.hpp>
+#include <Toon/SceneImporter.hpp>
 
 namespace Toon {
 
 TOON_ENGINE_API
-Entity::Entity()
+bool Entity::LoadFromFile(const string& filename)
 {
-    SetTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1));
+    const auto& importers = GetAllSceneImporters();
+    for (const auto& importer : importers) {
+        if (importer->LoadFromFile(this, filename)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 TOON_ENGINE_API
-Entity::Entity(glm::vec3 position)
+void Entity::SetParent(Entity * parent)
 {
-    SetPosition(position);
+    _parent = parent;
 }
 
 TOON_ENGINE_API
-Entity::~Entity()
+Entity * Entity::AddChild(std::unique_ptr<Entity> && child)
 {
-    delete _mSceneAxis;
-    _mChildren.clear();
+    child->SetParent(this);
+    _childPtrs.push_back(child.get());
+    _children.push_back(std::move(child));
+
+    return _childPtrs.back();
+}
+
+TOON_ENGINE_API
+std::vector<Entity *> Entity::GetChildren() const
+{
+    return _childPtrs;
+}
+
+TOON_ENGINE_API
+Component * Entity::AddComponent(std::unique_ptr<Component> && component)
+{
+    component->Attach(this);
+    _componentPtrs.push_back(component.get());
+    _components.push_back(std::move(component));
+
+    return _componentPtrs.back();
+}
+
+TOON_ENGINE_API
+std::vector<Component *> Entity::GetComponents() const
+{
+    return _componentPtrs;
+}
+
+TOON_ENGINE_API
+void Entity::SetName(const string& name)
+{
+    _name = name;
+}
+
+TOON_ENGINE_API
+void Entity::SetPosition(const glm::vec3& position)
+{
+    _position = position;
+}
+
+TOON_ENGINE_API
+void Entity::SetOrientation(const glm::quat& orientation)
+{
+    _orientation = orientation;
+}
+
+TOON_ENGINE_API
+void Entity::SetScale(const glm::vec3& scale)
+{
+    _scale = scale;
+}
+
+TOON_ENGINE_API
+glm::mat4 Entity::GetTransform() const
+{
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, GetPosition());
+    transform *= glm::mat4_cast(GetOrientation());
+    transform = glm::scale(transform, GetScale());
+    return transform;
+}
+
+TOON_ENGINE_API
+glm::vec3 Entity::GetWorldPosition() const
+{
+    if (_parent) {
+        return _parent->GetWorldPosition() + GetPosition();
+    }
+    return GetPosition();
+}
+
+TOON_ENGINE_API
+glm::quat Entity::GetWorldOrientation() const
+{
+    if (_parent) {
+        return _parent->GetWorldOrientation() * GetOrientation();
+    }
+    return GetOrientation();
+}
+
+TOON_ENGINE_API
+glm::vec3 Entity::GetWorldScale() const
+{
+    if (_parent) {
+        return _parent->GetWorldScale() * GetScale();
+    }
+    return GetScale();
+}
+
+TOON_ENGINE_API
+glm::mat4 Entity::GetWorldTransform() const
+{
+    if (_parent) {
+        return _parent->GetWorldTransform() * GetTransform();
+    }
+    return GetTransform();
 }
 
 TOON_ENGINE_API
 void Entity::Update(UpdateContext * ctx)
 {
     // Check if enabled
-    if (!_mEnabled)
-    {
+    if (!_mEnabled) {
         return;
     }
 
-    // Update
-    for (const auto& comp : _componentList)
-    {
+    for (auto& comp : _components) {
         comp->Update(ctx);
     }
 
-    // Update all children
-    for (const auto& child : _mChildren)
-    {
+    for (auto& child : _children) {
         child->Update(ctx);
     }
 }
@@ -55,46 +145,23 @@ TOON_ENGINE_API
 void Entity::Render(RenderContext * ctx)
 {
     // Check for visibility
-    if (!_mVisibility)
-    {
+    if (!_mVisibility) {
         return;
     }
 
-    // Render
-    for (const auto& comp : _componentList)
-    {
+    for (auto& comp : _components) {
         comp->Render(ctx);
     }
-
-    // Call render on all children
-    for (const auto& child : _mChildren)
-    {
+    
+    for (auto& child : _children) {
         child->Render(ctx);
-    }
-}
-
-TOON_ENGINE_API
-void Entity::RenderAxis()
-{
-    if (_mSceneAxis == nullptr)
-    {
-        _mSceneAxis = new Axis();
-    }
-
-    // Render the entitys axis
-    //_mSceneAxis->Render(GetWorldTransform());
-
-    // Render it for our children
-    for (auto& entity : _mChildren)
-    {
-        entity->RenderAxis();
     }
 }
 
 TOON_ENGINE_API
 Entity* Entity::FindEntity(std::string name)
 {
-    for (auto& entity : _mChildren)
+    for (auto& entity : _children)
     {
         if (entity->GetName() == name)
         {
@@ -102,7 +169,7 @@ Entity* Entity::FindEntity(std::string name)
         }
     }
 
-    for (auto& entity : _mChildren)
+    for (auto& entity : _children)
     {
         auto tmp = entity->FindEntity(name);
         if (tmp)
@@ -112,84 +179,6 @@ Entity* Entity::FindEntity(std::string name)
     }
 
     return nullptr;
-}
-
-TOON_ENGINE_API
-Component * Entity::AddComponent(std::unique_ptr<Component>&& component)
-{
-    component->Attach(this);
-    _componentPtrs.push_back(component.get());
-    _componentList.push_back(std::move(component));
-
-    return _componentPtrs.back();
-}
-
-TOON_ENGINE_API
-void Entity::AddChild(std::unique_ptr<Entity>&& child)
-{
-    child->SetParent(this);
-    _mChildren.push_back(std::move(child));
-}
-
-TOON_ENGINE_API
-void Entity::SetTransform(glm::vec3 position, glm::quat rotation, glm::vec3 scale)
-{
-    _position = position;
-    _orientation = rotation;
-    _scale = scale;
-}
-
-TOON_ENGINE_API
-glm::mat4 Entity::GetTransform() const {
-    glm::mat4 transform = glm::mat4(1);
-    transform = glm::translate(transform, GetPosition());
-    transform *= glm::mat4_cast(GetOrientation());
-    transform = glm::scale(transform, GetScale());
-    return transform;
-}
-
-TOON_ENGINE_API
-glm::mat4 Entity::GetWorldTransform() const
-{
-    if (GetParent())
-    {
-        return GetParent()->GetTransform() * GetTransform();
-    }
-
-    return GetTransform();
-}
-
-TOON_ENGINE_API
-glm::vec3 Entity::GetWorldPosition() const
-{
-    if (GetParent())
-    {
-        return GetParent()->GetPosition() + GetPosition();
-    }
-
-    return GetPosition();
-}
-
-TOON_ENGINE_API
-glm::quat Entity::GetWorldOrientation() const
-{
-    if (GetParent())
-    {
-        return GetParent()->GetOrientation() * GetOrientation();
-    }
-
-    return GetOrientation();
-}
-
-TOON_ENGINE_API
-glm::vec3 Entity::GetWorldScale() const
-{
-    if (GetParent())
-    {
-        return GetParent()->GetScale() * GetScale();
-    }
-
-    return GetScale();
 }
 
 } // namespace Toon

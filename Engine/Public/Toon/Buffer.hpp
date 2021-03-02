@@ -2,9 +2,9 @@
 #define TOON_BUFFER_HPP
 
 #include <Toon/Config.hpp>
+#include <Toon/String.hpp>
 
 #include <cstdint>
-#include <string>
 
 namespace Toon {
 
@@ -37,9 +37,9 @@ public:
 
     virtual void Terminate() = 0;
 
-    virtual bool ReadFrom(size_t offset, size_t length, uint8_t * data) = 0;
+    virtual bool ReadFrom(size_t offset, size_t length, uint8_t * data);
 
-    virtual bool WriteTo(size_t offset, size_t length, uint8_t * data) = 0;
+    virtual bool WriteTo(size_t offset, size_t length, uint8_t * data);
 
 protected:
 
@@ -47,9 +47,11 @@ protected:
 
     MemoryUsage _memoryUsage;
 
+    void * _mappedBufferMemory = nullptr;
+
 }; // class Buffer
 
-inline std::string BufferUsageToString(BufferUsage bufferUsage)
+inline string BufferUsageToString(BufferUsage bufferUsage)
 {
     switch (bufferUsage) {
         case BufferUsage::Index:
@@ -63,7 +65,7 @@ inline std::string BufferUsageToString(BufferUsage bufferUsage)
     return "Unknown";
 }
 
-inline std::string MemoryUsageToString(MemoryUsage memoryUsage)
+inline string MemoryUsageToString(MemoryUsage memoryUsage)
 {
     switch (memoryUsage) {
         case MemoryUsage::GPU:

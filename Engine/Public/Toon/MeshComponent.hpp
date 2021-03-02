@@ -2,6 +2,7 @@
 #define TOON_MESH_COMPONENT_HPP
 
 #include <Toon/Config.hpp>
+#include <Toon/Buffer.hpp>
 #include <Toon/Component.hpp>
 #include <Toon/Mesh.hpp>
 

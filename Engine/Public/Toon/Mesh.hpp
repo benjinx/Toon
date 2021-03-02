@@ -2,6 +2,7 @@
 #define TOON_MESH_HPP
 
 #include <Toon/Config.hpp>
+#include <Toon/Buffer.hpp>
 #include <Toon/Primitive.hpp>
 #include <Toon/PrimitiveData.hpp>
 #include <Toon/Pipeline.hpp>
@@ -23,6 +24,10 @@ public:
 
     virtual ~Mesh() = default;
 
+    virtual bool Initialize();
+
+    virtual void Terminate();
+
     virtual bool Load(const std::vector<std::unique_ptr<PrimitiveData>>& data);
 
     virtual void Render(RenderContext * ctx) = 0;
@@ -35,14 +40,16 @@ public:
 
 protected:
 
-    std::vector<std::unique_ptr<Primitive>> _primitiveList;
+    std::vector<std::shared_ptr<Primitive>> _primitiveList;
 
     std::shared_ptr<Pipeline> _pipeline;
+
+    std::shared_ptr<Buffer> _shaderTransformBuffer;
 
 }; // class Mesh
 
 TOON_ENGINE_API
-std::shared_ptr<Mesh> LoadMeshFromFile(const std::string& filename);
+std::shared_ptr<Mesh> LoadMeshFromFile(const string& filename);
 
 } // namespace Toon
 

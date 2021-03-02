@@ -9,13 +9,24 @@
 namespace Toon::Vulkan {
 
 TOON_VULKAN_API
-bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
+void VulkanShader::Terminate()
+{
+    auto gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
+
+    for (auto& shaderModule : _shaderModuleList) {
+        vkDestroyShaderModule(gfx->GetDevice(), shaderModule, nullptr);
+    }
+    _shaderModuleList.clear();
+}
+
+TOON_VULKAN_API
+bool VulkanShader::LoadFromFiles(const std::vector<string>& filenames, bool useAssetPath /*= true*/)
 {
     ToonBenchmarkStart();
 
     for (const auto& filename : filenames) {
-        if (!LoadSPV(filename)) {
-            if (!LoadSPV(filename + ".spv")) {
+        if (!LoadSPV(filename, useAssetPath)) {
+            if (!LoadSPV(filename + ".spv", useAssetPath)) {
                 ToonLogError("Failed to load '%s'", filename);
                 return false;
             }
@@ -27,22 +38,27 @@ bool VulkanShader::LoadFromFiles(const std::vector<std::string>& filenames)
 }
 
 TOON_VULKAN_API
-bool VulkanShader::LoadSPV(const std::string& filename)
+bool VulkanShader::LoadSPV(const string& filename, bool useAssetPath)
 {
     VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
-    const auto& assetPaths = GetAssetPaths();
+    const auto& assetPaths = GetAssetPathList();
 
     std::ifstream file;
-    
-    for (const auto& path : assetPaths) {
-        const std::string& fullPath = path + "Shaders/" + filename;
-        LogVerbose("Checking '%s'", fullPath);
 
-        file.open(fullPath, std::ios::binary);
-        if (file.is_open()) {
-            break;
+    if (useAssetPath) {
+        for (const auto& path : assetPaths) {
+            Path fullPath = path / "Shaders" / filename;
+            ToonLogVerbose("Checking '%s'", fullPath);
+
+            file.open(fullPath.ToString(), std::ios::binary);
+            if (file.is_open()) {
+                break;
+            }
         }
+    }
+    else {
+        file.open(filename, std::ios::binary);
     }
 
     if (!file.is_open()) {
@@ -73,6 +89,7 @@ bool VulkanShader::LoadSPV(const std::string& filename)
     };
 
     VkShaderModule shaderModule;
+
     if (vkCreateShaderModule(gfx->GetDevice(), &shaderModuleCreateInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         ToonLogError("Failed to create shader module");
         return false;
@@ -83,22 +100,23 @@ bool VulkanShader::LoadSPV(const std::string& filename)
         .pNext = nullptr,
         .flags = 0,
         .stage = type,
-        .module = shaderModule,
-        .pName = "main",
+        .module = shaderModule, // This conflicts with the `module` keyword in C++20
+        .pName = "main", // TODO: Update
         .pSpecializationInfo = nullptr,
     };
 
-    _shaderStages.push_back(shaderStageCreateInfo);
+    _shaderModuleList.push_back(shaderModule);
+    _shaderStageList.push_back(shaderStageCreateInfo);
 
     return true;
 }
 
 TOON_VULKAN_API
-VkShaderStageFlagBits VulkanShader::GetVkShaderType(const std::string& filename)
+VkShaderStageFlagBits VulkanShader::GetVkShaderType(const string& filename)
 {
-    std::string ext = GetExtension(filename);
+    string ext = GetExtension(filename);
     size_t pivot = filename.find_last_of('.');
-    if (pivot == std::string::npos) {
+    if (pivot == string::npos) {
         return VK_SHADER_STAGE_ALL; // Invalid
     }
     ext = GetExtension(filename.substr(0, pivot));

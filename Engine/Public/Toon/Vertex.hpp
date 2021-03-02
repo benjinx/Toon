@@ -3,6 +3,7 @@
 
 #include <Toon/Config.hpp>
 #include <Toon/Math.hpp>
+#include <Toon/String.hpp>
 
 namespace Toon {
 
@@ -37,7 +38,7 @@ enum class VertexAttribute
 
 }; // enum class VertexAttribute
 
-inline std::string VertexAttributeToString(VertexAttribute vertexAttribute)
+inline string VertexAttributeToString(VertexAttribute vertexAttribute)
 {
     switch (vertexAttribute) {
         case VertexAttribute::Position:

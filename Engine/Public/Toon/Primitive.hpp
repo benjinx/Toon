@@ -31,11 +31,13 @@ public:
 
     virtual ~Primitive() = default;
 
+    virtual void Terminate() { }
+
     virtual bool Load(const std::unique_ptr<PrimitiveData>& data) = 0;
 
 }; // class Primitive
 
-inline std::string PrimitiveTopologyToString(PrimitiveTopology primitiveTopology)
+inline string PrimitiveTopologyToString(PrimitiveTopology primitiveTopology)
 {
     switch (primitiveTopology) {
     case PrimitiveTopology::PointList:

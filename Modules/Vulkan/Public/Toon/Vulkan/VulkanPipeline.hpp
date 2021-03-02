@@ -22,9 +22,13 @@ public:
 
     virtual ~VulkanPipeline() = default;
 
-    bool Initialize() override;
+    bool Initialize(std::shared_ptr<Shader> shader) override;
 
     void Terminate() override;
+
+    bool Create();
+
+    void Destroy();
 
     void GenerateCommands(VkCommandBuffer vkCommandBuffer);
 

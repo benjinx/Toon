@@ -18,12 +18,21 @@ public:
 
     virtual ~OpenGLTexture();
 
-    bool Load(const TextureData * data) override;
+    bool Load(const std::unique_ptr<TextureData>& data, Options opts = Options()) override;
 
-    void Bind() override;
+    void Bind();
 
 private:
-    GLuint _mGLid = 0;
+
+    GLenum GetGLDataFormat(int components);
+    
+    GLenum GetGLDataType(const TextureDataType& type);
+
+    GLenum GetGLWrapType(const TextureWrapType& type);
+
+    GLenum GetGLFilterType(const TextureFilterType& type);
+
+    GLuint _glID = 0;
     
 }; // class OpenGLTexture
 

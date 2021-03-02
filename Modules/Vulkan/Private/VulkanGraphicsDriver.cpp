@@ -1,8 +1,13 @@
 #include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
-#include <Toon/Log.hpp>
-#include <Toon/Toon.hpp>
-#include <Toon/Benchmark.hpp>
 
+#include <Toon/Toon.hpp>
+#include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
+#include <Toon/MeshImporter.hpp>
+#include <Toon/Camera.hpp>
+#include <Toon/Scene.hpp>
+
+#include <algorithm>
 #include <set>
 
 DISABLE_WARNINGS()
@@ -19,10 +24,8 @@ bool VulkanGraphicsDriver::Initialize()
 {
     ToonBenchmarkStart();
 
-    if (!SDL2GraphicsDriver::Initialize()) {
-        return false;
-    }
-
+    SDL2GraphicsDriver::Initialize();
+    
     SDL2GraphicsDriver::CreateWindow(SDL_WINDOW_VULKAN);
 
     if (!InitInstance()) {
@@ -53,12 +56,30 @@ bool VulkanGraphicsDriver::Initialize()
         return false;
     }
 
+    InitializeUpdateContext();
+    InitializeRenderContext();
+
+    if (!InitializeConstantBuffers()) {
+        return false;
+    }
+    
     if (!InitSwapChain()) {
         return false;
     }
 
-    ToonBenchmarkEnd();
+    if (!InitSyncObjects()) {
+        return false;
+    }
 
+    VmaStats stats;
+    vmaCalculateStats(_vmaAllocator, &stats);
+    
+    ToonLogVerbose("Allocated Memory Blocks: %u", stats.total.blockCount);
+    ToonLogVerbose("Allocation Objects: %u", stats.total.allocationCount);
+    ToonLogVerbose("Used bytes: %u", stats.total.usedBytes);
+    ToonLogVerbose("Unused bytes: %u", stats.total.unusedBytes);
+
+    ToonBenchmarkEnd();
     return true;
 }
 
@@ -67,8 +88,37 @@ void VulkanGraphicsDriver::Terminate()
 {
     ToonBenchmarkStart();
 
+    if (_vkDevice) {
+        vkDeviceWaitIdle(_vkDevice);
+    }
+
+    TermSyncObjects();
+
+    TermSwapChain();
+
+    for (auto& primitive : _primitiveList) {
+        primitive->Terminate();
+    }
+
+    _primitiveList.clear();
+
+    // TODO: Move
+    _shaderGlobalsBuffer->Terminate();
+
+    for (auto& shader : _shaderList) {
+        shader->Terminate();
+    }
+
+    _shaderList.clear();
+
+    TermAllocator();
+    TermLogicalDevice();
+    TermSurface();
+
     #if defined(TOON_BUILD_DEBUG)
+
         TermDebugUtilsMessenger();
+
     #endif
 
     TermInstance();
@@ -78,95 +128,157 @@ void VulkanGraphicsDriver::Terminate()
     ToonBenchmarkEnd();
 }
 
+void VulkanGraphicsDriver::InitializeRenderContext()
+{
+    _renderContext.reset(new VulkanRenderContext());
+    SDL2GraphicsDriver::InitializeRenderContext();
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::SetBackbufferCount(unsigned backbufferCount)
+{
+    if (backbufferCount != GetBackbufferCount()) {
+        ResetSwapChain();
+    }
+
+    SDL2GraphicsDriver::SetBackbufferCount(backbufferCount);
+}
+
 TOON_VULKAN_API
 void VulkanGraphicsDriver::Render()
 {
+    VkResult vkResult;
 
+    SDL2GraphicsDriver::Render();
+
+    VulkanRenderContext * vkRenderCtx = TOON_VULKAN_RENDER_CONTEXT(_renderContext.get());
+    vkRenderCtx->SetVkCommandBuffer(nullptr);
+    
+    Scene * scene = GetCurrentScene();
+    if (scene) {
+        scene->Render(_renderContext.get());
+    }
+
+    vmaSetCurrentFrameIndex(_vmaAllocator, _currentFrame);
+
+    vkWaitForFences(_vkDevice, 1, &_vkInFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
+
+    uint32_t imageIndex = 0;
+    vkResult = vkAcquireNextImageKHR(_vkDevice, _vkSwapChain, UINT64_MAX, _vkImageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+    if (vkResult == VK_ERROR_OUT_OF_DATE_KHR) {
+        if (!ResetSwapChain()) {
+            ToonLogFatal("Failed to resize swap chain");
+        }
+    }
+    else if (vkResult != VK_SUCCESS && vkResult != VK_SUBOPTIMAL_KHR) {
+        ToonLogFatal("vkAcquireNextImageKHR() failed");
+    }
+
+    if (_vkImagesInFlight[imageIndex] != VK_NULL_HANDLE) {
+        vkWaitForFences(_vkDevice, 1, &_vkImagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+    }
+    _vkImagesInFlight[imageIndex] = _vkInFlightFences[_currentFrame];
+
+    // "Present Complete"
+    VkSemaphore waitSemaphores[] = { _vkImageAvailableSemaphores[_currentFrame] };
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    // "Render Complete"
+    VkSemaphore signalSemaphores[] = { _vkRenderingFinishedSemaphores[_currentFrame] };
+
+    VkSubmitInfo submitInfo = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .pNext = nullptr,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = waitSemaphores,
+        .pWaitDstStageMask = waitStages,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &_vkCommandBuffers[imageIndex],
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores = signalSemaphores,
+    };
+
+    vkResetFences(_vkDevice, 1, &_vkInFlightFences[_currentFrame]);
+
+    vkResult = vkQueueSubmit(_vkGraphicsQueue, 1, &submitInfo, _vkInFlightFences[_currentFrame]);
+    if (vkResult != VK_SUCCESS) {
+        ToonLogFatal("vkQueueSubmit() failed");
+    }
+
+    VkSwapchainKHR swapChains[] = { _vkSwapChain };
+
+    VkPresentInfoKHR presentInfo = {
+        .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .pNext = 0,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = signalSemaphores,
+        .swapchainCount = 1,
+        .pSwapchains = swapChains,
+        .pImageIndices = &imageIndex,
+    };
+
+    vkResult = vkQueuePresentKHR(_vkPresentQueue, &presentInfo);
+
+    if (vkResult == VK_ERROR_OUT_OF_DATE_KHR || vkResult == VK_SUBOPTIMAL_KHR) {
+        if (!ResetSwapChain()) {
+            ToonLogFatal("Failed to resize swap chain");
+        }
+    }
+    else if (vkResult != VK_SUCCESS) {
+        ToonLogFatal("vkQueuePresentKHR() failed");
+    }
+
+    _currentFrame = (_currentFrame + 1) % GetBackbufferCount();
 }
 
 TOON_VULKAN_API
-std::shared_ptr<Texture> VulkanGraphicsDriver::CreateTexture()
+std::shared_ptr<Buffer> VulkanGraphicsDriver::CreateBuffer()
 {
-
-    return nullptr;
+    return std::shared_ptr<Buffer>(new VulkanBuffer());
 }
 
-TOON_VULKAN_API
-std::shared_ptr<Shader> VulkanGraphicsDriver::CreateShader()
-{
-    return std::shared_ptr<Shader>(new VulkanShader());
-}
 
 TOON_VULKAN_API
 std::shared_ptr<Pipeline> VulkanGraphicsDriver::CreatePipeline(std::shared_ptr<Shader> shader)
 {
     auto ptr = std::shared_ptr<Pipeline>(new VulkanPipeline());
-    ptr->SetShader(shader);
-    // ptr->Initialize();
-    _pipelines.push_back(ptr);
+    ptr->Initialize(shader);
+    _pipelineList.push_back(ptr);
+    return ptr;
+}
 
-    ResetSwapChain();
+TOON_VULKAN_API
+std::shared_ptr<Texture> VulkanGraphicsDriver::CreateTexture()
+{
+    return std::shared_ptr<Texture>(new VulkanTexture());
+}
+
+TOON_VULKAN_API
+std::shared_ptr<Shader> VulkanGraphicsDriver::CreateShader()
+{
+    auto ptr = std::shared_ptr<Shader>(new VulkanShader());
+    // ptr->Initialize();
+    _shaderList.push_back(ptr);
     return ptr;
 }
 
 TOON_VULKAN_API
 std::shared_ptr<Mesh> VulkanGraphicsDriver::CreateMesh()
 {
-    return std::shared_ptr<Mesh>(new VulkanMesh());
+    auto ptr = std::shared_ptr<Mesh>(new VulkanMesh());
+    ptr->Initialize();
+    _meshList.push_back(ptr);
+
+    // Reset swap chain?
+    return ptr;
 }
 
 TOON_VULKAN_API
-std::unique_ptr<Primitive> VulkanGraphicsDriver::CreatePrimitive()
+std::shared_ptr<Primitive> VulkanGraphicsDriver::CreatePrimitive()
 {
-    return std::unique_ptr<Primitive>(new VulkanPrimitive());
-}
-
-TOON_VULKAN_API
-uint32_t VulkanGraphicsDriver::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags props)
-{
-    VkPhysicalDeviceMemoryProperties memoryProperties;
-    vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice, &memoryProperties);
-
-    for (unsigned i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-        if ((filter & (1 << i)) && 
-            (memoryProperties.memoryTypes[i].propertyFlags & props) == props) {
-            return i;
-        }
-    }
-
-    ToonLogError("Failed to find suitable memory type");
-    return UINT32_MAX;
-}
-
-TOON_VULKAN_API
-bool VulkanGraphicsDriver::CreateBuffer(VkBuffer * buffer, VmaAllocation * vmaAllocation, VkDeviceSize size, VkBufferUsageFlags bufferUsage, VmaMemoryUsage memoryUsage)
-{
-    VkResult vkResult;
-    
-    VkBufferCreateInfo bufferCreateInfo = {
-        .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .size = size,
-        .usage = bufferUsage,
-        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-    };
-
-    VmaAllocationCreateInfo allocationCreateInfo = {
-        .flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
-        .usage = memoryUsage,
-    };
-
-    VmaAllocationInfo allocationInfo = {
-    };
-
-    vkResult = vmaCreateBuffer(_vmaAllocator, &bufferCreateInfo, &allocationCreateInfo, buffer, vmaAllocation, &allocationInfo);
-    if (vkResult != VK_SUCCESS) {
-        ToonLogError("Failed to create buffer");
-        return false;
-    }
-
-    return true;
+    auto ptr = std::shared_ptr<Primitive>(new VulkanPrimitive());
+    _primitiveList.push_back(ptr);
+    return ptr;
 }
 
 TOON_VULKAN_API
@@ -220,6 +332,52 @@ bool VulkanGraphicsDriver::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, Vk
     vkResult = vkQueueSubmit(_vkGraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(_vkGraphicsQueue);
 
+    vkFreeCommandBuffers(_vkDevice, _vkCommandPool, 1, &commandBuffer);
+
+    return true;
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::CreateDescriptorSet(VkDescriptorSet * descriptorSet)
+{
+    VkResult vkResult;
+
+    VkDescriptorSetLayout setLayouts[] = { _vkDescriptorSetLayout };
+
+    VkDescriptorSetAllocateInfo allocateInfo = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .descriptorPool = _vkDescriptorPool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = setLayouts,
+    };
+
+    vkResult = vkAllocateDescriptorSets(_vkDevice, &allocateInfo, descriptorSet);
+    if (vkResult != VK_SUCCESS) {
+        ToonLogError("vkAllocateDescriptorSets() failed");
+        return false;
+    }
+
+    VulkanBuffer * vkShaderGlobalsBuffer = TOON_VULKAN_BUFFER(GetShaderGlobalsBuffer().get());
+
+    VkDescriptorBufferInfo bufferInfo = {
+        .buffer = vkShaderGlobalsBuffer->GetVkBuffer(),
+        .offset = 0,
+        .range = VK_WHOLE_SIZE,
+    };
+
+    VkWriteDescriptorSet writeDescriptorSet = {
+        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet = *descriptorSet,
+        .dstBinding = TOON_SHADER_GLOBALS_BINDING,
+        .dstArrayElement = 0,
+        .descriptorCount = 1,
+        .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .pBufferInfo = &bufferInfo,
+    };
+
+    vkUpdateDescriptorSets(_vkDevice, 1, &writeDescriptorSet, 0, nullptr);
+
     return true;
 }
 
@@ -229,17 +387,22 @@ bool VulkanGraphicsDriver::IsDeviceSuitable(const VkPhysicalDevice device)
     vkGetPhysicalDeviceProperties(device, &_vkPhysicalDeviceProperties);
     vkGetPhysicalDeviceFeatures(device, &_vkPhysicalDeviceFeatures);
 
+    // TODO:
+    // * Queue Families
+    // * Device Extensions
+    // * Swap Chain Support
+
     return _vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU 
         && _vkPhysicalDeviceFeatures.geometryShader;
 }
 
 TOON_VULKAN_API
-std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceLayers()
+std::vector<const char *> VulkanGraphicsDriver::GetRequiredLayers()
 {
-    std::vector<const char*> requiredLayers = {};
+    std::vector<const char *> requiredLayers = { };
 
     #if defined(TOON_BUILD_DEBUG)
-        
+
         auto it = _vkAvailableLayers.find("VK_LAYER_KHRONOS_validation");
         if (it != _vkAvailableLayers.end()) {
             requiredLayers.push_back("VK_LAYER_KHRONOS_validation");
@@ -253,7 +416,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceLayers()
 TOON_VULKAN_API
 std::vector<const char *> VulkanGraphicsDriver::GetRequiredDeviceExtensions()
 {
-    std::vector<const char*> requiredExtensions = {
+    std::vector<const char *> requiredExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
 
@@ -288,7 +451,7 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
     uint32_t requiredExtensionCount;
     SDL_Vulkan_GetInstanceExtensions(GetSDL2Window(), &requiredExtensionCount, nullptr);
 
-    std::vector<const char*> requiredExtensions(requiredExtensionCount);
+    std::vector<const char *> requiredExtensions(requiredExtensionCount);
     sdlResult = SDL_Vulkan_GetInstanceExtensions(GetSDL2Window(), &requiredExtensionCount, requiredExtensions.data());
     if (!sdlResult) {
         ToonLogError("SDL_Vulkan_GetInstanceExtensions() failed, %s", SDL_GetError());
@@ -304,9 +467,95 @@ std::vector<const char *> VulkanGraphicsDriver::GetRequiredInstanceExtensions()
         else {
             ToonLogWarn("Vulkan Extension '%s' not available", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
+
     #endif
 
     return requiredExtensions;
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL _VulkanDebugMessageCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT * callbackData,
+    void * userData)
+{
+    // if (callbackData->messageIdNumber == 0) { // Loader Message
+    //     return VK_FALSE;
+    // }
+
+    LogLevel level = LogLevel::Info;
+
+    if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) > 0) {
+        level = LogLevel::Performance;
+    }
+    else {
+        if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) > 0) {
+            level = LogLevel::Error;
+        }
+        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) > 0) {
+            level = LogLevel::Warning;
+        }
+        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) > 0) {
+            level = LogLevel::Info;
+        }
+        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) > 0) {
+            level = LogLevel::Verbose;
+
+            /*if (!IsVerboseLoggingEnabled()) {
+                return VK_FALSE;
+            }*/
+        }
+    }
+
+    const char * prefix;
+
+    switch (level) {
+    case LogLevel::Error:
+        prefix = "ERRO";
+        break;
+    case LogLevel::Warning:
+        prefix = "WARN";
+        break;
+    case LogLevel::Info:
+        prefix = "INFO";
+        break;
+    case LogLevel::Performance:
+        prefix = "PERF";
+        break;
+    case LogLevel::Verbose:
+        prefix = "VERB";
+        break;
+    default: ;
+    }
+
+    Log(level, "[%s](VkDebugUtilsMessenger) %s %s\n", 
+        prefix, 
+        callbackData->pMessageIdName, 
+        callbackData->pMessage);
+
+    if (callbackData->objectCount > 0) {
+        for (uint32_t i = 0; i < callbackData->objectCount; ++i) {
+            const char * name = callbackData->pObjects[i].pObjectName;
+            if (name) {
+                Log(level, "\t\tObject #%d: Type %d, Value %p, Name '%s'\n",
+                    i,
+                    callbackData->pObjects[i].objectType,
+                    callbackData->pObjects[i].objectHandle,
+                    callbackData->pObjects[i].pObjectName);
+            }
+        }
+    }
+
+    if (callbackData->cmdBufLabelCount > 0) {
+        for (uint32_t i = 0; i < callbackData->cmdBufLabelCount; ++i) {
+            const char * name = callbackData->pCmdBufLabels[i].pLabelName;
+            if (name) {
+                Log(level, "\t\tLabel #%d: %s\n", name);
+            }
+        }
+    }
+
+    return VK_FALSE;
 }
 
 TOON_VULKAN_API
@@ -319,8 +568,8 @@ bool VulkanGraphicsDriver::InitInstance()
         ToonLogError("gladLoaderLoadVulkan() failed");
         return false;
     }
-
-    LogVerbose("Vulkan %d.%d", GLAD_VERSION_MAJOR(vkVersion), GLAD_VERSION_MINOR(vkVersion));
+    
+    ToonLogVerbose("Vulkan %d.%d", GLAD_VERSION_MAJOR(vkVersion), GLAD_VERSION_MINOR(vkVersion));
 
     uint32_t availableLayerCount = 0;
     vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
@@ -337,11 +586,17 @@ bool VulkanGraphicsDriver::InitInstance()
         return false;
     }
 
-    LogVerbose("Available Vulkan Layers:");
-    for (const auto& layer : availableLayers)
-    {
-        LogVerbose("\t%s: %s", layer.layerName, layer.description);
+    ToonLogVerbose("Available Vulkan Layers:");
+    for (const auto& layer : availableLayers) {
+        ToonLogVerbose("\t%s: %s", layer.layerName, layer.description);
         _vkAvailableLayers.emplace(layer.layerName, layer);
+    }
+
+    const auto& requiredLayers = GetRequiredLayers();
+
+    ToonLogVerbose("Required Vulkan Device Layers:");
+    for (const auto& layer : requiredLayers) {
+        ToonLogVerbose("\t%s", layer);
     }
 
     uint32_t availableExtensionCount = 0;
@@ -359,22 +614,21 @@ bool VulkanGraphicsDriver::InitInstance()
         return false;
     }
 
-    LogVerbose("Available Vulkan Instance Extensions:");
+    ToonLogVerbose("Available Vulkan Instance Extensions:");
     for (const auto& extension : availableExtensions) {
-        LogVerbose("\t%s", extension.extensionName);
+        ToonLogVerbose("\t%s", extension.extensionName);
         _vkAvailableInstanceExtensions.emplace(extension.extensionName, extension);
     }
 
     const auto& requiredExtensions = GetRequiredInstanceExtensions();
-    if (requiredExtensions.empty())
-    {
+    if (requiredExtensions.empty()) {
         ToonLogError("Failed to get Required Instance Extensions");
         return false;
     }
 
-    LogVerbose("Required Vulkan Instance Extensions:");
+    ToonLogVerbose("Required Vulkan Instance Extensions:");
     for (const auto& extension : requiredExtensions) {
-        LogVerbose("\t%s", extension);
+        ToonLogVerbose("\t%s", extension);
     }
 
     const auto& engineVersion = GetVersion();
@@ -399,18 +653,50 @@ bool VulkanGraphicsDriver::InitInstance()
         .apiVersion = VK_API_VERSION_1_1,
     };
 
-    VkInstanceCreateInfo createInfo = {
+
+    VkInstanceCreateInfo instanceCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
         .pApplicationInfo = &applicationInfo,
-        .enabledLayerCount = 0,
-        .ppEnabledLayerNames = nullptr,
+        .enabledLayerCount = static_cast<uint32_t>(requiredLayers.size()),
+        .ppEnabledLayerNames = requiredLayers.data(),
         .enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size()),
         .ppEnabledExtensionNames = requiredExtensions.data(),
     };
 
-    vkResult = vkCreateInstance(&createInfo, nullptr, &_vkInstance);
+    VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo;
+
+    auto it = _vkAvailableLayers.find("VK_LAYER_KHRONOS_validation");
+    if (it != _vkAvailableLayers.end()) {
+        VkDebugUtilsMessageSeverityFlagsEXT messageSeverity = 
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
+
+        #if defined(TOON_BUILD_DEBUG)
+            messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+        #endif
+
+        VkDebugUtilsMessageTypeFlagsEXT messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | 
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | 
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+
+        debugUtilsMessengerCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .pNext = nullptr,
+            .flags = 0,
+            .messageSeverity = messageSeverity,
+            .messageType = messageType,
+            .pfnUserCallback = _VulkanDebugMessageCallback,
+            .pUserData = nullptr,
+        };
+
+        instanceCreateInfo.pNext = &debugUtilsMessengerCreateInfo;
+    }
+
+    vkResult = vkCreateInstance(&instanceCreateInfo, nullptr, &_vkInstance);
     if (vkResult != VK_SUCCESS) {
         ToonLogError("vkCreateInstance() failed");
         return false;
@@ -426,31 +712,13 @@ bool VulkanGraphicsDriver::InitInstance()
     return true;
 }
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL _VulkanDebugMessageCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-    void* userData)
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermInstance()
 {
-    if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) > 0) {
-        Log(LogLevel::Performance, "[PERF](VkDebugUtilsMessenger) %s\n", callbackData->pMessage);
+    if (!_vkInstance) {
+        vkDestroyInstance(_vkInstance, nullptr);
+        _vkInstance = nullptr;
     }
-    else {
-        if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) > 0) {
-            Log(LogLevel::Error, "[ERRO](VkDebugUtilsMessenger) %s\n", callbackData->pMessage);
-        }
-        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) > 0) {
-            Log(LogLevel::Warning, "[WARN](VkDebugUtilsMessenger) %s\n", callbackData->pMessage);
-        }
-        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) > 0) {
-            Log(LogLevel::Info, "[INFO](VkDebugUtilsMessenger) %s\n", callbackData->pMessage);
-        }
-        else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) > 0) {
-            Log(LogLevel::Verbose, "[VERB](VkDebugUtilsMessenger) %s\n", callbackData->pMessage);
-        }
-    }
-
-    return VK_FALSE;
 }
 
 TOON_VULKAN_API
@@ -464,18 +732,18 @@ bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
         return false;
     }
 
-    VkDebugUtilsMessageSeverityFlagsEXT messageSeverity =
+    VkDebugUtilsMessageSeverityFlagsEXT messageSeverity = 
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
 
-    #if defined(TOON_ENABLE_VERBOSE_LOGGING)
+    #if defined(TOON_BUILD_DEBUG)
         messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
     #endif
 
-    VkDebugUtilsMessageTypeFlagsEXT messageType = 
-        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+    VkDebugUtilsMessageTypeFlagsEXT messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | 
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | 
         VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 
     VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = {
@@ -485,7 +753,7 @@ bool VulkanGraphicsDriver::InitDebugUtilsMessenger()
         .messageSeverity = messageSeverity,
         .messageType = messageType,
         .pfnUserCallback = _VulkanDebugMessageCallback,
-        .pUserData = nullptr
+        .pUserData = nullptr,
     };
 
     if (!vkCreateDebugUtilsMessengerEXT) {
@@ -508,22 +776,13 @@ void VulkanGraphicsDriver::TermDebugUtilsMessenger()
     if (!_vkDebugMessenger) {
         return;
     }
-
+    
     if (!vkDestroyDebugUtilsMessengerEXT) {
         ToonLogWarn("vkDestroyDebugUtilsMessengerEXT() is not bound");
         return;
     }
 
     vkDestroyDebugUtilsMessengerEXT(_vkInstance, _vkDebugMessenger, nullptr);
-}
-
-TOON_VULKAN_API
-void VulkanGraphicsDriver::TermInstance()
-{
-    if (!_vkInstance) {
-        vkDestroyInstance(_vkInstance, nullptr);
-        _vkInstance = nullptr;
-    }
 }
 
 TOON_VULKAN_API
@@ -556,7 +815,7 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
 
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, nullptr);
-    
+
     if (deviceCount == 0) {
         ToonLogError("vkEnumeratePhysicalDevices() failed, no devices found");
         return false;
@@ -581,7 +840,7 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
         return false;
     }
 
-    LogVerbose("Physical Device Name: %s", _vkPhysicalDeviceProperties.deviceName);
+    ToonLogVerbose("Physical Device Name: %s", _vkPhysicalDeviceProperties.deviceName);
 
     // Reload glad to load instance pointers and populate available extensions
     int vkVersion = gladLoaderLoadVulkan(_vkInstance, _vkPhysicalDevice, nullptr);
@@ -601,16 +860,16 @@ bool VulkanGraphicsDriver::InitPhysicalDevice()
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
     vkResult = vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &availableExtensionCount, availableExtensions.data());
     if (vkResult != VK_SUCCESS) {
-        ToonLogError("vkEnumerateDeviceExtensionsProperties() failed");
+        ToonLogError("vkEnumerateDeviceExtensionProperties() failed");
         return false;
     }
 
-    LogVerbose("Available Vulkan Device Extensions:");
+    ToonLogVerbose("Available Vulkan Device Extensions:");
     for (const auto& extension : availableExtensions) {
-        LogVerbose("\t%s", extension.extensionName);
+        ToonLogVerbose("\t%s", extension.extensionName);
         _vkAvailableDeviceExtensions.emplace(extension.extensionName, extension);
     }
-
+    
     return true;
 }
 
@@ -631,9 +890,9 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
 
     _vkGraphicsQueueFamilyIndex = UINT32_MAX;
     _vkPresentQueueFamilyIndex = UINT32_MAX;
-
+    
     for (const auto& prop : queueFamilyProps) {
-        std::string types;
+        string types;
         if (prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             types += "Graphics ";
         }
@@ -647,7 +906,7 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
             types += "SparseBinding ";
         }
 
-        LogVerbose("Queue #%d: %s", prop.queueCount, types);
+        ToonLogVerbose("Queue #%d: %s", prop.queueCount, types);
     }
 
     uint32_t index = 0;
@@ -696,20 +955,17 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
         });
     }
 
-    VkPhysicalDeviceFeatures requiredDeviceFeatures = { };
-    
-    const auto& requiredLayers = GetRequiredDeviceLayers();
+    VkPhysicalDeviceFeatures requiredDeviceFeatures = {
+        // TODO
+    };
 
-    LogVerbose("Required Vulkan Device Layers:");
-    for (const auto& layer : requiredLayers) {
-        LogVerbose("\t%s", layer);
-    }
+    const auto& requiredLayers = GetRequiredLayers();
 
     const auto& requiredExtensions = GetRequiredDeviceExtensions();
-
-    LogVerbose("Required Vulkan Device Extensions:");
+    
+    ToonLogVerbose("Required Vulkan Device Extensions:");
     for (const auto& extension : requiredExtensions) {
-        LogVerbose("\t%s", extension);
+        ToonLogVerbose("\t%s", extension);
     }
 
     VkDeviceCreateInfo deviceCreateInfo = {
@@ -740,7 +996,7 @@ bool VulkanGraphicsDriver::InitLogicalDevice()
 
     vkGetDeviceQueue(_vkDevice, _vkGraphicsQueueFamilyIndex, 0, &_vkGraphicsQueue);
     vkGetDeviceQueue(_vkDevice, _vkPresentQueueFamilyIndex, 0, &_vkPresentQueue);
-    
+
     return true;
 }
 
@@ -779,6 +1035,9 @@ bool VulkanGraphicsDriver::InitAllocator()
         .flags = flags,
         .physicalDevice = _vkPhysicalDevice,
         .device = _vkDevice,
+        // .preferredLargeHeapBlockSize = ,
+        // .pAllocationCallbacks = ,
+        // .pDeviceMemoryCallbacks = ,
         .instance = _vkInstance,
         .vulkanApiVersion = VK_API_VERSION_1_1,
     };
@@ -819,15 +1078,20 @@ bool VulkanGraphicsDriver::InitSwapChain()
     vkGetPhysicalDeviceSurfacePresentModesKHR(_vkPhysicalDevice, _vkSurface, &presentModeCount, presentModes.data());
 
     // VK_FORMAT_R8G8B8A8_UNORM
+    // VK_FORMAT_B8G8R8A8_SRGB
+
     _vkSwapChainImageFormat = formats[0];
     for (const auto& format : formats) {
-        if (format.format == VK_FORMAT_B8G8R8A8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+        // TODO: Investigate
+        if (format.format == VK_FORMAT_R8G8B8A8_UNORM && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             _vkSwapChainImageFormat = format;
             break;
         }
     }
 
-    // TODO: Mine will use the VK_PRESENT_MODE_MAILBOX_KHR, stephens will use VK_PRESENT_MODE_FIFO_KHR
+    // TODO: Investigate
+    // VK_PRESENT_MODE_FIFO_KHR = Queue of presentation requests, wait for vsync, required to be supported
+    // VK_PRESENT_MODE_MAILBOX_KHR = Queue of presentation requests, wait for vsync, replaces entries if the queue is full
     VkPresentModeKHR swapChainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     for (const auto& presentMode : presentModes) {
         if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -847,13 +1111,11 @@ bool VulkanGraphicsDriver::InitSwapChain()
             surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
     }
 
-    /*uint32_t backbufferCount = std::clamp(
+    uint32_t backbufferCount = std::clamp(
         GetBackbufferCount(),
         surfaceCapabilities.minImageCount,
         surfaceCapabilities.maxImageCount
-    );*/
-
-    uint32_t backbufferCount = 2;
+    );
 
     VkSwapchainCreateInfoKHR swapChainCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -880,6 +1142,7 @@ bool VulkanGraphicsDriver::InitSwapChain()
         _vkPresentQueueFamilyIndex
     };
 
+    // TODO: Refactor
     if (_vkGraphicsQueueFamilyIndex != _vkPresentQueueFamilyIndex) {
         swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         swapChainCreateInfo.queueFamilyIndexCount = 2;
@@ -900,7 +1163,7 @@ bool VulkanGraphicsDriver::InitSwapChain()
     _vkSwapChainImageViews.resize(backbufferCount);
 
     for (size_t i = 0; i < _vkSwapChainImages.size(); ++i) {
-        VkImageViewCreateInfo VkImageViewCreateInfo = {
+        VkImageViewCreateInfo imageViewCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
@@ -916,87 +1179,16 @@ bool VulkanGraphicsDriver::InitSwapChain()
             },
         };
 
-        vkResult = vkCreateImageView(_vkDevice, &VkImageViewCreateInfo, nullptr, &_vkSwapChainImageViews[i]);
+        vkResult = vkCreateImageView(_vkDevice, &imageViewCreateInfo, nullptr, &_vkSwapChainImageViews[i]);
         if (vkResult != VK_SUCCESS) {
             ToonLogError("vkCreateImageView() failed");
             return false;
         }
     }
 
-    return true;
-}
+    GraphicsDriver::SetBackbufferCount(backbufferCount);
 
-void VulkanGraphicsDriver::TermSwapChain()
-{
-    if (_vkDepthImageView) {
-        vkDestroyImageView(_vkDevice, _vkDepthImageView, nullptr);
-        _vkDepthImageView = nullptr;
-    }
-
-    if (_vkDepthImage) {
-        vkDestroyImage(_vkDevice, _vkDepthImage, nullptr);
-        _vkDepthImage = nullptr;
-    }
-
-    if (_vkDepthImageMemory) {
-        vkFreeMemory(_vkDevice, _vkDepthImageMemory, nullptr);
-        _vkDepthImageMemory = nullptr;
-    }
-
-    for (auto& framebuffer : _vkFramebuffers) {
-        if (framebuffer) {
-            vkDestroyFramebuffer(_vkDevice, framebuffer, nullptr);
-            framebuffer = nullptr;
-        }
-    }
-
-    if (!_vkCommandBuffers.empty()) {
-        vkFreeCommandBuffers(_vkDevice, _vkCommandPool, static_cast<size_t>(_vkCommandBuffers.size()), _vkCommandBuffers.data());
-        _vkCommandBuffers.assign(_vkCommandBuffers.size(), nullptr);
-    }
-
-    // for (const auto& pipeline : _pipelines) {
-    //     pipeline->Terminate();
-    // }
-
-    if (_vkPipelineLayout) {
-        vkDestroyPipelineLayout(_vkDevice, _vkPipelineLayout, nullptr);
-        _vkPipelineLayout = nullptr;
-    }
-
-    if (_vkRenderPass) {
-        vkDestroyRenderPass(_vkDevice, _vkRenderPass, nullptr);
-        _vkRenderPass = nullptr;
-    }
-
-    for (auto& imageView : _vkSwapChainImageViews) {
-        if (imageView) {
-            vkDestroyImageView(_vkDevice, imageView, nullptr);
-            imageView = nullptr;
-        }
-    }
-
-    if (_vkSwapChain) {
-        vkDestroySwapchainKHR(_vkDevice, _vkSwapChain, nullptr);
-        _vkSwapChain = nullptr;
-    }
-
-    if (_vkDescriptorPool) {
-        vkDestroyDescriptorPool(_vkDevice, _vkDescriptorPool, nullptr);
-        _vkDescriptorPool = nullptr;
-    }
-}
-
-TOON_VULKAN_API
-bool VulkanGraphicsDriver::ResetSwapChain()
-{
-    ToonBenchmarkStart();
-
-    vkDeviceWaitIdle(_vkDevice);
-
-    TermSwapChain();
-
-    if (!InitSwapChain()) {
+    if (!InitDepthBuffer()) {
         return false;
     }
 
@@ -1008,12 +1200,9 @@ bool VulkanGraphicsDriver::ResetSwapChain()
         return false;
     }
 
-    if (!InitGraphicsPipelines()) {
-        return false;
-    }
-
-    if (!InitDepthBuffer()) {
-        return false;
+    for (const auto& pipeline : _pipelineList) {
+        VulkanPipeline * vkPipeline = TOON_VULKAN_PIPELINE(pipeline.get());
+        vkPipeline->Create();
     }
 
     if (!InitFramebuffers()) {
@@ -1028,8 +1217,184 @@ bool VulkanGraphicsDriver::ResetSwapChain()
         return false;
     }
 
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermSwapChain(bool resetting /*= false*/)
+{
+    TermCommandBuffers();
+    TermCommandPool();
+    TermFramebuffers();
+
+    if (resetting) {
+        for (const auto& pipeline : _pipelineList) {
+            VulkanPipeline * vkPipeline = TOON_VULKAN_PIPELINE(pipeline.get());
+            vkPipeline->Destroy();
+        }
+
+        for (const auto& mesh : _meshList) {
+            VulkanMesh * vkMesh = TOON_VULKAN_MESH(mesh.get());
+            vkMesh->Destroy();
+        }
+    }
+    else {
+        for (const auto& pipeline : _pipelineList) {
+            pipeline->Terminate();
+        }
+        _pipelineList.clear();
+
+        for (const auto& mesh : _meshList) {
+            mesh->Terminate();
+        }
+        _meshList.clear();
+    }
+
+    TermDescriptorPool();
+    TermRenderPass();
+    TermDepthBuffer();
+
+    for (auto& imageView : _vkSwapChainImageViews) {
+        if (imageView) {
+            vkDestroyImageView(_vkDevice, imageView, nullptr);
+            imageView = nullptr;
+        }
+    }
+
+    if (_vkSwapChain) {
+        vkDestroySwapchainKHR(_vkDevice, _vkSwapChain, nullptr);
+        _vkSwapChain = nullptr;
+    }
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::ResetSwapChain()
+{
+    ToonBenchmarkStart();
+
+    vkDeviceWaitIdle(_vkDevice);
+
+    TermSwapChain(true);
+
+    if (!InitSwapChain()) {
+        return false;
+    }
+
     ToonBenchmarkEnd();
     return true;
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::InitDepthBuffer()
+{
+    VkResult vkResult;
+
+    std::vector<VkFormat> potentialDepthFormats = {
+        VK_FORMAT_D32_SFLOAT,
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        VK_FORMAT_D24_UNORM_S8_UINT,
+    };
+
+    _vkDepthImageFormat = VK_FORMAT_UNDEFINED;
+
+    for (VkFormat format : potentialDepthFormats) {
+        VkFormatProperties formatProperties;
+        vkGetPhysicalDeviceFormatProperties(_vkPhysicalDevice, format, &formatProperties);
+
+        VkFormatFeatureFlags features = (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        if (features == VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            _vkDepthImageFormat = format;
+            break;
+        }
+    }
+
+    if (_vkDepthImageFormat == VK_FORMAT_UNDEFINED) {
+        ToonLogError("Unable to find suitable depth buffer image format");
+        return false;
+    }
+
+    VkImageCreateInfo imageCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .imageType = VK_IMAGE_TYPE_2D,
+        .format = _vkDepthImageFormat,
+        .extent = {
+            .width = _vkSwapChainExtent.width,
+            .height = _vkSwapChainExtent.height,
+            .depth = 1,
+        },
+        .mipLevels = 1,
+        .arrayLayers = 1,
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .tiling = VK_IMAGE_TILING_OPTIMAL,
+        .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+    };
+
+    VmaAllocationCreateInfo allocationCreateInfo = {
+        .flags = 0,
+        .usage = VMA_MEMORY_USAGE_GPU_ONLY,
+    };
+
+    vkResult = vmaCreateImage(
+        _vmaAllocator,
+        &imageCreateInfo,
+        &allocationCreateInfo,
+        &_vkDepthImage,
+        &_vmaDepthImageAllocation,
+        nullptr
+    );
+
+    if (vkResult != VK_SUCCESS) {
+        ToonLogError("vmaCreateImage() failed, unable to create depth buffer image");
+        return false;
+    }
+
+    VkImageViewCreateInfo imageViewCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .image = _vkDepthImage,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format = VK_FORMAT_D32_SFLOAT,
+        // .components
+        .subresourceRange = {
+            .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1,
+        },
+    };
+
+    if (vkCreateImageView(_vkDevice, &imageViewCreateInfo, nullptr, &_vkDepthImageView) != VK_SUCCESS) {
+        ToonLogError("Failed to create depth buffer image view");
+        return false;
+    }
+
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermDepthBuffer()
+{
+    if (_vkDepthImageView) {
+        vkDestroyImageView(_vkDevice, _vkDepthImageView, nullptr);
+        _vkDepthImageView = nullptr;
+    }
+
+    if (_vkDepthImage) {
+        vkDestroyImage(_vkDevice, _vkDepthImage, nullptr);
+        _vkDepthImage = nullptr;
+    }
+
+    if (_vmaDepthImageAllocation) {
+        vmaFreeMemory(_vmaAllocator, _vmaDepthImageAllocation);
+        _vmaDepthImageAllocation = nullptr;
+    }
+
 }
 
 TOON_VULKAN_API
@@ -1120,20 +1485,35 @@ bool VulkanGraphicsDriver::InitRenderPass()
 }
 
 TOON_VULKAN_API
+void VulkanGraphicsDriver::TermRenderPass()
+{
+    if (_vkRenderPass) {
+        vkDestroyRenderPass(_vkDevice, _vkRenderPass, nullptr);
+        _vkRenderPass = nullptr;
+    }
+}
+
+TOON_VULKAN_API
 bool VulkanGraphicsDriver::InitDescriptorPool()
 {
     VkResult vkResult;
 
-    VkDescriptorPoolSize descriptorPoolSize = {
-        .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        .descriptorCount = static_cast<uint32_t>(_vkSwapChainImages.size()),
+    std::array<VkDescriptorPoolSize, 1> descriptorPoolSizeList = {
+        VkDescriptorPoolSize {
+            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = static_cast<uint32_t>(1 + _meshList.size()), // Can never be 0
+        },
+        // VkDescriptorPoolSize {
+        //     .type = VK_DESCRIPTOR_TYPE_SAMPLER,
+        //     .descriptorCount = 0,
+        // },
     };
 
     VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .maxSets = static_cast<uint32_t>(_vkSwapChainImages.size()),
-        .poolSizeCount = 1,
-        .pPoolSizes = &descriptorPoolSize,
+        .poolSizeCount = descriptorPoolSizeList.size(),
+        .pPoolSizes = descriptorPoolSizeList.data(),
     };
 
     vkResult = vkCreateDescriptorPool(_vkDevice, &descriptorPoolCreateInfo, nullptr, &_vkDescriptorPool);
@@ -1142,44 +1522,55 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
         return false;
     }
 
-    std::vector<VkDescriptorSetLayoutBinding> layoutBindingList;
-    //layoutBindingList.resize(_constantBufferBindings.size());
+    std::array<VkDescriptorSetLayoutBinding, 2> descriptorSetLayoutBindingList = {
+        VkDescriptorSetLayoutBinding {
+            .binding = TOON_SHADER_GLOBALS_BINDING,
+            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS,
+            .pImmutableSamplers = nullptr,
+        },
+        VkDescriptorSetLayoutBinding {
+            .binding = TOON_SHADER_TRANSFORM_BINDING,
+            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+            .pImmutableSamplers = nullptr,
+        },
+    };
 
-    // size_t i = 0;
-    // for (const auto& it : _constantBufferBindings) {
-    //     layoutBindingList[i] = {
-    //         .binding = it.first,
-    //         .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-    //         .descriptorCount = 1,
-    //         .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-    //         .pImmutableSamplers = nullptr,
-    //     };
-    // }
-
-    VkDescriptorSetLayoutCreateInfo descriptorLayoutCreateInfo = {
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .bindingCount = static_cast<uint32_t>(layoutBindingList.size()),
-        .pBindings = layoutBindingList.data(),
+        .bindingCount = static_cast<uint32_t>(descriptorSetLayoutBindingList.size()),
+        .pBindings = descriptorSetLayoutBindingList.data(),
     };
 
-    vkResult = vkCreateDescriptorSetLayout(_vkDevice, &descriptorLayoutCreateInfo, nullptr, &_vkDescriptorSetLayout);
+    vkResult = vkCreateDescriptorSetLayout(_vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &_vkDescriptorSetLayout);
     if (vkResult != VK_SUCCESS) {
         ToonLogError("vkCreateDescriptorSetLayout() failed");
         return false;
     }
 
-    VkDescriptorSetLayout setLayouts[] = { _vkDescriptorSetLayout };
+    for (auto& mesh : _meshList) {
+        VulkanMesh * vkMesh = TOON_VULKAN_MESH(mesh.get());
+        if (!vkMesh->Create()) {
+            return false;
+        }
+    }
+
+    std::array<VkDescriptorSetLayout, 1> setLayouts = {
+        _vkDescriptorSetLayout,
+    };
 
     // TODO: Move into Pipeline
-    // Get "default" Registered Constant Buffers from the graphics driver at creation time
     VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .setLayoutCount = 1,
-        .pSetLayouts = setLayouts,
+        .setLayoutCount = static_cast<uint32_t>(setLayouts.size()),
+        .pSetLayouts = setLayouts.data(),
         .pushConstantRangeCount = 0,
         .pPushConstantRanges = nullptr,
     };
@@ -1189,19 +1580,90 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
         ToonLogFatal("vkCreatePipelineLayout() failed");
     }
 
-    std::vector<VkDescriptorSetLayout> layouts(_vkSwapChainImages.size(), _vkDescriptorSetLayout);
-    VkDescriptorSetAllocateInfo allocateInfo = {
-        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermDescriptorPool()
+{
+    if (_vkPipelineLayout) {
+        vkDestroyPipelineLayout(_vkDevice, _vkPipelineLayout, nullptr);
+        _vkPipelineLayout = nullptr;
+    }
+
+    if (_vkDescriptorSetLayout) {
+        vkDestroyDescriptorSetLayout(_vkDevice, _vkDescriptorSetLayout, nullptr);
+        _vkDescriptorSetLayout = nullptr;
+    }
+
+    if (_vkDescriptorPool) {
+        vkResetDescriptorPool(_vkDevice, _vkDescriptorPool, 0); // ?
+        vkDestroyDescriptorPool(_vkDevice, _vkDescriptorPool, nullptr);
+        _vkDescriptorPool = nullptr;
+    }
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::InitFramebuffers()
+{
+    VkResult vkResult;
+
+    _vkFramebuffers.resize(_vkSwapChainImageViews.size());
+
+    for (size_t i = 0; i < _vkSwapChainImageViews.size(); ++i) {
+        std::array<VkImageView, 2> attachments = {
+            _vkSwapChainImageViews[i],
+            _vkDepthImageView,
+        };
+
+        VkFramebufferCreateInfo framebufferCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .renderPass = _vkRenderPass,
+            .attachmentCount = static_cast<uint32_t>(attachments.size()),
+            .pAttachments = attachments.data(),
+            .width = _vkSwapChainExtent.width,
+            .height = _vkSwapChainExtent.height,
+            .layers = 1,
+        };
+
+        vkResult = vkCreateFramebuffer(_vkDevice, &framebufferCreateInfo, nullptr, &_vkFramebuffers[i]);
+        if (vkResult != VK_SUCCESS) {
+            ToonLogError("vkCreateFramebuffer() failed");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermFramebuffers()
+{
+    for (auto& framebuffer : _vkFramebuffers) {
+        if (framebuffer) {
+            vkDestroyFramebuffer(_vkDevice, framebuffer, nullptr);
+        }
+    }
+    _vkFramebuffers.clear();
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::InitCommandPool()
+{
+    VkResult vkResult;
+
+    VkCommandPoolCreateInfo commandPoolCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         .pNext = nullptr,
-        .descriptorPool = _vkDescriptorPool,
-        .descriptorSetCount = static_cast<uint32_t>(_vkSwapChainImages.size()),
-        .pSetLayouts = layouts.data(),
+        .flags = 0,
+        .queueFamilyIndex = _vkGraphicsQueueFamilyIndex,
     };
 
-    _vkDescriptorSets.resize(_vkSwapChainImages.size());
-    vkResult = vkAllocateDescriptorSets(_vkDevice, &allocateInfo, _vkDescriptorSets.data());
+    vkResult = vkCreateCommandPool(_vkDevice, &commandPoolCreateInfo, nullptr, &_vkCommandPool);
     if (vkResult != VK_SUCCESS) {
-        ToonLogError("vkAllocateDescriptorSets() failed");
+        ToonLogError("vkCreateCommandPool() failed");
         return false;
     }
 
@@ -1209,39 +1671,185 @@ bool VulkanGraphicsDriver::InitDescriptorPool()
 }
 
 TOON_VULKAN_API
-bool VulkanGraphicsDriver::InitGraphicsPipelines()
+void VulkanGraphicsDriver::TermCommandPool()
 {
-    for (auto& pipeline : _pipelines) {
-        if (!pipeline->Initialize()) {
-            return false;
-        }
+    if (_vkCommandPool) {
+        vkDestroyCommandPool(_vkDevice, _vkCommandPool, nullptr);
+        _vkCommandPool = nullptr;
     }
-
-    return false;
-}
-
-TOON_VULKAN_API
-bool VulkanGraphicsDriver::InitDepthBuffer()
-{
-    return false;
-}
-
-TOON_VULKAN_API
-bool VulkanGraphicsDriver::InitFramebuffers()
-{
-    return false;
-}
-
-TOON_VULKAN_API
-bool VulkanGraphicsDriver::InitCommandPool()
-{
-    return false;
 }
 
 TOON_VULKAN_API
 bool VulkanGraphicsDriver::InitCommandBuffers()
 {
-    return false;
+    VkResult vkResult;
+
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .commandPool = _vkCommandPool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = static_cast<uint32_t>(_vkFramebuffers.size()),
+    };
+
+    _vkCommandBuffers.resize(_vkFramebuffers.size());
+
+    vkResult = vkAllocateCommandBuffers(_vkDevice, &commandBufferAllocateInfo, _vkCommandBuffers.data());
+    if (vkResult != VK_SUCCESS) {
+        ToonLogError("vkAllocateCommandBuffers() failed");
+        return false;
+    }
+
+    if (!FillCommandBuffers()) {
+        return false;
+    }
+
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermCommandBuffers()
+{
+    if (!_vkCommandBuffers.empty()) {
+        vkFreeCommandBuffers(_vkDevice, _vkCommandPool, static_cast<size_t>(_vkCommandBuffers.size()), _vkCommandBuffers.data());
+        _vkCommandBuffers.clear();
+    }
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::InitSyncObjects()
+{
+    VkResult vkResult;
+
+    _vkImageAvailableSemaphores.resize(2);
+    _vkRenderingFinishedSemaphores.resize(2);
+    _vkInFlightFences.resize(2);
+    _vkImagesInFlight.resize(_vkSwapChainImages.size(), VK_NULL_HANDLE);
+
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+    };
+
+    VkFenceCreateInfo fenceCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = VK_FENCE_CREATE_SIGNALED_BIT,
+    };
+
+    for (size_t i = 0; i < 2; ++i) {
+        vkResult = vkCreateSemaphore(_vkDevice, &semaphoreCreateInfo, nullptr, &_vkImageAvailableSemaphores[i]);
+        if (vkResult != VK_SUCCESS) {
+            ToonLogError("vkCreateSemaphore() failed");
+            return false;
+        }
+        else {
+            vkResult = vkCreateSemaphore(_vkDevice, &semaphoreCreateInfo, nullptr, &_vkRenderingFinishedSemaphores[i]);
+            if (vkResult != VK_SUCCESS) {
+                ToonLogError("vkCreateSemaphore() failed");
+                return false;
+            }
+            else {
+                vkResult = vkCreateFence(_vkDevice, &fenceCreateInfo, nullptr, &_vkInFlightFences[i]);
+                if (vkResult != VK_SUCCESS) {
+                    ToonLogError("vkCreateFence() failed");
+                    return false;
+                }   
+            }
+        }
+    }
+
+    return true;
+}
+
+TOON_VULKAN_API
+void VulkanGraphicsDriver::TermSyncObjects()
+{
+    for (auto fence : _vkInFlightFences) {
+        vkDestroyFence(_vkDevice, fence, nullptr);
+        fence = nullptr;
+    }
+
+    for (auto semaphore : _vkRenderingFinishedSemaphores) {
+        vkDestroySemaphore(_vkDevice, semaphore, nullptr);
+        semaphore = nullptr;
+    }
+
+    for (auto semaphore : _vkImageAvailableSemaphores) {
+        vkDestroySemaphore(_vkDevice, semaphore, nullptr);
+        semaphore = nullptr;
+    }
+}
+
+TOON_VULKAN_API
+bool VulkanGraphicsDriver::FillCommandBuffers()
+{
+    VkResult vkResult;
+
+    for (size_t i = 0; i < _vkCommandBuffers.size(); ++i) {
+
+        VkCommandBufferBeginInfo commandBufferBeginInfo = {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .pInheritanceInfo = nullptr,
+        };
+
+        // Requires VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
+        // vkResetCommandBuffer(_vkCommandBuffers[i], 0);
+
+        vkResult = vkBeginCommandBuffer(_vkCommandBuffers[i], &commandBufferBeginInfo);
+        if (vkResult != VK_SUCCESS) {
+            ToonLogError("vkBeginCommandBuffer() failed");
+            return false;
+        }
+
+        VulkanRenderContext * vkRenderContext = TOON_VULKAN_RENDER_CONTEXT(_renderContext.get());
+        vkRenderContext->SetVkCommandBuffer(_vkCommandBuffers[i]);
+
+        std::array<VkClearValue, 2> clearValues = { };
+
+        const glm::vec4& cc = GetClearColor();
+        clearValues[0].color = {
+            .float32 = { cc.r, cc.g, cc.b, cc.a }
+        };
+        
+        clearValues[1].depthStencil = { 
+            .depth = 1.0f, 
+            .stencil = 0,
+        };
+
+        VkRenderPassBeginInfo renderPassBeginInfo = {
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            .renderPass = _vkRenderPass,
+            .framebuffer = _vkFramebuffers[i],
+            .renderArea = {
+                .offset = { 0, 0 },
+                .extent = _vkSwapChainExtent,
+            },
+            .clearValueCount = static_cast<uint32_t>(clearValues.size()),
+            .pClearValues = clearValues.data(),
+        };
+
+        vkCmdBeginRenderPass(_vkCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        Scene * scene = GetCurrentScene();
+        if (scene) {
+            scene->Render(_renderContext.get());
+        }
+
+
+        vkCmdEndRenderPass(_vkCommandBuffers[i]);
+
+        vkResult = vkEndCommandBuffer(_vkCommandBuffers[i]);
+        if (vkResult != VK_SUCCESS) {
+            ToonLogError("vkEndCommandBuffer() failed");
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace Toon::Vulkan

@@ -29,35 +29,67 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
 
     // If we are uploading to a GPU only buffer, use a staging buffer
     if (_memoryUsage == MemoryUsage::GPU) {
+        VkBufferCreateInfo stagingBufferCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .size = _size,
+            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        };
+
+        VmaAllocationCreateInfo stagingAllocationCreateInfo = {
+            .flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
+            .usage = VMA_MEMORY_USAGE_CPU_ONLY,
+        };
+
         VkBuffer stagingBuffer;
         VmaAllocation stagingAllocation;
+        VmaAllocationInfo stagingAllocationInfo;
+        
+        vkResult = vmaCreateBuffer(
+            gfx->GetAllocator(),
+            &stagingBufferCreateInfo,
+            &stagingAllocationCreateInfo,
+            &stagingBuffer,
+            &stagingAllocation,
+            &stagingAllocationInfo
+        );
 
-        result = gfx->CreateBuffer(&stagingBuffer, &stagingAllocation, _size, 
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VMA_MEMORY_USAGE_CPU_ONLY);
-
-        if (!result) {
-            ToonLogError("CreateBuffer() failed, unable to create staging buffer");
-            return false;
-        }
-
-        void * ptr;
-        vkResult = vmaMapMemory(gfx->GetAllocator(), stagingAllocation, &ptr);
         if (vkResult != VK_SUCCESS) {
-            ToonLogError("vmaMapMemory() failed");
+            ToonLogError("vmaCreateBuffer() failed, unable to create staging buffer");
             return false;
         }
 
-        memcpy(ptr, data, _size);
+        memcpy(stagingAllocationInfo.pMappedData, data, _size);
 
-        vmaUnmapMemory(gfx->GetAllocator(), stagingAllocation);
+        VkBufferUsageFlags bufferUsageFlags = VK_BUFFER_USAGE_TRANSFER_DST_BIT | vkBufferUsage.value();
 
-        result = gfx->CreateBuffer(&_vkBuffer, &_vmaAllocation, _size, 
-            VK_BUFFER_USAGE_TRANSFER_DST_BIT | vkBufferUsage.value(),
-            VMA_MEMORY_USAGE_GPU_ONLY);
+        VkBufferCreateInfo bufferCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .size = _size,
+            .usage = bufferUsageFlags,
+            .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        };
+
+        VmaAllocationCreateInfo allocationCreateInfo = {
+            .flags = 0,
+            .usage = vkMemoryUsage.value(),
+        };
+
+        vkResult = vmaCreateBuffer(
+            gfx->GetAllocator(),
+            &bufferCreateInfo,
+            &allocationCreateInfo,
+            &_vkBuffer,
+            &_vmaAllocation,
+            nullptr
+        );
             
-        if (!result) {
-            ToonLogError("CreateBuffer() failed, unable to create buffer");
+        if (vkResult != VK_SUCCESS) {
+            ToonLogError("vmaCreateBuffer() failed, unable to create buffer");
             return false;
         }
 
@@ -70,34 +102,47 @@ bool VulkanBuffer::Initialize(size_t size, uint8_t * data, BufferUsage bufferUsa
         vkDestroyBuffer(gfx->GetDevice(), stagingBuffer, nullptr);
         vmaFreeMemory(gfx->GetAllocator(), stagingAllocation);
     }
-    else if (_memoryUsage == MemoryUsage::UploadOnce || 
-             _memoryUsage == MemoryUsage::UploadOften) {
-                 
-        result = gfx->CreateBuffer(&_vkBuffer, &_vmaAllocation, _size, 
-            vkBufferUsage.value(),
-            vkMemoryUsage.value());
+    else {
+
+        VkBufferUsageFlags bufferUsageFlags = vkBufferUsage.value();
+
+        VkBufferCreateInfo bufferCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .size = _size,
+            .usage = bufferUsageFlags,
+            .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        };
+
+        VmaAllocationCreateInfo allocationCreateInfo = {
+            .flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
+            .usage = vkMemoryUsage.value(),
+        };
+
+        VmaAllocationInfo allocationInfo;
+
+        vkResult = vmaCreateBuffer(
+            gfx->GetAllocator(),
+            &bufferCreateInfo,
+            &allocationCreateInfo,
+            &_vkBuffer,
+            &_vmaAllocation,
+            &allocationInfo
+        );
             
-        if (!result) {
+        if (vkResult != VK_SUCCESS) {
             ToonLogError("CreateBuffer() failed, unable to create buffer");
             return false;
         }
 
-        if (data) {
-            void * ptr;
-            vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
-            if (vkResult != VK_SUCCESS) {
-                ToonLogError("vmaMapMemory() failed");
-                return false;
-            }
+        _mappedBufferMemory = allocationInfo.pMappedData;
 
-            memcpy(ptr, data, _size);
+        bool upload = (_memoryUsage == MemoryUsage::UploadOnce || _memoryUsage == MemoryUsage::UploadOften);
 
-            vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
+        if (data && upload) {
+            memcpy(_mappedBufferMemory, data, _size);
         }
-    }
-    else {
-        ToonLogError("MemoryUsage::Download is not yet supported");
-        return false;
     }
 
     return true;
@@ -108,62 +153,16 @@ void VulkanBuffer::Terminate()
 {
     VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
+    if (_mappedBufferMemory) {
+        vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
+        _mappedBufferMemory = nullptr;
+    }
+
     vkDestroyBuffer(gfx->GetDevice(), _vkBuffer, nullptr);
+    _vkBuffer = nullptr;
+
     vmaFreeMemory(gfx->GetAllocator(), _vmaAllocation);
+    _vmaAllocation = nullptr;
 }
 
-TOON_VULKAN_API
-bool VulkanBuffer::ReadFrom(size_t offset, size_t length, uint8_t * data)
-{
-    VkResult vkResult;
-
-    if (_memoryUsage != MemoryUsage::Download) {
-        ToonLogError("Unable to read data from buffer with MemoryUsage: %s",
-            MemoryUsageToString(_memoryUsage));
-        return false;
-    }
-
-    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
-
-    void * ptr;
-    vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
-    if (vkResult != VK_SUCCESS) {
-        ToonLogError("vmaMapMemory() failed");
-        return false;
-    }
-
-    memcpy(data, static_cast<char *>(ptr) + offset, length);
-
-    vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
-
-    return true;
-}
-
-TOON_VULKAN_API
-bool VulkanBuffer::WriteTo(size_t offset, size_t length, uint8_t * data)
-{
-    VkResult vkResult;
-    
-    if (_memoryUsage != MemoryUsage::UploadOnce && _memoryUsage != MemoryUsage::UploadOften) {
-        ToonLogError("Unable to write data to buffer with MemoryUsage: %s",
-            MemoryUsageToString(_memoryUsage));
-        return false;
-    }
-
-    VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
-
-    void * ptr;
-    vkResult = vmaMapMemory(gfx->GetAllocator(), _vmaAllocation, &ptr);
-    if (vkResult != VK_SUCCESS) {
-        ToonLogError("vmaMapMemory() failed");
-        return false;
-    }
-
-    memcpy(static_cast<char *>(ptr) + offset, data, length);
-
-    vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
-
-    return true;
-}
-
-}; // namespace Toon::Vulkan
+} // namespace Toon::Vulkan

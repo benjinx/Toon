@@ -31,7 +31,6 @@ private:
     VkCommandBuffer _vkCommandBuffer;
 }; // class VulkanRenderContext
 
-
 } // namespace Toon::Vulkan
 
 #endif // VULKAN_RENDER_CONTEXT_HPP
