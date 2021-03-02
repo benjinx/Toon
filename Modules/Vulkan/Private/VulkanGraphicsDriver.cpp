@@ -103,7 +103,9 @@ void VulkanGraphicsDriver::Terminate()
     _primitiveList.clear();
 
     // TODO: Move
-    _shaderGlobalsBuffer->Terminate();
+    if (_shaderGlobalsBuffer) {
+        _shaderGlobalsBuffer->Terminate();
+    }
 
     for (auto& shader : _shaderList) {
         shader->Terminate();
@@ -1054,7 +1056,9 @@ bool VulkanGraphicsDriver::InitAllocator()
 TOON_VULKAN_API
 void VulkanGraphicsDriver::TermAllocator()
 {
-    vmaDestroyAllocator(_vmaAllocator);
+    if (_vmaAllocator) {
+        vmaDestroyAllocator(_vmaAllocator);
+    }
 }
 
 TOON_VULKAN_API

@@ -153,16 +153,20 @@ void VulkanBuffer::Terminate()
 {
     VulkanGraphicsDriver * gfx = TOON_VULKAN_GRAPHICS_DRIVER(GetGraphicsDriver());
 
-    if (_mappedBufferMemory) {
-        vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
-        _mappedBufferMemory = nullptr;
+    if (_vkBuffer) {
+        vkDestroyBuffer(gfx->GetDevice(), _vkBuffer, nullptr);
+        _vkBuffer = nullptr;
     }
 
-    vkDestroyBuffer(gfx->GetDevice(), _vkBuffer, nullptr);
-    _vkBuffer = nullptr;
+    if (_vmaAllocation) {
+        if (_mappedBufferMemory) {
+            vmaUnmapMemory(gfx->GetAllocator(), _vmaAllocation);
+            _mappedBufferMemory = nullptr;
+        }
 
-    vmaFreeMemory(gfx->GetAllocator(), _vmaAllocation);
-    _vmaAllocation = nullptr;
+        vmaFreeMemory(gfx->GetAllocator(), _vmaAllocation);
+        _vmaAllocation = nullptr;
+    }
 }
 
 } // namespace Toon::Vulkan

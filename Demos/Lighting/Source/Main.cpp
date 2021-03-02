@@ -88,9 +88,10 @@ void Run()
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "passThruColor.vert",
-        "passThruColor.frag",
+        "Toon/DebugNormalColor.vert",
+        "Toon/DebugNormalColor.frag",
     })) {
+        ToonLogError("lol");
         return;
     }
 
