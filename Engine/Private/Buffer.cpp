@@ -2,6 +2,7 @@
 #include <Toon/Log.hpp>
 
 #include <Toon/String.hpp>
+#include <cstring>
 
 namespace Toon {
 
