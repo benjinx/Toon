@@ -108,7 +108,7 @@ void Run()
     entity->AddComponent(std::move(textureComponent));*/
     
     // Set the texture (Temp for now)
-    mesh->_texture = LoadTextureFromFile("crate/crate_diffuse.png");
+    mesh->_texture = LoadTextureFromFile("brickwall/brickwall.jpg");
 
     // Set our view and proj matrix (in shaders).
     shaderTransform->View = camera.GetView();
@@ -133,7 +133,7 @@ void Run()
 
     // Add the new entity to the scene
     auto e = scene.AddChild(std::move(entity));
-    
+
     // Game loop
     Toon::Run([&]() {
         gfx->Render();
