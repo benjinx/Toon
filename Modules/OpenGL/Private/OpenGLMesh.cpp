@@ -16,7 +16,6 @@ void OpenGLMesh::Render(RenderContext * ctx)
     glPipeline->Bind();
 
     OpenGLTexture * glTexture = TOON_OPENGL_TEXTURE(_texture.get());
-
     if (glTexture)
     {
         glActiveTexture(GL_TEXTURE0);

@@ -1,24 +1,17 @@
 #include <Toon/Toon.hpp>
-#include <Toon/Module.hpp>
 
 #include <Toon/Camera.hpp>
 #include <Toon/Entity.hpp>
-#include <Toon/RenderContext.hpp>
-#include <Toon/UpdateContext.hpp>
-#include <Toon/Component.hpp>
-#include <Toon/MeshComponent.hpp>
+#include <Toon/GraphicsDriver.hpp>
 #include <Toon/Light.hpp>
 #include <Toon/Log.hpp>
 #include <Toon/Mesh.hpp>
+#include <Toon/MeshComponent.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/RenderContext.hpp>
 #include <Toon/Scene.hpp>
-#include <Toon/Shader.hpp>
 #include <Toon/Texture.hpp>
-#include <Toon/Time.hpp>
-#include <Toon/Util.hpp>
-#include <Toon/GraphicsDriver.hpp>
-#include <Toon/TextureImporter.hpp>
-#include <Toon/MeshImporter.hpp>
-#include <Toon/Version.hpp>
+#include <Toon/UpdateContext.hpp>
 
 #include <cstdio>
 #include <memory>
@@ -74,26 +67,12 @@ void Run()
     camera.SetPosition({ 3, 3, 3 });
     camera.SetLookAt({ 0, 0, 0 });
 
-    // Light Source
-    Light* light = new Light();
-    light->SetPosition(glm::vec3(10.0f, 10.0f, 10.0f));
-    light->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
-    light->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
-    scene.AddChild(std::unique_ptr<Entity>(light));
-
-    // make buffer
-    // Light data struct
-    // Light data buffer
-    // Call write to
-    // do binding things when it changes
-
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "BasicLighting.vert",
-        "BasicLighting.frag",
+        "Lighting.vert",
+        "Lighting.frag",
     })) {
-        ToonLogError("lol");
         return;
     }
 
@@ -101,7 +80,7 @@ void Run()
     auto pipeline = gfx->CreatePipeline(shader);
 
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("Primitives/Obj/pMonkey.obj");
+    auto mesh = LoadMeshFromFile("pCube.obj");
     if (!mesh) {
         return;
     }
@@ -115,7 +94,7 @@ void Run()
 
     // Set position/orientation/scale
     entity->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    entity->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));//glm::angleAxis(glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+    entity->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
     entity->SetScale(glm::vec3(1.0f));
 
     // Add components to entity
@@ -129,29 +108,37 @@ void Run()
     entity->AddComponent(std::move(textureComponent));*/
     
     // Set the texture (Temp for now)
-    mesh->_texture = gfx->CreateTexture();
+    mesh->_texture = LoadTextureFromFile("crate/crate_diffuse.png");
 
-    // Add the new entity to the scene
-    auto e = scene.AddChild(std::move(entity));
-
+    // Set our view and proj matrix (in shaders).
     shaderTransform->View = camera.GetView();
     shaderTransform->Projection = camera.GetProjection();
 
+    // Set camera position (in shaders).
     auto globals = renderCtx->GetShaderGlobals();
     globals->CameraPosition = glm::vec4(camera.GetPosition(), 1.0f);
-    globals->LightCount++;
-    globals->Lights[0].Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    globals->Lights[0].Direction = glm::vec4(GetWorldForward() * light->GetOrientation(), 1.0f);
-    globals->Lights[0].Position = glm::vec4(light->GetPosition(), 1.0f);
 
+    // Light Source
+    Light* light = new Light();
+    light->SetPosition(glm::vec3(10.0f, 10.0f, 10.0f));
+    light->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+    light->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
+    scene.AddChild(std::unique_ptr<Entity>(light));
+
+    // Add our light(s) to our shaders.
+    globals->Lights[globals->LightCount].Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    globals->Lights[globals->LightCount].Direction = glm::vec4(GetWorldForward() * light->GetOrientation(), 1.0f);
+    globals->Lights[globals->LightCount].Position = glm::vec4(light->GetPosition(), 1.0f);
+    globals->LightCount++;
+
+    // Add the new entity to the scene
+    auto e = scene.AddChild(std::move(entity));
+    
     // Game loop
     Toon::Run([&]() {
         gfx->Render();
 
         gfx->ProcessEvents();
-
-        // How do i pass in a uniform for things such as light direction or
-        // A color or something
 
         e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f), GetWorldUp()));
 
@@ -162,6 +149,7 @@ void Run()
 
 int main(int argc, char ** argv)
 {
+    // Lets log things
     AddLogFile("lastrun.log");
 
     // Set application info
@@ -179,6 +167,7 @@ int main(int argc, char ** argv)
     // Terminate
     Terminate();
 
+    // Lets not log things anymore
     CloseAllLogFiles();
 
     return 0;
