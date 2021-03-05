@@ -394,7 +394,7 @@ bool glTF2File::LoadMaterials()
     //     }
     // }
 
-    ToonLogVerbose("Loaded %d Material(s)", Materials.size());
+    //ToonLogVerbose("Loaded %d Material(s)", Materials.size());
 
     return true;
 }

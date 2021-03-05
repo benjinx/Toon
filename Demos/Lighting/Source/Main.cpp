@@ -110,7 +110,7 @@ void Run()
     // GLTF2 Temp Loading
     GLTF2::glTF2File file;
     //bool result = file.LoadFromFile("../../../Engine/Assets/Models/Primitives/pCube.glb");
-    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelmet.glb");
+    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelm.glb");
     
     if (!result) {
         ToonLogError("glTF2 go BRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
