@@ -27,7 +27,7 @@ build_script:
   - cmd: mkdir Build
   - cmd: cd Build
   # TODO -DBUILD_TESTS=ON
-  - cmd: cmake -G "Visual Studio 16 2019" -A x64 ..
+  - cmd: cmake -G "Visual Studio 16 2019" -A x64 -DVERBOSE_LOGGING=ON ..
   - cmd: cmake --build .
   # - cmd: cmake --build . --target RUN_TESTS
 
