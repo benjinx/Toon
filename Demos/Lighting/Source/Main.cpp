@@ -17,6 +17,8 @@
 #include <memory>
 #include <thread>
 
+#include <Toon/GLTF2/glTF2File.hpp>
+
 using namespace Toon;
 
 void Run()
@@ -29,7 +31,7 @@ void Run()
     const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
     
     if (!graphicsDriver) {
-        graphicsDriver = "Vulkan";
+        graphicsDriver = "OpenGL";
     }
 
     if (strcmp(graphicsDriver, "OpenGL") == 0) {
@@ -70,8 +72,10 @@ void Run()
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "Lighting.vert",
-        "Lighting.frag",
+        //"Lighting.vert",
+        //"Lighting.frag",
+        "Toon/FlatColor.vert",
+        "Toon/FlatColor.frag",
     })) {
         return;
     }
@@ -80,11 +84,11 @@ void Run()
     auto pipeline = gfx->CreatePipeline(shader);
 
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("pCube.obj");
+    auto mesh = LoadMeshFromFile("Primitives/Obj/pCube.obj");
     if (!mesh) {
         return;
     }
-    
+
     // Set the pipeline for the mesh, we can set any pipeline for any mesh as needed.
     mesh->SetPipeline(pipeline);
 
@@ -98,9 +102,24 @@ void Run()
     entity->SetScale(glm::vec3(1.0f));
 
     // Add components to entity
+    // auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
+    // meshComponent->SetMesh(mesh);
+    // entity->AddComponent(std::move(meshComponent));
+
+    ///
+    // GLTF2 Temp Loading
+    GLTF2::glTF2File file;
+    //bool result = file.LoadFromFile("../../../Engine/Assets/Models/Primitives/pCube.glb");
+    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelmet.glb");
+    
+    if (!result) {
+        ToonLogError("glTF2 go BRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+    }
+    file.Meshes[0]->SetPipeline(pipeline);
     auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    meshComponent->SetMesh(mesh);
+    meshComponent->SetMesh(file.Meshes[0]);
     entity->AddComponent(std::move(meshComponent));
+    ///
 
     // How are we handling textures? like this?
     /*auto textureComponent = std::unique_ptr<TextureComponent>(new TextureComponent());

@@ -80,6 +80,7 @@ SET(AVAILABLE_MODULES
     "STBI"
     "TinyOBJ"
     "Vulkan"
+    "GLTF2"
 )
 
 IF(BUILD_DEMOS OR MODULES STREQUAL "All")

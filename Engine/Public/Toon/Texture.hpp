@@ -58,7 +58,7 @@ TOON_ENGINE_API
 std::shared_ptr<Texture> LoadTextureFromFile(const string& filename, bool useAssetPath = true, Texture::Options opts = Texture::Options());
 
 TOON_ENGINE_API
-std::shared_ptr<Texture> LoadFromMemory(const uint8_t* buffer, size_t length, Texture::Options opts = Texture::Options());
+std::shared_ptr<Texture> LoadTextureFromMemory(const uint8_t* buffer, size_t length, Texture::Options opts = Texture::Options());
 
 inline string TextureWrapTypeToString(TextureWrapType textureWrapType)
 {
