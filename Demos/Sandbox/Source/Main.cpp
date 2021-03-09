@@ -149,8 +149,8 @@ int main(int argc, char ** argv)
 {
 
     // Set application info
-    SetApplicationName("HelloWorld");
-    SetApplicationVersion({1, 0, 0});
+    SetApplicationName("Sandbox");
+    SetApplicationVersion({TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH});
 
     // Initialize our demo
     if (!Initialize(argc, argv)) {

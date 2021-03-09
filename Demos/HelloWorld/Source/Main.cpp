@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
 {
 
     SetApplicationName("HelloWorld");
-    SetApplicationVersion({1, 0, 0});
+    SetApplicationVersion({TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH});
 
 
     if (!Initialize(argc, argv)) {

@@ -12,6 +12,7 @@
 #include <Toon/Scene.hpp>
 #include <Toon/Texture.hpp>
 #include <Toon/UpdateContext.hpp>
+#include <Toon/Version.hpp>
 
 #include <cstdio>
 #include <memory>
@@ -172,8 +173,8 @@ int main(int argc, char ** argv)
     AddLogFile("lastrun.log");
 
     // Set application info
-    SetApplicationName("HelloWorld");
-    SetApplicationVersion({1, 0, 0});
+    SetApplicationName("Lighting");
+    SetApplicationVersion({TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH});
 
     // Initialize our demo
     if (!Initialize(argc, argv)) {
