@@ -11,6 +11,22 @@
 namespace Toon::GLTF2 {
 
 TOON_GLTF2_API
+bool glTF2File::IsValidTextureIndex(int index, int texCoord)
+{
+    if (index < 0 || index > static_cast<int>(Textures.size())) {
+        ToonLogError("Invalid glTF2 Texture Index: %d", index);
+        return false;
+    }
+
+    if (texCoord > 0) {
+        ToonLogWarn("Multiple glTF2 TEXCOORDS not supported");
+        return false;
+    }
+
+    return true;
+}
+
+TOON_GLTF2_API
 bool glTF2File::LoadFromFile(const string& filename)
 {
     ToonBenchmarkStart();
@@ -359,6 +375,27 @@ bool glTF2File::LoadMaterials()
 
     // if (JSON.contains(MATERIALS_PATH)) {
     //     for (const auto& object : JSON[MATERIALS_PATH]) {
+            // auto material = std::make_shared<Material>();
+
+            // auto it = object.find("normalTexture");
+            // for (it != object.end()) {
+            //     const auto& value = it.value();
+            //     if (value.is_object()) {
+            //         int index = value.value("index", -1);
+            //         int texCoord = value.value("texCoord", 0);
+
+            //         if (IsValidTextureIndex(index, texCoord)) {
+            //             material->SetNormalMap(Textures[index]);
+            //         }
+
+            //         material->SetNormalMapScale(value.value["scale", material->GetNormalScale()]);
+            //     }
+            //     else
+            //     {
+            //         ToonLogWarn("Malformed glTF2 normalTexture");
+            //     }
+            //}
+
 
             // extensions
             /// KHR_materials_transmission
@@ -533,6 +570,7 @@ bool glTF2File::LoadMeshes()
                             return false;
                         }
                         
+                        // Find the position attribute
                         int positionIndex = attributes.value("POSITION", -1);
 
                         if (positionIndex >= 0) {
@@ -541,7 +579,7 @@ bool glTF2File::LoadMeshes()
                             auto& buffer = Buffers[bufferView.buffer];
 
                             if (bufferView.byteStride != 0) {
-                                ToonLogFatal("position byteStride != 0");
+                                ToonLogFatal("Position byteStride != 0");
                             }
 
                             if (accessor.componentType != GL_FLOAT) {
@@ -558,7 +596,7 @@ bool glTF2File::LoadMeshes()
 
                                 for (size_t i = 0; i < posData.size(); ++i) {
                                     data->VertexList[i].Position = glm::vec4(posData[i], 1.0f);
-                                    ToonLogWarn("posData: %s", glm::to_string(posData[i]));
+                                    //ToonLogWarn("posData: %s", glm::to_string(posData[i]));
                                 }
                             }
                             else if (accessor.type == "VEC4") {
@@ -570,6 +608,50 @@ bool glTF2File::LoadMeshes()
                                 for (size_t i = 0; i < posData.size(); ++i) {
                                     data->VertexList[i].Position = posData[i];
                                 }
+                            }
+                            else {
+                                ToonLogFatal("Unsupported accessor type: %s", accessor.type);
+                            }
+                        }
+
+                        // Find the Normal
+                        int normalIndex = attributes.value("NORMAL", -1);
+
+                        if (normalIndex >= 0) {
+                            const auto& accessor = Accessors[normalIndex];
+                            const auto& bufferView = BufferViews[accessor.bufferView];
+                            auto& buffer = Buffers[bufferView.buffer];
+
+                            if (bufferView.byteStride != 0) {
+                                ToonLogFatal("Normal byteStride != 0");
+                            }
+
+                            if (accessor.componentType != GL_FLOAT) {
+                                ToonLogFatal("Unsupported format type: %04X, %s", accessor.componentType, accessor.type);
+                            }
+
+                            if (accessor.type == "VEC3") {
+                                gsl::span<glm::vec3> normData = gsl::span<glm::vec3>(
+                                    reinterpret_cast<glm::vec3 *>(buffer.data() + bufferView.byteOffset),
+                                    accessor.count
+                                );
+
+                                // for (size_t i = 0; i < normData.size(); ++i) {
+                                //     data->VertexList[i].Position = glm::vec4(normData[i], 1.0f);
+                                //     ToonLogWarn("normData: %s", glm::to_string(normData[i]));
+                                // }
+
+                            }
+                            else if (accessor.type == "VEC4") {
+                                gsl::span<glm::vec4> normData = gsl::span<glm::vec4>(
+                                    reinterpret_cast<glm::vec4 *>(buffer.data() + bufferView.byteOffset),
+                                    accessor.count
+                                );
+
+                                // for (size_t i = 0; i < normData.size(); ++i) {
+                                //     data->VertexList[i].Position = normData[i];
+                                // }
+
                             }
                             else {
                                 ToonLogFatal("Unsupported accessor type: %s", accessor.type);

@@ -120,7 +120,7 @@ protected:
 
     glm::ivec2 _windowSize = { 640, 480 };
 
-    microseconds _fpsUpdateElaspedTime = 0us;
+    microseconds _fpsUpdateElapsedTime = 0us;
 
     uintmax_t _fpsUpdateFrameCount = 0;
     

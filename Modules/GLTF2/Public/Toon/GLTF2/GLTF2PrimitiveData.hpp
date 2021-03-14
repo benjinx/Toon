@@ -9,7 +9,7 @@ class TOON_GLTF2_API GLTF2PrimitiveData : public PrimitiveData
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(GLTF2PrimitiveData);
+    DISALLOW_COPY_AND_ASSIGN(GLTF2PrimitiveData)
 
     GLTF2PrimitiveData() = default;
 
@@ -28,7 +28,7 @@ public:
     }
 
     gsl::span<Vertex> GetVertexList() override {
-        return gsl::span<Vertex>(VertexList.data(), VertexList.size());
+        return VertexList;
     }
 
 }; // class GLTF2PrimitiveData

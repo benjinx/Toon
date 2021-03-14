@@ -12,7 +12,7 @@ class TOON_ENGINE_API PrimitiveData
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(PrimitiveData);
+    DISALLOW_COPY_AND_ASSIGN(PrimitiveData)
 
     PrimitiveData() = default;
 

@@ -59,16 +59,16 @@ void GraphicsDriver::Render()
     UpdateContext * updateCtx = GetUpdateContext();
 
     // Update FPS
-    _fpsUpdateElaspedTime += updateCtx->GetPreviousFrameDuration();
+    _fpsUpdateElapsedTime += updateCtx->GetPreviousFrameDuration();
     if (_fpsUpdateFrameCount >= updateCtx->GetTargetFPS()) {
-        float currentFPS = (float)_fpsUpdateFrameCount / (float)_fpsUpdateElaspedTime.count();
+        float currentFPS = (float)_fpsUpdateFrameCount / (float)_fpsUpdateElapsedTime.count();
         currentFPS *= 1000000.0f; // Microseconds -> Seconds
 
         char buffer[32];
         snprintf(buffer, sizeof(buffer), "%.2f FPS", currentFPS);
         UpdateWindowTitle(_windowTitle + " - " + buffer); // FIX
 
-        _fpsUpdateElaspedTime = 0ms;
+        _fpsUpdateElapsedTime = 0ms;
         _fpsUpdateFrameCount = 0;
     }
 

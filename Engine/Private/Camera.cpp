@@ -166,10 +166,12 @@ TOON_ENGINE_API
 void Camera::HandleMovement(float dt)
 {
     float velocity = _movementSpeed * dt;
-    
+
     glm::vec3 right = glm::normalize(glm::cross(_up, GetForward()));
 
     auto pos = GetPosition();
+
+    _direction = glm::vec3(0.0f, 0.0f, 1.0f);//GetWorldForward();//glm::axisAngle(GetWorldForward(), GetWorldOrientation());
 
     pos += glm::normalize(glm::cross(GetForward(), _up)) * velocity * _direction.x;
     pos += glm::normalize(glm::cross(GetForward(), right)) * velocity * _direction.y;

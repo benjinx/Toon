@@ -47,7 +47,7 @@ inline string PrimitiveTopologyToString(PrimitiveTopology primitiveTopology)
     case PrimitiveTopology::LineStrip:
         return "LineStrip";
     case PrimitiveTopology::TriangleList:
-        return "Triangles";
+        return "TriangleList";
     case PrimitiveTopology::TriangleStrip:
         return "TriangleStrip";
     }

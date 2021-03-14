@@ -160,9 +160,14 @@ void Run()
 
         gfx->ProcessEvents();
 
+        //camera.HandleMovement(gfx->GetUpdateContext()->GetFrameSpeedRatio());
+
+        // Set our view and proj matrix (in shaders).
+        shaderTransform->View = camera.GetView();
+        shaderTransform->Projection = camera.GetProjection();
+
         e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f), GetWorldUp()));
 
-        std::this_thread::sleep_for(16ms);
     });
 }
 

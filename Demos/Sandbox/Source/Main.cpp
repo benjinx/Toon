@@ -1,31 +1,25 @@
 #include <Toon/Toon.hpp>
-#include <Toon/Module.hpp>
 
 #include <Toon/Camera.hpp>
 #include <Toon/Entity.hpp>
-#include <Toon/RenderContext.hpp>
-#include <Toon/UpdateContext.hpp>
-#include <Toon/Component.hpp>
-#include <Toon/MeshComponent.hpp>
+#include <Toon/GraphicsDriver.hpp>
 #include <Toon/Light.hpp>
 #include <Toon/Log.hpp>
 #include <Toon/Mesh.hpp>
+#include <Toon/MeshComponent.hpp>
+#include <Toon/Module.hpp>
+#include <Toon/RenderContext.hpp>
 #include <Toon/Scene.hpp>
-#include <Toon/Shader.hpp>
 #include <Toon/Texture.hpp>
-#include <Toon/Util.hpp>
-#include <Toon/GraphicsDriver.hpp>
-#include <Toon/TextureImporter.hpp>
-#include <Toon/MeshImporter.hpp>
+#include <Toon/UpdateContext.hpp>
 #include <Toon/Version.hpp>
 
 #include <cstdio>
 #include <memory>
 #include <thread>
 
-#include <chrono>
+#include <Toon/GLTF2/glTF2File.hpp>
 
-using namespace std::chrono;
 using namespace Toon;
 
 void Run()
@@ -38,7 +32,7 @@ void Run()
     const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
     
     if (!graphicsDriver) {
-        graphicsDriver = "Vulkan";
+        graphicsDriver = "OpenGL";
     }
 
     if (strcmp(graphicsDriver, "OpenGL") == 0) {
@@ -64,10 +58,6 @@ void Run()
     Scene scene;
     SetCurrentScene(&scene);
 
-    // Create a render context and transform data
-    RenderContext * renderCtx = gfx->GetRenderContext();
-    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
-
     // Create camera
     Camera camera;
     camera.SetAspect(glm::vec2(640.0f, 480.0f));
@@ -76,15 +66,11 @@ void Run()
     camera.SetPosition({ 3, 3, 3 });
     camera.SetLookAt({ 0, 0, 0 });
 
-    // Light Source
-    /*auto Light = scene.AddChild(std::unique_ptr<Light>(new Light()));
-    Light->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));*/
-
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        "Toon/DebugNormalColor.vert",
-        "Toon/DebugNormalColor.frag",
+        "Toon/FlatColor.vert",
+        "Toon/FlatColor.frag",
     })) {
         return;
     }
@@ -93,11 +79,11 @@ void Run()
     auto pipeline = gfx->CreatePipeline(shader);
 
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("models/cube.obj");
+    auto mesh = LoadMeshFromFile("Primitives/Obj/pCube.obj");
     if (!mesh) {
         return;
     }
-    
+
     // Set the pipeline for the mesh, we can set any pipeline for any mesh as needed.
     mesh->SetPipeline(pipeline);
 
@@ -111,42 +97,84 @@ void Run()
     entity->SetScale(glm::vec3(1.0f));
 
     // Add components to entity
+    // auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
+    // meshComponent->SetMesh(mesh);
+    // entity->AddComponent(std::move(meshComponent));
+
+    ///
+    // GLTF2 Temp Loading
+    GLTF2::glTF2File file;
+    //bool result = file.LoadFromFile("../../../Engine/Assets/Models/Primitives/pCube.glb");
+    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelm.glb");
+    
+    if (!result) {
+        ToonLogError("glTF2 go BRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+    }
+    file.Meshes[0]->SetPipeline(pipeline);
     auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    meshComponent->SetMesh(mesh);
+    meshComponent->SetMesh(file.Meshes[0]);
     entity->AddComponent(std::move(meshComponent));
+    ///
 
     // How are we handling textures? like this?
     /*auto textureComponent = std::unique_ptr<TextureComponent>(new TextureComponent());
     textureComponent->SetTexture();
     entity->AddComponent(std::move(textureComponent));*/
     
+    // Set the texture (Temp for now)
+    mesh->_texture = LoadTextureFromFile("brickwall/brickwall.jpg");
 
+    // Create a render context and transform data
+    RenderContext * renderCtx = gfx->GetRenderContext();
+    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
 
-    // Add the new entity to the scene
-    scene.AddChild(std::move(entity));
-
-    
+    // Set our view and proj matrix (in shaders).
     shaderTransform->View = camera.GetView();
     shaderTransform->Projection = camera.GetProjection();
 
+    // Set camera position (in shaders).
+    auto globals = renderCtx->GetShaderGlobals();
+    globals->CameraPosition = glm::vec4(camera.GetPosition(), 1.0f);
+
+    // Light Source
+    Light* light = new Light();
+    light->SetPosition(glm::vec3(10.0f, 10.0f, 10.0f));
+    light->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+    light->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
+    scene.AddChild(std::unique_ptr<Entity>(light));
+
+    // Add our light(s) to our shaders.
+    globals->Lights[globals->LightCount].Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    globals->Lights[globals->LightCount].Direction = glm::vec4(GetWorldForward() * light->GetOrientation(), 1.0f);
+    globals->Lights[globals->LightCount].Position = glm::vec4(light->GetPosition(), 1.0f);
+    globals->LightCount++;
+
+    // Add the new entity to the scene
+    auto e = scene.AddChild(std::move(entity));
+
     // Game loop
-    while (IsRunning()) {
+    Toon::Run([&]() {
         gfx->Render();
 
         gfx->ProcessEvents();
 
-        
-        // How do i pass in a uniform for things such as light direction or
-        // A color or something
+        //camera.HandleMovement(gfx->GetUpdateContext()->GetFrameSpeedRatio());
 
-        std::this_thread::sleep_for(16ms);
-    }
+        // Set our view and proj matrix (in shaders).
+        shaderTransform->View = camera.GetView();
+        shaderTransform->Projection = camera.GetProjection();
 
+        auto uctx = gfx->GetUpdateContext();
+        e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f * uctx->GetFrameSpeedRatio()), GetWorldUp()));
+
+    });
 }
 
 
 int main(int argc, char ** argv)
 {
+    // Lets log things
+    AddLogFile("lastrun.log");
 
     // Set application info
     SetApplicationName("Sandbox");
@@ -162,6 +190,9 @@ int main(int argc, char ** argv)
 
     // Terminate
     Terminate();
+
+    // Lets not log things anymore
+    CloseAllLogFiles();
 
     return 0;
 }

@@ -77,7 +77,7 @@ void run()
     Scene scene;
     SetCurrentScene(&scene);
 
-    auto mesh = LoadMeshFromFile("models/cube.obj");
+    auto mesh = LoadMeshFromFile("Primitives/Obj/pCube.obj");
     if (!mesh) {
         return;
     }
@@ -93,13 +93,6 @@ void run()
 
     scene.AddChild(std::move(entity));
 
-    // Entity e;
-
-    // auto meshComp = e.AddComponent<MeshComponent>(std::unique_ptr<Component>(new MeshComponent()));
-    // meshComp->LoadFromFile("models/ball/model.obj");
-
-    // //e.AddComponent());
-
     shaderTransform->View = camera.GetView();
     shaderTransform->Projection = camera.GetProjection();
 
@@ -111,11 +104,7 @@ void run()
         gfx->Render();
 
         gfx->ProcessEvents();
-
-
         
-
-        std::this_thread::sleep_for(16ms);
     }
 
 }

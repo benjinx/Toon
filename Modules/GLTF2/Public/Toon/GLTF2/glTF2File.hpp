@@ -148,7 +148,7 @@ class TOON_GLTF2_API glTF2File
 {
 public:
 
-    DISALLOW_COPY_AND_ASSIGN(glTF2File);
+    DISALLOW_COPY_AND_ASSIGN(glTF2File)
 
     glTF2File() = default;
 
@@ -187,6 +187,8 @@ public:
     std::vector<CameraData> Cameras;
 
     std::vector<std::shared_ptr<Mesh>> Meshes;
+
+    bool IsValidTextureIndex(int index, int texCoord);
 
     bool LoadBuffers();
 
