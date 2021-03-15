@@ -1,85 +1,35 @@
 #include <Toon/Light.hpp>
 
-#include <Toon/Util.hpp>
-
 namespace Toon {
 
-//DirectionalLight::DirectionalLight(glm::vec3 direction)
-//{
-//    SetDirection(direction);
-//}
-
-//void DirectionalLight::SetDirection(glm::vec3 direction)
-//{
-//    if ((normalize(direction) + Utils::GetWorldUp()) == glm::vec3(0.0f)) {
-//        SetRotation(glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
-//    }
-//    else {
-//        SetRotation(glm::quatLookAt(glm::normalize(direction), Utils::GetWorldUp()));
-//    }
-//}
-
-//glm::vec3 DirectionalLight::GetDirection()
-//{
-//    return glm::rotate(GetWorldRotation(), Utils::GetWorldForward());
-//}
-
-
-PointLight::PointLight(glm::vec3 position, float constant, float linear, float quadratic)
-    : _mConstant(constant)
-    , _mLinear(linear)
-    , _mQuadratic(quadratic)
+void Light::SetType(LightType type)
 {
-    SetPosition(position);
+    _type = type;
 }
 
-void PointLight::SetConstant(float constant)
+void Light::FillLightData(LightData1 * data)
 {
-    _mConstant = constant;
+    data->Type = static_cast<uint8_t>(_type);
+    data->Position = GetPosition();
+    data->Direction = GetOrientation() * GetWorldForward();
+    data->Color = _color;
+    data->InnerCutOff = _innerCutOff;
+    data->OuterCutOff = _outerCutOff;
 }
 
-void PointLight::SetLinear(float linear)
+void Light::SetColor(glm::vec3 color)
 {
-    _mLinear = linear;
+    _color = color;
 }
 
-void PointLight::SetQuadratic(float quadratic)
+void Light::SetInnerCutOff(float cutOff)
 {
-    _mQuadratic = quadratic;
+    _innerCutOff = cutOff;
 }
 
-
-SpotLight::SpotLight(glm::vec3 position, /*glm::vec3 direction,*/ float cutOff, float outerCutOff)
-    : _mCutOff(cutOff)
-    , _mOuterCutOff(outerCutOff)
+void Light::SetOuterCutOff(float cutOff)
 {
-    SetPosition(position);
-    //SetDirection(direction);
-}
-
-//void SpotLight::SetDirection(glm::vec3 direction)
-//{
-//    if ((normalize(direction) + Utils::GetWorldUp()) == glm::vec3(0.0f)) {
-//        SetRotation(glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
-//    }
-//    else {
-//        SetRotation(glm::quatLookAt(glm::normalize(direction), Utils::GetWorldUp()));
-//    }
-//}
-
-//glm::vec3 SpotLight::GetDirection()
-//{
-//    return glm::rotate(GetWorldRotation(), Utils::GetWorldForward());
-//}
-
-void SpotLight::SetCutOff(float cutOff)
-{
-    _mCutOff = cutOff;
-}
-
-void SpotLight::SetOuterCutOff(float outerCutOff)
-{
-    _mOuterCutOff = outerCutOff;
+    _outerCutOff = cutOff;
 }
 
 } // namespace Toon

@@ -20,11 +20,11 @@ public:
 
     bool Load(const std::unique_ptr<TextureData>& data, Options opts = Options()) override;
 
-    void Bind();
+    inline GLuint GetGLID() {
+        return _glID;
+    }
 
 private:
-
-    GLenum GetGLDataFormat(int components);
     
     GLenum GetGLDataType(const TextureDataType& type);
 

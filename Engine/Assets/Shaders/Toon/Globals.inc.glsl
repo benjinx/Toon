@@ -3,19 +3,19 @@
 
 struct LightData
 {
-    vec4 Position;
-    vec4 Direction;
-    vec4 Color;
+    vec3 Position;
+    vec3 Direction;
+    vec3 Color;
 };
 
 layout(binding = 0, std140) uniform ToonGlobals
 {
-    vec2 Resolution;
-    vec2 Mouse;
-    int FrameCount;
-    float TotalTime;
-    float FrameSpeedRatio;
-    vec4 CameraPosition;
+    vec2 u_Resolution;
+    vec2 u_Mouse;
+    int u_FrameCount;
+    float u_TotalTime;
+    float u_FrameSpeedRatio;
+    vec3 CameraPosition;
     int LightCount;
     LightData Lights[10];
 };

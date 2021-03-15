@@ -4,6 +4,7 @@
 #include <Toon/Config.hpp>
 #include <Toon/Math.hpp>
 #include <Toon/Vertex.hpp>
+#include <Toon/Material.hpp>
 
 #include <memory>
 
@@ -34,6 +35,18 @@ public:
     virtual void Terminate() { }
 
     virtual bool Load(const std::unique_ptr<PrimitiveData>& data) = 0;
+
+    virtual inline void SetMaterial(std::shared_ptr<Material> material) {
+        _material = material;
+    }
+
+    virtual inline std::shared_ptr<Material> GetMaterial() {
+        return _material;
+    }
+
+protected:
+
+    std::shared_ptr<Material> _material;
 
 }; // class Primitive
 

@@ -1,11 +1,10 @@
 #version 450 core
 
 #include <Toon/Globals.inc.glsl>
+#include <Toon/Material.inc.glsl>
 
-#include <PhongLighting.inc.glsl>
-#include <BlinnPhongLighting.inc.glsl>
-
-layout (binding = 0) uniform sampler2D baseColor; // glTexture0
+#include "PhongLighting.inc.glsl"
+#include "BlinnPhongLighting.inc.glsl"
 
 layout (location = 0) in vec4 v_Position;
 layout (location = 1) in vec4 v_Normal;
@@ -16,7 +15,7 @@ layout (location = 0) out vec4 o_Color;
 
 void main()
 {
-    vec4 baseColorTexture = texture(baseColor, v_TexCoords);
+    vec4 baseColorTexture = texture(u_BaseColorMap, v_TexCoords) * u_BaseColorFactor;
 
     vec4 outputColor = vec4(0.0, 0.0, 0.0, 1.0);
 

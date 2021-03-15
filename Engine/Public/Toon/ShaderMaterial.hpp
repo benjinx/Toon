@@ -10,12 +10,12 @@ namespace Toon {
 struct TOON_ENGINE_API ShaderMaterial
 {
 public:
-    alignas(16) glm::vec4 BaseColorFactor;
-    alignas(16) glm::vec3 EmissiveFactor;
-    alignas(4) float MetallicFactor;
-    alignas(4) float RoughnessFactor;
-    alignas(4) float OcclusionStrength;
-    alignas(4) float NormalScale;
+    alignas(16) glm::vec4 BaseColorFactor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    alignas(16) glm::vec3 EmissiveFactor = vec3(1.0f, 1.0f, 1.0f);
+    alignas(4) float NormalScale = 1.0f;
+    alignas(4) float MetallicFactor = 1.0f;
+    alignas(4) float RoughnessFactor = 1.0f;
+    alignas(4) float OcclusionStrength = 1.0f;
 
 }; // struct ShaderMaterial
 

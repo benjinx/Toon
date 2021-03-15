@@ -26,7 +26,11 @@ public:
     
     virtual gsl::span<Vertex> GetVertexList() = 0;
 
-    virtual void CalculateTBN();
+    virtual std::shared_ptr<Material> GetMaterial() {
+        return nullptr;
+    }
+
+    virtual void CalculateTangents();
 
 }; // class PrimitiveData
 

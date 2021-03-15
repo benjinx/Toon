@@ -84,11 +84,11 @@ void SDL2GraphicsDriver::ProcessEvents()
             case SDL_WINDOWEVENT_RESIZED:
             {
                 glm::ivec2 size = { event.window.data1, event.window.data2 };
-                GraphicsDriver::SetWindowSize(size);
+                _windowSize = size;
 
-                //WindowResizedEventData data;
-                //data.Size = size;
-                //WindowResizedEvent.Call(&data);
+                WindowResizedEventData data;
+                data.Size = size;
+                WindowResizedEvent.Call(&data);
 
                 break;
             }
@@ -107,9 +107,9 @@ void SDL2GraphicsDriver::UpdateWindowSize(const glm::ivec2& size)
     SDL_SetWindowSize(_sdlWindow, size.x, size.y);
 
     // TODO: Investigate why this wasn't done automatically from the ProcessEvents loop
-    //WindowResizedEventData data;
-    //data.Size = size;
-    //WindowResizedEvent.Call(&data);
+    WindowResizedEventData data;
+    data.Size = size;
+    WindowResizedEvent.Call(&data);
 }
 
 } // namespace Toon::SDL2

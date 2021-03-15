@@ -18,8 +18,6 @@
 #include <memory>
 #include <thread>
 
-#include <Toon/GLTF2/glTF2File.hpp>
-
 using namespace Toon;
 
 void Run()
@@ -27,6 +25,7 @@ void Run()
     // Load Modules
     LoadModule("ToonSTBI");
     LoadModule("ToonTinyOBJ");
+    LoadModule("ToonGLTF2");
 
     // Decide our Graphics driver
     const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
@@ -58,25 +57,19 @@ void Run()
     Scene scene;
     SetCurrentScene(&scene);
 
-    // Create a render context and transform data
-    RenderContext * renderCtx = gfx->GetRenderContext();
-    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
-
     // Create camera
     Camera camera;
     camera.SetAspect(glm::vec2(640.0f, 480.0f));
     camera.SetFOVX(45.0f);
     camera.SetMode(CameraMode::Perspective);
-    camera.SetPosition({ 3, 3, 3 });
+    camera.SetPosition({ 1.5, 1.5, 1.5 });
     camera.SetLookAt({ 0, 0, 0 });
 
     // Create our shader and load them
     auto shader = gfx->CreateShader();
     if (!shader->LoadFromFiles({
-        //"Lighting.vert",
-        //"Lighting.frag",
-        "Toon/FlatColor.vert",
-        "Toon/FlatColor.frag",
+        "Lighting.vert",
+        "Lighting.frag",
     })) {
         return;
     }
@@ -85,7 +78,7 @@ void Run()
     auto pipeline = gfx->CreatePipeline(shader);
 
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("Primitives/Obj/pCube.obj");
+    auto mesh = LoadMeshFromFile("DamagedHelmet.glb");
     if (!mesh) {
         return;
     }
@@ -97,38 +90,17 @@ void Run()
     auto entity = std::unique_ptr<Entity>(new Entity());
     Entity * tmpEntity = entity.get();
 
-    // Set position/orientation/scale
-    entity->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    entity->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
-    entity->SetScale(glm::vec3(1.0f));
-
     // Add components to entity
-    // auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    // meshComponent->SetMesh(mesh);
-    // entity->AddComponent(std::move(meshComponent));
-
-    ///
-    // GLTF2 Temp Loading
-    GLTF2::glTF2File file;
-    //bool result = file.LoadFromFile("../../../Engine/Assets/Models/Primitives/pCube.glb");
-    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelm.glb");
-    
-    if (!result) {
-        ToonLogError("glTF2 go BRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-    }
-    file.Meshes[0]->SetPipeline(pipeline);
     auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    meshComponent->SetMesh(file.Meshes[0]);
+    meshComponent->SetMesh(mesh);
     entity->AddComponent(std::move(meshComponent));
-    ///
 
-    // How are we handling textures? like this?
-    /*auto textureComponent = std::unique_ptr<TextureComponent>(new TextureComponent());
-    textureComponent->SetTexture();
-    entity->AddComponent(std::move(textureComponent));*/
-    
-    // Set the texture (Temp for now)
-    mesh->_texture = LoadTextureFromFile("brickwall/brickwall.jpg");
+    // Add the new entity to the scene
+    auto e = scene.AddChild(std::move(entity));
+
+    // Create a render context and transform data
+    RenderContext * renderCtx = gfx->GetRenderContext();
+    ShaderTransform * shaderTransform = renderCtx->GetShaderTransform();
 
     // Set our view and proj matrix (in shaders).
     shaderTransform->View = camera.GetView();
@@ -151,9 +123,6 @@ void Run()
     globals->Lights[globals->LightCount].Position = glm::vec4(light->GetPosition(), 1.0f);
     globals->LightCount++;
 
-    // Add the new entity to the scene
-    auto e = scene.AddChild(std::move(entity));
-
     // Game loop
     Toon::Run([&]() {
         gfx->Render();
@@ -166,7 +135,8 @@ void Run()
         shaderTransform->View = camera.GetView();
         shaderTransform->Projection = camera.GetProjection();
 
-        e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f), GetWorldUp()));
+        auto uctx = gfx->GetUpdateContext();
+        e->SetOrientation(e->GetOrientation() * glm::angleAxis(glm::radians(0.25f * uctx->GetFrameSpeedRatio()), GetWorldUp()));
 
     });
 }

@@ -6,11 +6,15 @@
 namespace Toon::GLTF2 {
 
 bool ModuleInit() {
+    AddMeshImporter("GLTF2", std::unique_ptr<MeshImporter>(new GLTF2MeshImporter()));
+    AddSceneImporter("GLTF2", std::unique_ptr<SceneImporter>(new GLTF2SceneImporter()));
 
     return true;
 }
 
 void ModuleTerm() {
+    RemoveSceneImporter("GLTF2");
+    RemoveMeshImporter("GLTF2");
 }
 
 TOON_MODULE {

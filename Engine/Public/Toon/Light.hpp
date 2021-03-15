@@ -1,83 +1,70 @@
-#ifndef LIGHT_H
-#define LIGHT_H
+#ifndef TOON_LIGHT_H
+#define TOON_LIGHT_H
 
 #include <Toon/Config.hpp>
 #include <Toon/Entity.hpp>
 #include <Toon/Math.hpp>
+#include <Toon/ShaderScene.hpp>
 
 namespace Toon {
 
-class Light : public Entity
+enum class LightType
+{
+    Point = 0,
+    Spot = 1,
+    Directional = 2,
+
+}; // enum class LightType
+
+class TOON_ENGINE_API Light : public Entity
 {
 public:
+
+    DISALLOW_COPY_AND_ASSIGN(Light)
+
     Light() = default;
+
     virtual ~Light() = default;
 
-    void SetColor(glm::vec3 color) { _mColor = color; }
-    void SetColor(float r, float g, float b) {  _mColor.r = r;
-                                                _mColor.g = g;
-                                                _mColor.b = b; }
-    glm::vec3 GetColor() { return _mColor; }
+    void SetType(LightType type);
 
-    void SetIntensity(int intensity) { _mIntensity = intensity; }
-    int GetIntensity() { return _mIntensity; }
-    
-private:
-    glm::vec3 _mColor;
-    int _mIntensity;
-};
+    inline LightType GetType() const {
+        return _type;
+    }
 
-class DirectionalLight : public Light
-{
-public:
-    DirectionalLight() = default;
-    /*DirectionalLight(glm::vec3 direction);
+    void FillLightData(LightData1 * data);
 
-    void SetDirection(glm::vec3 direction);
-    glm::vec3 GetDirection();*/
+    void SetColor(glm::vec3 color);
 
-    // getQuat * worldforward = dir
-};
+    inline glm::vec3 GetColor() const {
+        return _color;
+    }
 
-class PointLight : public Light
-{
-public:
-    PointLight() = default;
-    PointLight(glm::vec3 position, float constant, float linear, float quadratic);
+    // Spot
+    void SetInnerCutOff(float cutOff);
 
-    void SetConstant(float constant);
-    void SetLinear(float linear);
-    void SetQuadratic(float quadratic);
+    inline float GetInnerCutOff() const {
+        return _innerCutOff;
+    }
+    void SetOuterCutOff(float cutOff);
 
-    float GetConstant() { return _mConstant; }
-    float GetLinear() { return _mLinear; }
-    float GetQuadratic() { return _mQuadratic; }
+    inline float GetOuterCutOff() const {
+        return _outerCutOff;
+    }
 
 private:
-    float _mConstant,
-          _mLinear,
-          _mQuadratic;
-};
 
-class SpotLight : public Light
-{
-public:
-    SpotLight() = default;
-    SpotLight(glm::vec3 position, /*glm::vec3 direction,*/ float cutoff, float outerCutoff);
+    LightType _type;
 
-    //void SetDirection(glm::vec3 direction);
-    void SetCutOff(float cutOff);
-    void SetOuterCutOff(float outerCutOff);
+    glm::vec3 _color;
 
-    //glm::vec3 GetDirection();
-    float GetCutOff() { return _mCutOff; }
-    float GetOuterCutOff() { return _mOuterCutOff; }
+    // Spot
 
-private:
-    float _mCutOff,
-          _mOuterCutOff;
+    float _innerCutOff;
+
+    float _outerCutOff;
 };
 
 } // namespace Toon
 
-#endif // LIGHT_H
+#endif // TOON_LIGHT_H

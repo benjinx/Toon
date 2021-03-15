@@ -7,6 +7,8 @@
 
 namespace Toon::OpenGL {
 
+#define TOON_OPENGL_MATERIAL(x) (dynamic_cast<Toon::OpenGL::OpenGLMaterial *>(x))
+
 class TOON_OPENGL_API OpenGLMaterial : public Material
 {
 public:
@@ -17,9 +19,11 @@ public:
 
     virtual ~OpenGLMaterial() = default;
 
+    void Bind();
+
 private:
 
-};
+}; // class OpenGLMaterial
 
 } // namespace Toon::OpenGL
 

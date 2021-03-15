@@ -102,6 +102,10 @@ bool OpenGLGraphicsDriver::Initialize()
         return false;
     }
 
+    if (!InitializeDefaults()) {
+        return false;
+    }
+
     return true;
 }
 
@@ -174,6 +178,12 @@ std::shared_ptr<Mesh> OpenGLGraphicsDriver::CreateMesh()
     auto ptr = std::shared_ptr<Mesh>(new OpenGLMesh());
     ptr->Initialize();
     return ptr;
+}
+
+TOON_OPENGL_API
+std::shared_ptr<Material> OpenGLGraphicsDriver::CreateMaterial()
+{
+    return std::shared_ptr<Material>(new OpenGLMaterial());
 }
 
 TOON_OPENGL_API

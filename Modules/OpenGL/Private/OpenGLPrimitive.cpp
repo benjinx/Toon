@@ -1,4 +1,6 @@
 #include <Toon/OpenGL/OpenGLPrimitive.hpp>
+#include <Toon/OpenGL/OpenGLMaterial.hpp>
+#include <Toon/GraphicsDriver.hpp>
 
 #include <Toon/Log.hpp>
 #include <Toon/Benchmark.hpp>
@@ -9,6 +11,11 @@ TOON_OPENGL_API
 void OpenGLPrimitive::Render()
 {
     glBindVertexArray(_glVAO);
+
+    OpenGLMaterial * glMaterial = TOON_OPENGL_MATERIAL(_material.get());
+    if (glMaterial) {
+        glMaterial->Bind();
+    }
 
     if (_indexed) {
         glDrawElements(_glMode, _glCount, GL_UNSIGNED_INT, NULL);
@@ -24,6 +31,13 @@ TOON_OPENGL_API
 bool OpenGLPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
 {
     ToonBenchmarkStart();
+
+    auto gfx = GetGraphicsDriver();
+
+    _material = data->GetMaterial();
+    if (!_material) {
+        _material = gfx->GetDefaultMaterial();
+    }
 
     glGenVertexArrays(1, &_glVAO);
     glBindVertexArray(_glVAO);

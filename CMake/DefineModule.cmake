@@ -109,8 +109,8 @@ MACRO(DEFINE_MODULE _target _prefix)
             $<$<CXX_COMPILER_ID:MSVC>: /utf-8>
 
             # Disable unknown pragmas warning, C++ exceptions
-            $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas -fno-exceptions>
-            $<$<CXX_COMPILER_ID:Clang>: -Wall -Wno-unknown-pragmas -fno-exceptions>
+            $<$<CXX_COMPILER_ID:GNU>:   -Wall -Wno-unknown-pragmas>
+            $<$<CXX_COMPILER_ID:Clang>: -Wall -Wno-unknown-pragmas>
             $<$<CXX_COMPILER_ID:MSVC>:  /MP /wd4068 /EHsc->
     )
 

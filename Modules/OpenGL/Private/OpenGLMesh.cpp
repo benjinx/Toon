@@ -15,13 +15,6 @@ void OpenGLMesh::Render(RenderContext * ctx)
     OpenGLPipeline * glPipeline = TOON_OPENGL_PIPELINE(_pipeline.get());
     glPipeline->Bind();
 
-    OpenGLTexture * glTexture = TOON_OPENGL_TEXTURE(_texture.get());
-    if (glTexture)
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glTexture->Bind();
-    }
-
     OpenGLBuffer * glTransformBuffer = TOON_OPENGL_BUFFER(_shaderTransformBuffer.get());
     glBindBufferBase(GL_UNIFORM_BUFFER, TOON_SHADER_TRANSFORM_BINDING, glTransformBuffer->GetGLID());
 

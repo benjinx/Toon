@@ -30,10 +30,13 @@ bool OpenGLTexture::Load(const std::unique_ptr<TextureData>& data, Options opts 
         return false;
     }
 
-    GLenum glFormat = GetGLDataFormat(data->GetComponents());
     GLenum glType = GetGLDataType(data->GetDataType());
 
     glBindTexture(GL_TEXTURE_2D, _glID);
+
+    const auto& size = data->GetSize();
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, glType, data->GetData());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLWrapType(opts.WrapS));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLWrapType(opts.WrapT));
@@ -41,42 +44,12 @@ bool OpenGLTexture::Load(const std::unique_ptr<TextureData>& data, Options opts 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetGLFilterType(opts.MagFilter));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGLFilterType(opts.MinFilter));
 
-    const auto& size = data->GetSize();
-    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)glFormat, size.x, size.y, 0, glFormat, glType, data->GetData());
-
-    if (opts.GenerateMipmaps) {
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-
     ToonLogVerbose("Bound texture to ID %d", _glID);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     ToonBenchmarkEnd();
     return true;
-}
-
-TOON_OPENGL_API
-void OpenGLTexture::Bind()
-{
-    glBindTexture(GL_TEXTURE_2D, _glID);
-}
-
-TOON_OPENGL_API
-GLenum OpenGLTexture::GetGLDataFormat(int components)
-{
-    switch (components) {
-    case 1:
-        return GL_RED;
-    case 2:
-        return GL_RG;
-    case 3:
-        return GL_RGB;
-    case 4:
-        return GL_RGBA;
-    }
-
-    return GL_INVALID_ENUM;
 }
 
 TOON_OPENGL_API
@@ -124,15 +97,19 @@ GLenum OpenGLTexture::GetGLFilterType(const TextureFilterType& type)
     case TextureFilterType::Nearest:
         return GL_NEAREST;
     case TextureFilterType::NearestMipmapLinear:
-        return GL_NEAREST_MIPMAP_LINEAR;
+        // return GL_NEAREST_MIPMAP_LINEAR;
+        return GL_NEAREST;
     case TextureFilterType::NearestMipmapNearest:
-        return GL_NEAREST_MIPMAP_NEAREST;
+        // return GL_NEAREST_MIPMAP_NEAREST;
+        return GL_NEAREST;
     case TextureFilterType::Linear:
         return GL_LINEAR;
     case TextureFilterType::LinearMipmapLinear:
-        return GL_LINEAR_MIPMAP_LINEAR;
+        // return GL_LINEAR_MIPMAP_LINEAR;
+        return GL_LINEAR;
     case TextureFilterType::LinearMipmapNearest:
-        return GL_LINEAR_MIPMAP_NEAREST;
+        // return GL_LINEAR_MIPMAP_NEAREST;
+        return GL_LINEAR;
     }
 
     return GL_INVALID_ENUM;

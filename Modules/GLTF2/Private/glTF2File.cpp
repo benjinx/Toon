@@ -1,17 +1,16 @@
-#include <Toon/GLTF2/glTF2File.hpp>
+#include "glTF2File.hpp"
 
 #include <Toon/GraphicsDriver.hpp>
 #include <Toon/Benchmark.hpp>
 #include <Toon/Log.hpp>
+#include <Toon/GLTF2/GLTF2PrimitiveData.hpp>
 
-#include <Base64.hpp>
+#include "Base64.hpp"
 #include <fstream>
-#include <gsl/gsl>
 
 namespace Toon::GLTF2 {
 
-TOON_GLTF2_API
-bool glTF2File::IsValidTextureIndex(int index, int texCoord)
+bool glTF2File::IsValidTexture(int index, int texCoord)
 {
     if (index < 0 || index > static_cast<int>(Textures.size())) {
         ToonLogError("Invalid glTF2 Texture Index: %d", index);
@@ -19,14 +18,13 @@ bool glTF2File::IsValidTextureIndex(int index, int texCoord)
     }
 
     if (texCoord > 0) {
-        ToonLogWarn("Multiple glTF2 TEXCOORDS not supported");
+        ToonLogWarn("Multiple glTF2 TEXCOORDs not supported");
         return false;
     }
 
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadFromFile(const string& filename)
 {
     ToonBenchmarkStart();
@@ -38,7 +36,6 @@ bool glTF2File::LoadFromFile(const string& filename)
     file.open(Filename, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
-        ToonLogError("Failed to load glTF2, '%s'", Filename);
         return false;
     }
 
@@ -80,7 +77,12 @@ bool glTF2File::LoadFromFile(const string& filename)
         file.read(jsonChunk.data(), jsonChunkLength);
         jsonChunk.back() = '\0';
 
-        JSON = json::parse(jsonChunk.data());
+        try {
+            JSON = json::parse(jsonChunk.data());
+        }
+        catch (...) {
+            return false;
+        }
 
         // Buffer Chunk (Optional)
 
@@ -101,7 +103,12 @@ bool glTF2File::LoadFromFile(const string& filename)
         }
     }
     else {
-        file >> JSON;
+        try {
+            file >> JSON;
+        }
+        catch (...) {
+            return false;
+        }
 
         if (!LoadBuffers()) {
             return false;
@@ -142,21 +149,18 @@ bool glTF2File::LoadFromFile(const string& filename)
         return false;
     }
 
+    if (!LoadMaterials()) {
+        return false;
+    }
+
     if (!LoadCameras()) {
         return false;
     }
-
-    if (!LoadMeshes()) {
-        return false;
-    }
-
-    ToonLogLoad("glTF2 file '%s'", Filename);
 
     ToonBenchmarkEnd();
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadBuffers()
 {
     const auto BUFFERS_PATH = json::json_pointer("/buffers");
@@ -196,7 +200,6 @@ bool glTF2File::LoadBuffers()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadBufferViews()
 {
     const auto BUFFER_VIEWS_PATH = json::json_pointer("/bufferViews");
@@ -221,7 +224,6 @@ bool glTF2File::LoadBufferViews()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadAccessors()
 {
     const auto ACCESSORS_PATH = json::json_pointer("/accessors");
@@ -247,7 +249,6 @@ bool glTF2File::LoadAccessors()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadImages()
 {
     const auto IMAGES_PATH = json::json_pointer("/images");
@@ -267,7 +268,6 @@ bool glTF2File::LoadImages()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadSamplers()
 {
     const auto SAMPLERS_PATH = json::json_pointer("/samplers");
@@ -289,7 +289,6 @@ bool glTF2File::LoadSamplers()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadTextures()
 {
     const auto TEXTURES_PATH = json::json_pointer("/textures");
@@ -368,34 +367,129 @@ bool glTF2File::LoadTextures()
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadMaterials()
 {
     const auto MATERIALS_PATH = json::json_pointer("/materials");
 
-    // if (JSON.contains(MATERIALS_PATH)) {
-    //     for (const auto& object : JSON[MATERIALS_PATH]) {
-            // auto material = std::make_shared<Material>();
+    GraphicsDriver * gfx = Toon::GetGraphicsDriver();
+    if (!gfx) {
+        ToonLogError("Unable to load textures from a glTF2 file without a graphics driver");
+        return false;
+    }
 
-            // auto it = object.find("normalTexture");
-            // for (it != object.end()) {
-            //     const auto& value = it.value();
-            //     if (value.is_object()) {
-            //         int index = value.value("index", -1);
-            //         int texCoord = value.value("texCoord", 0);
+    if (JSON.contains(MATERIALS_PATH)) {
+        for (const auto& object : JSON[MATERIALS_PATH]) {
+            auto material = gfx->CreateMaterial();
+            material->Initialize();
 
-            //         if (IsValidTextureIndex(index, texCoord)) {
-            //             material->SetNormalMap(Textures[index]);
-            //         }
+            auto it = object.find("normalTexture");
+            if (it != object.end()) {
+                const auto& value = it.value();
+                if (value.is_object()) {
+                    int index = value.value("index", -1);
+                    int texCoord = value.value("texCoord", 0);
 
-            //         material->SetNormalMapScale(value.value["scale", material->GetNormalScale()]);
-            //     }
-            //     else
-            //     {
-            //         ToonLogWarn("Malformed glTF2 normalTexture");
-            //     }
-            //}
+                    if (IsValidTexture(index, texCoord)) {
+                        material->SetNormalMap(Textures[index]);
+                    }
 
+                    material->SetNormalScale(value.value("scale", material->GetNormalScale()));
+                }
+                else {
+                    ToonLogWarn("Malformed glTF2 normalTexture");
+                }
+            }
+
+            // TODO: Investigate vs stephens change (We think gltf2 exports a value of 1.0, 1.0, 1.0 if we have a texture)
+            it = object.find("emissiveFactor");
+            if (it != object.end()) {
+                material->SetEmissiveFactor(ExtractVec3(it.value(), material->GetEmissiveFactor()));
+            }
+
+            it = object.find("emissiveTexture");
+            if (it != object.end()) {
+                const auto& value = it.value();
+                if (value.is_object()) {
+                    int index = value.value("index", -1);
+                    int texCoord = value.value("texCoord", 0);
+
+                    if (IsValidTexture(index, texCoord)) {
+                        material->SetEmissiveMap(Textures[index]);
+                    }
+                }
+                else {
+                    ToonLogWarn("Malformed glTF2 emissiveTexture");
+                }
+            }
+
+            it = object.find("occlusionTexture");
+            if (it != object.end()) {
+                const auto& value = it.value();
+                if (value.is_object()) {
+                    int index = value.value("index", -1);
+                    int texCoord = value.value("texCoord", 0);
+
+                    if (IsValidTexture(index, texCoord)) {
+                        material->SetOcclusionMap(Textures[index]);
+                    }
+
+                    material->SetOcclusionStrength(value.value("strength", material->GetOcclusionStrength()));
+                }
+                else {
+                    ToonLogWarn("Malformed glTF2 occlusionTexture");
+                }
+            }
+
+            it = object.find("pbrMetallicRoughness");
+            if (it != object.end()) {
+                const auto& group = it.value();
+                if (group.is_object()) {
+                    it = group.find("baseColorFactor");
+                    if (it != group.end()) {
+                        material->SetBaseColorFactor(ExtractVec4(it.value(), material->GetBaseColorFactor()));
+                    }
+
+                    it = group.find("baseColorTexture");
+                    if (it != group.end()) {
+                        const auto& value = it.value();
+                        if (value.is_object()) {
+                            int index = value.value("index", -1);
+                            int texCoord = value.value("texCoord", 0);
+
+                            if (IsValidTexture(index, texCoord)) {
+                                material->SetBaseColorMap(Textures[index]);
+                            }
+                        }
+                        else {
+                            ToonLogWarn("Malformed glTF2 baseColorTexture");
+                        }
+                    }
+
+                    material->SetMetallicFactor(group.value("metallicFactor", material->GetMetallicFactor()));
+
+                    material->SetRoughnessFactor(group.value("roughnessFactor", material->GetRoughnessFactor()));
+
+                    it = group.find("metallicRoughnessTexture");
+                    if (it != group.end()) {
+                        const auto& value = it.value();
+                        if (value.is_object()) {
+                            int index = value.value("index", -1);
+                            int texCoord = value.value("texCoord", 0);
+
+                            if (IsValidTexture(index, texCoord)) {
+                                material->SetMetallicRoughnessMap(Textures[index]);
+                            }
+                        }
+                        else {
+                            ToonLogWarn("Malformed glTF2 metallicRoughnessTexture");
+                        }
+                    }
+                }
+            }
+
+            // it = object.find("pbrSpecularGlossiness");
+            // if (it != object.end()) {
+            // }
 
             // extensions
             /// KHR_materials_transmission
@@ -404,11 +498,6 @@ bool glTF2File::LoadMaterials()
             /// KHR_materials_variants
             /// KHR_techniques_webgl
 
-            // each texture
-            /// [scale] = 1
-            /// index
-            /// [texCoord] = 0
-
             // name
 
             // [alphaMode] ?
@@ -416,27 +505,15 @@ bool glTF2File::LoadMaterials()
 
             // [doubleSided]
 
-            // [normal]
-            // [occlusionTexture]
-            // [emissiveTexture]
-            // [emissiveFactor]
+            Materials.push_back(material);
+        }
+    }
 
-            // [pbrMetallicRoughness]
-            /// [baseColorFactor]
-            /// [baseColorTexture]
-            /// [metallicFactor]
-            /// [roughnessFactor]
-            /// [metallicRoughnessTexture]
-
-    //     }
-    // }
-
-    //ToonLogVerbose("Loaded %d Material(s)", Materials.size());
+    ToonLogVerbose("Loaded %d Material(s)", Materials.size());
 
     return true;
 }
 
-TOON_GLTF2_API
 bool glTF2File::LoadCameras()
 {
     const auto CAMERAS_PATH = json::json_pointer("/cameras");
@@ -486,204 +563,139 @@ bool glTF2File::LoadCameras()
     return true;
 }
 
-// gltf2 Node
-    // camera (Camera Component?)
-    // children[]
-    // skin (needs mesh)
-    // matrix (rip apart into TRS? Error out instead)
-    // mesh (Mesh Component)
-    // translate
-    // rotation
-    // scale
-    // weights (needs mesh)
-
-// gltf2 
-
-// Entity -> glft2 Node
-// Mesh -> gltf2 Primitive
-// MeshComponent -> gltf2 Mesh
-
-TOON_GLTF2_API
-bool glTF2File::LoadMeshes()
+std::vector<std::unique_ptr<PrimitiveData>> glTF2File::LoadMesh()
 {
-
-    auto gfx = GetGraphicsDriver();
-
     const auto MESHES_PATH = json::json_pointer("/meshes");
 
     if (JSON.contains(MESHES_PATH)) {
+        std::vector<std::unique_ptr<PrimitiveData>> primitiveDataList;
         for (const auto& object : JSON[MESHES_PATH]) {
 
-            auto it = object.find("primitives");
-            if (it != object.end()) {
-                const auto& primitives = it.value();
+            auto iter = object.find("primitives");
+            if (iter != object.end()) {
+                const auto& primitives = iter.value();
                 if (!primitives.is_array()) {
                     ToonLogError("Invalid glTF2 mesh, missing primitives array");
-                    return false;
+                    continue;
                 }
-
-                std::vector<std::unique_ptr<PrimitiveData>> PrimitiveDataList;
 
                 for (const auto& primitive : primitives) {
-                    int indicesIndex = primitive.value("indices", -1);
-                    
-    
-                    auto data = std::unique_ptr<GLTF2PrimitiveData>(new GLTF2PrimitiveData());
+                    // TODO: Possibly change
+                    GLTF2PrimitiveData * primitiveData = new GLTF2PrimitiveData();
+                    primitiveDataList.push_back(std::unique_ptr<PrimitiveData>(primitiveData));
 
+                    int materialIndex = primitive.value("material", -1);
+                    if (materialIndex >= 0) {
+                        primitiveData->material = Materials[materialIndex];
+                    }
+
+                    int indicesIndex = primitive.value("indices", -1);
+                    GLenum primitiveType = primitive.value<GLenum>("mode", GL_TRIANGLES);
+
+                    if (primitiveType == GL_LINE_LOOP) {
+                        ToonLogWarn("Unsupported glTF2 primitive mode: GL_LINE_LOOP");
+                        continue;
+                    }
+                    else if (primitiveType == GL_TRIANGLE_FAN) {
+                        ToonLogWarn("Unsupported glTF2 primitive mode: GL_TRIANGLE_FAN");
+                        continue;
+                    }
+
+                    switch (primitiveType) {
+                    case GL_POINTS:
+                        primitiveData->topology = PrimitiveTopology::PointList;
+                        break;
+                    case GL_LINES:
+                        primitiveData->topology = PrimitiveTopology::LineList;
+                        break;
+                    case GL_LINE_STRIP:
+                        primitiveData->topology = PrimitiveTopology::LineStrip;
+                        break;
+                    case GL_TRIANGLES:
+                        primitiveData->topology = PrimitiveTopology::TriangleList;
+                        break;
+                    case GL_TRIANGLE_STRIP:
+                        primitiveData->topology = PrimitiveTopology::TriangleStrip;
+                        break;
+                    }
+                    
                     if (indicesIndex >= 0) {
                         const auto& accessor = Accessors[indicesIndex];
-                        const auto& bufferView = BufferViews[accessor.bufferView];
-                        auto& buffer = Buffers[bufferView.buffer];
+                        primitiveData->indexList.resize(accessor.count);
 
-                        if (bufferView.byteStride != 0) {
-                            ToonLogFatal("index ByteStride != 0");
+                        AccessorIterator iterIndex(this, indicesIndex);
+                        for (auto& index : primitiveData->indexList) {
+                            index = iterIndex.getInteger();
+                            ++iterIndex;
                         }
-
-                        if (accessor.componentType == GL_UNSIGNED_INT) {
-                            auto indices = gsl::span<uint32_t>(
-                                reinterpret_cast<uint32_t *>(buffer.data() + bufferView.byteOffset),
-                                accessor.count
-                            );
-
-                            data->IndexList.assign(indices.begin(), indices.end());
-                        }
-                        else if (accessor.componentType == GL_UNSIGNED_SHORT) {
-                            auto indices = gsl::span<uint16_t>(
-                                reinterpret_cast<uint16_t *>(buffer.data() + bufferView.byteOffset),
-                                accessor.count
-                            );
-
-                            data->IndexList.assign(indices.begin(), indices.end());
-                        }
-                        else {
-                            ToonLogFatal("Unsupported index format type: %04X, %s", accessor.componentType, accessor.type);
-                        }
-
-
                     }
 
-                    it = primitive.find("attributes");
-                    if (it != primitive.end()) {
-                        const auto& attributes = it.value();
+                    iter = primitive.find("attributes");
+                    if (iter != primitive.end()) {
+                        const auto& attributes = iter.value();
                         if (!attributes.is_object()) {
                             ToonLogError("Invalid glTF2 primitive, missing attributes dictionary");
-                            return false;
+                            continue;
                         }
-                        
-                        // Find the position attribute
+
                         int positionIndex = attributes.value("POSITION", -1);
-
-                        if (positionIndex >= 0) {
-                            const auto& accessor = Accessors[positionIndex];
-                            const auto& bufferView = BufferViews[accessor.bufferView];
-                            auto& buffer = Buffers[bufferView.buffer];
-
-                            if (bufferView.byteStride != 0) {
-                                ToonLogFatal("Position byteStride != 0");
-                            }
-
-                            if (accessor.componentType != GL_FLOAT) {
-                                ToonLogFatal("Unsupported format type: %04X, %s", accessor.componentType, accessor.type);
-                            }
-                            
-                            data->VertexList.resize(accessor.count);
-
-                            if (accessor.type == "VEC3") {
-                                gsl::span<glm::vec3> posData = gsl::span<glm::vec3>(
-                                    reinterpret_cast<glm::vec3 *>(buffer.data() + bufferView.byteOffset),
-                                    accessor.count
-                                );
-
-                                for (size_t i = 0; i < posData.size(); ++i) {
-                                    data->VertexList[i].Position = glm::vec4(posData[i], 1.0f);
-                                    //ToonLogWarn("posData: %s", glm::to_string(posData[i]));
-                                }
-                            }
-                            else if (accessor.type == "VEC4") {
-                                gsl::span<glm::vec4> posData = gsl::span<glm::vec4>(
-                                    reinterpret_cast<glm::vec4 *>(buffer.data() + bufferView.byteOffset),
-                                    accessor.count
-                                );
-
-                                for (size_t i = 0; i < posData.size(); ++i) {
-                                    data->VertexList[i].Position = posData[i];
-                                }
-                            }
-                            else {
-                                ToonLogFatal("Unsupported accessor type: %s", accessor.type);
-                            }
+                        if (positionIndex < 0) {
+                            ToonLogError("Invalid glTF2 primitive, missing POSITION");
+                            continue;
                         }
 
-                        // Find the Normal
-                        int normalIndex = attributes.value("NORMAL", -1);
+                        int tangentIndex = attributes.value("TANGENT", -1);
 
-                        if (normalIndex >= 0) {
-                            const auto& accessor = Accessors[normalIndex];
-                            const auto& bufferView = BufferViews[accessor.bufferView];
-                            auto& buffer = Buffers[bufferView.buffer];
+                        const auto& positionAccessor = Accessors[positionIndex];
+                        primitiveData->vertexList.resize(positionAccessor.count);
 
-                            if (bufferView.byteStride != 0) {
-                                ToonLogFatal("Normal byteStride != 0");
-                            }
+                        AccessorIterator iterPosition (this, positionIndex);
+                        AccessorIterator iterNormal   (this, attributes.value("NORMAL", -1));
+                        AccessorIterator iterTangent  (this, tangentIndex);
+                        AccessorIterator iterTexCoord1(this, attributes.value("TEXCOORD_0", -1));
+                        AccessorIterator iterTexCoord2(this, attributes.value("TEXCOORD_1", -1));
+                        AccessorIterator iterColor    (this, attributes.value("COLOR_0", -1));
+                        AccessorIterator iterJoints   (this, attributes.value("JOINTS_0", -1));
+                        AccessorIterator iterWeights  (this, attributes.value("WEIGHTS_0", -1));
 
-                            if (accessor.componentType != GL_FLOAT) {
-                                ToonLogFatal("Unsupported format type: %04X, %s", accessor.componentType, accessor.type);
-                            }
+                        for (auto& vertex : primitiveData->vertexList) {
+                            vertex.Position = iterPosition.getVec4({ 0.0f, 0.0f, 0.0f, 1.0f });
+                            ++iterPosition;
 
-                            if (accessor.type == "VEC3") {
-                                gsl::span<glm::vec3> normData = gsl::span<glm::vec3>(
-                                    reinterpret_cast<glm::vec3 *>(buffer.data() + bufferView.byteOffset),
-                                    accessor.count
-                                );
+                            vertex.Normal = iterNormal.getVec4({ 0.0f, 0.0f, 0.0f, 1.0f });
+                            ++iterNormal;
 
-                                // for (size_t i = 0; i < normData.size(); ++i) {
-                                //     data->VertexList[i].Position = glm::vec4(normData[i], 1.0f);
-                                //     ToonLogWarn("normData: %s", glm::to_string(normData[i]));
-                                // }
+                            vertex.Tangent = iterTangent.getVec4();
+                            ++iterTangent;
 
-                            }
-                            else if (accessor.type == "VEC4") {
-                                gsl::span<glm::vec4> normData = gsl::span<glm::vec4>(
-                                    reinterpret_cast<glm::vec4 *>(buffer.data() + bufferView.byteOffset),
-                                    accessor.count
-                                );
+                            vertex.TexCoord1 = iterTexCoord1.getVec2();
+                            ++iterTexCoord1;
 
-                                // for (size_t i = 0; i < normData.size(); ++i) {
-                                //     data->VertexList[i].Position = normData[i];
-                                // }
+                            vertex.TexCoord2 = iterTexCoord2.getVec2();
+                            ++iterTexCoord2;
 
-                            }
-                            else {
-                                ToonLogFatal("Unsupported accessor type: %s", accessor.type);
-                            }
+                            vertex.Color = iterColor.getVec4({ 0.0f, 0.0f, 0.0f, 1.0f });
+                            ++iterColor;
+
+                            vertex.Joints = iterJoints.getUVec4();
+                            ++iterJoints;
+
+                            vertex.Weights = iterWeights.getVec4();
+                            ++iterWeights;
                         }
-                        
-                        PrimitiveDataList.push_back(std::move(data));
+
+                        if (tangentIndex < 0) {
+                            primitiveData->CalculateTangents();
+                        }
                     }
                 }
-                
-                Meshes.push_back(gfx->CreateMesh());
-                Meshes.back()->Load(PrimitiveDataList);
-
-                if (auto it = object.find("attributes"); it != object.end()) {
-                    // const auto& attributes = it.value();
-
-                }
-
-
-
-
-                // attributes
-                // material
-                // mode
-                // targets (animation)
             }
-
-            // Meshes.push_back()
+            
+            return primitiveDataList;
         }
     }
 
-    return true;
+    return { };
 }
 
 } // namespace Toon::GLTF2

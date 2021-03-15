@@ -2,6 +2,7 @@
 #include <Toon/MeshImporter.hpp>
 #include <Toon/GraphicsDriver.hpp>
 #include <Toon/Log.hpp>
+#include <Toon/Benchmark.hpp>
 
 namespace Toon {
 
@@ -11,6 +12,8 @@ bool Mesh::Initialize()
     bool result = true;
 
     GraphicsDriver* gfx = GetGraphicsDriver();
+
+    _pipeline = gfx->GetDefaultPipeline();
 
     _shaderTransformBuffer = gfx->CreateBuffer();
     result = _shaderTransformBuffer->Initialize(
@@ -51,6 +54,7 @@ bool Mesh::Load(const std::vector<std::unique_ptr<PrimitiveData>>& data)
 TOON_ENGINE_API
 std::shared_ptr<Mesh> LoadMeshFromFile(const string& filename)
 {
+    ToonBenchmarkStart();
     GraphicsDriver * gfx = GetGraphicsDriver();
 
     const auto& importers = GetAllMeshImporters();
@@ -69,6 +73,7 @@ std::shared_ptr<Mesh> LoadMeshFromFile(const string& filename)
     }
 
     ToonLogError("Failed to load mesh '%s'", filename);
+    ToonBenchmarkEnd();
     return nullptr;
 }
 

@@ -49,6 +49,8 @@ public:
 
     std::shared_ptr<Mesh> CreateMesh() override;
 
+    std::shared_ptr<Material> CreateMaterial() override;
+
     std::shared_ptr<Primitive> CreatePrimitive() override;
 
     inline VkDevice GetDevice() const {

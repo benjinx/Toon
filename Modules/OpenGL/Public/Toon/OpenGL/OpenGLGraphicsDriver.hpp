@@ -8,18 +8,13 @@
 #include <Toon/OpenGL/OpenGLTexture.hpp>
 #include <Toon/OpenGL/OpenGLShader.hpp>
 #include <Toon/OpenGL/OpenGLMesh.hpp>
+#include <Toon/OpenGL/OpenGLMaterial.hpp>
 #include <Toon/OpenGL/OpenGLPrimitive.hpp>
 #include <Toon/OpenGL/OpenGLBuffer.hpp>
 
 #include <SDL.h>
 
 namespace Toon::OpenGL {
-
-struct ShaderDataBindingInfo
-{
-    GLuint glID;
-    size_t size;
-};
 
 #define TOON_OPENGL_GRAPHICS_DRIVER(x) (dynamic_cast<Toon::OpenGL::OpenGLGraphicsDriver *>(x))
 
@@ -48,6 +43,8 @@ public:
     std::shared_ptr<Shader> CreateShader() override;
 
     std::shared_ptr<Mesh> CreateMesh() override;
+
+    std::shared_ptr<Material> CreateMaterial() override;
 
     std::shared_ptr<Primitive> CreatePrimitive() override;
 

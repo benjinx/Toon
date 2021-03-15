@@ -108,7 +108,7 @@ std::vector<std::unique_ptr<PrimitiveData>> TinyOBJMeshImporter::LoadFromFile(co
             }
         }
 
-        primitiveData->CalculateTBN();
+        primitiveData->CalculateTangents();
         primitiveList.push_back(std::unique_ptr<PrimitiveData>(primitiveData));
     }
 

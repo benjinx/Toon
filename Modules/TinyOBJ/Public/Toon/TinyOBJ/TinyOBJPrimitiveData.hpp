@@ -18,7 +18,7 @@ public:
     }
 
     gsl::span<Vertex> GetVertexList() override {
-        return gsl::span<Vertex>(VertexList.data(), VertexList.size());
+        return VertexList;
     }
 
 }; // class TinyOBJPrimitiveData

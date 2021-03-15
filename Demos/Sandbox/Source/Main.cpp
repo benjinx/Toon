@@ -18,15 +18,14 @@
 #include <memory>
 #include <thread>
 
-#include <Toon/GLTF2/glTF2File.hpp>
-
 using namespace Toon;
 
 void Run()
 {
     // Load Modules
     LoadModule("ToonSTBI");
-    LoadModule("ToonTinyOBJ");
+    //LoadModule("ToonTinyOBJ");
+    LoadModule("ToonGLTF2");
 
     // Decide our Graphics driver
     const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
@@ -51,11 +50,11 @@ void Run()
         return;
     }
 
-    // Set our options
+    // Set our options   
     gfx->SetWindowSize({ 1024, 768 });
 
     // Create our scene
-    Scene scene;
+    Scene scene; 
     SetCurrentScene(&scene);
 
     // Create camera
@@ -63,66 +62,26 @@ void Run()
     camera.SetAspect(glm::vec2(640.0f, 480.0f));
     camera.SetFOVX(45.0f);
     camera.SetMode(CameraMode::Perspective);
-    camera.SetPosition({ 3, 3, 3 });
+    camera.SetPosition({ 1.5, 1.5, 1.5 });
     camera.SetLookAt({ 0, 0, 0 });
 
-    // Create our shader and load them
-    auto shader = gfx->CreateShader();
-    if (!shader->LoadFromFiles({
-        "Toon/FlatColor.vert",
-        "Toon/FlatColor.frag",
-    })) {
-        return;
-    }
-
-    // Create our pipeline (we need a pipeline for each shader)
-    auto pipeline = gfx->CreatePipeline(shader);
-
     // Create and load a mesh
-    auto mesh = LoadMeshFromFile("Primitives/Obj/pCube.obj");
+    auto mesh = LoadMeshFromFile("DamagedHelmet/DamagedHelmet.gltf");
     if (!mesh) {
         return;
     }
-
-    // Set the pipeline for the mesh, we can set any pipeline for any mesh as needed.
-    mesh->SetPipeline(pipeline);
 
     // Create an entity
     auto entity = std::unique_ptr<Entity>(new Entity());
     Entity * tmpEntity = entity.get();
 
-    // Set position/orientation/scale
-    entity->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    entity->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
-    entity->SetScale(glm::vec3(1.0f));
-
     // Add components to entity
-    // auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    // meshComponent->SetMesh(mesh);
-    // entity->AddComponent(std::move(meshComponent));
-
-    ///
-    // GLTF2 Temp Loading
-    GLTF2::glTF2File file;
-    //bool result = file.LoadFromFile("../../../Engine/Assets/Models/Primitives/pCube.glb");
-    bool result = file.LoadFromFile("../../../Engine/Assets/Models/DamagedHelm.glb");
-    
-    if (!result) {
-        ToonLogError("glTF2 go BRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-    }
-    file.Meshes[0]->SetPipeline(pipeline);
     auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    meshComponent->SetMesh(file.Meshes[0]);
+    meshComponent->SetMesh(mesh);
     entity->AddComponent(std::move(meshComponent));
-    ///
 
-    // How are we handling textures? like this?
-    /*auto textureComponent = std::unique_ptr<TextureComponent>(new TextureComponent());
-    textureComponent->SetTexture();
-    entity->AddComponent(std::move(textureComponent));*/
-    
-    // Set the texture (Temp for now)
-    mesh->_texture = LoadTextureFromFile("brickwall/brickwall.jpg");
+    // Add the new entity to the scene
+    auto e = scene.AddChild(std::move(entity));
 
     // Create a render context and transform data
     RenderContext * renderCtx = gfx->GetRenderContext();
@@ -134,23 +93,19 @@ void Run()
 
     // Set camera position (in shaders).
     auto globals = renderCtx->GetShaderGlobals();
-    globals->CameraPosition = glm::vec4(camera.GetPosition(), 1.0f);
+    globals->CameraPosition = camera.GetPosition();
 
     // Light Source
     Light* light = new Light();
-    light->SetPosition(glm::vec3(10.0f, 10.0f, 10.0f));
-    light->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
-    light->SetOrientation(glm::quat(0.0f, 0.0f, 0.0f, 1.0f));
+    light->SetPosition({2.0, 3.0, 2.0});
+    light->SetColor({1.0f, 1.0f, 1.0f});
     scene.AddChild(std::unique_ptr<Entity>(light));
 
     // Add our light(s) to our shaders.
-    globals->Lights[globals->LightCount].Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    globals->Lights[globals->LightCount].Direction = glm::vec4(GetWorldForward() * light->GetOrientation(), 1.0f);
-    globals->Lights[globals->LightCount].Position = glm::vec4(light->GetPosition(), 1.0f);
+    globals->Lights[globals->LightCount].Color = light->GetColor();
+    globals->Lights[globals->LightCount].Direction = glm::vec3(GetWorldForward() * light->GetOrientation());
+    globals->Lights[globals->LightCount].Position = light->GetPosition();
     globals->LightCount++;
-
-    // Add the new entity to the scene
-    auto e = scene.AddChild(std::move(entity));
 
     // Game loop
     Toon::Run([&]() {

@@ -35,14 +35,14 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string
 
         for (const auto& path : assetPathList) {
             Path fullPath = path / "Textures" / filename;
-            data = stbi_load(fullPath.ToCString(), &size.x, &size.y, &components, 0);
+            data = stbi_load(fullPath.ToCString(), &size.x, &size.y, &components, STBI_rgb_alpha);
             if (data) {
                 break;
             }
         }
     }
     else {
-        data = stbi_load(filename.c_str(), &size.x, &size.y, &components, 0);
+        data = stbi_load(filename.c_str(), &size.x, &size.y, &components, STBI_rgb_alpha);
     }
 
     if (!data) {
@@ -54,7 +54,6 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromFile(const std::string
     STBITextureData * textureData = new STBITextureData();
     textureData->Data = data;
     textureData->Size = size;
-    textureData->Components = components;
 
     ToonBenchmarkEnd();
     return std::unique_ptr<TextureData>(textureData);
@@ -68,7 +67,7 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
     glm::ivec2 size;
     int components;
 
-    uint8_t * data = stbi_load_from_memory(buffer, length, &size.x, &size.y, &components, 0);
+    uint8_t * data = stbi_load_from_memory(buffer, length, &size.x, &size.y, &components, STBI_rgb_alpha);
     if (!data) {
         return nullptr;
     }
@@ -76,7 +75,6 @@ std::unique_ptr<TextureData> STBITextureImporter::LoadFromMemory(const uint8_t *
     STBITextureData * textureData = new STBITextureData();
     textureData->Data = data;
     textureData->Size = size;
-    textureData->Components = components;
     
     ToonBenchmarkEnd();
     return std::unique_ptr<TextureData>(textureData);

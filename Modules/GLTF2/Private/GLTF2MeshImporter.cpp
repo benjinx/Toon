@@ -3,6 +3,10 @@
 #include <Toon/Log.hpp>
 #include <Toon/Benchmark.hpp>
 #include <Toon/Util.hpp>
+#include <Toon/Path.hpp>
+#include <Toon/GLTF2/GLTF2PrimitiveData.hpp>
+
+#include "glTF2File.hpp"
 
 namespace Toon::GLTF2 {
 
@@ -11,13 +15,36 @@ std::vector<std::unique_ptr<PrimitiveData>> GLTF2MeshImporter::LoadFromFile(cons
 {
     ToonBenchmarkStart();
 
-    const string& dir = GetDirname(filename);
-    std::vector<std::unique_ptr<PrimitiveData>> meshes;
+    glTF2File file;
+    bool result = false;
 
-    ToonLogInfo("%s %s", dir, filename);
+    if (useAssetPath) {
+        const auto& getAssetPathList = GetAssetPathList();
+
+        for (const auto& path : getAssetPathList) {
+            Path fullPath = path / "Models" / filename;
+            ToonLogVerbose("Checking '%s'", fullPath);
+
+            result = file.LoadFromFile(fullPath);
+
+            if (result) {
+                break;
+            }
+        }
+    }
+    else {
+        result = file.LoadFromFile(filename);
+    }
+
+    if (!result) {
+        return { };
+    }
+
+    auto primitiveList = file.LoadMesh();
 
     ToonBenchmarkEnd();
-    return { };
+
+    return primitiveList;
 }
 
 } // namespace Toon::GLTF2

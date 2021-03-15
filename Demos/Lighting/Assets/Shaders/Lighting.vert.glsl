@@ -9,13 +9,13 @@ layout (location = 5) out vec2 v_TexCoords;
 
 void main()
 {
-    // Move the normal to world space
-    v_Normal = transpose(inverse(Model)) * a_Normal;
+    // Move the normal (perpendicular) to tangent space
+    v_Normal = transpose(inverse(u_Model)) * a_Normal;
 
-    v_Position = Model * a_Position;
+    v_Position = u_Model * a_Position;
 
-    //v_TexCoords = vec2(a_UV1.x, 1.0 - a_UV1.y);
-    v_TexCoords = a_UV1;
+    //v_TexCoords = vec2(u_TexCoord1.x, 1.0 - u_TexCoord1.y);
+    v_TexCoords = a_TexCoord1;
 
-    gl_Position = MVP * a_Position;
+    gl_Position = u_MVP * a_Position;
 }

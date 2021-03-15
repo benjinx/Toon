@@ -36,8 +36,6 @@ public:
         _pipeline = pipeline;
     }
 
-    std::shared_ptr<Texture> _texture;
-
 protected:
 
     std::vector<std::shared_ptr<Primitive>> _primitiveList;

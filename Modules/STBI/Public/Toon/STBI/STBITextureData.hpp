@@ -14,8 +14,6 @@ public:
 
     glm::uvec2 Size;
 
-    int Components;
-
     virtual ~STBITextureData() {
         stbi_image_free(Data);
     }
@@ -26,10 +24,6 @@ public:
 
     glm::uvec2 GetSize() const override {
         return Size;
-    }
-
-    int GetComponents() const override {
-        return Components;
     }
 
     TextureDataType GetDataType() const override {

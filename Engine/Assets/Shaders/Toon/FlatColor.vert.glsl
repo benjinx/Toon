@@ -6,5 +6,5 @@
 
 void main()
 {
-    gl_Position = MVP * a_Position;
+    gl_Position = u_MVP * a_Position;
 }

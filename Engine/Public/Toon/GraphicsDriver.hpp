@@ -14,21 +14,22 @@
 #include <Toon/Texture.hpp>
 #include <Toon/Time.hpp>
 #include <Toon/UpdateContext.hpp>
+#include <Toon/Material.hpp>
 
 #include <vector>
 #include <memory>
 
 namespace Toon {
 
-// class TOON_ENGINE_API WindowResizedEventData : public EventData
-// {
-// public:
+class TOON_ENGINE_API WindowResizedEventData : public EventData
+{
+public:
 
-//     glm::ivec2 Size;
+    glm::ivec2 Size;
 
-//     //PyObject * GetPyObject() const override;
+    //PyObject * GetPyObject() const override;
 
-// }; // class WindowResizedEventData
+}; // class WindowResizedEventData
 
 class TOON_ENGINE_API GraphicsDriver
 {
@@ -49,6 +50,8 @@ public:
     virtual void InitializeRenderContext();
 
     virtual bool InitializeConstantBuffers();
+
+    virtual bool InitializeDefaults();
 
     virtual void SetWindowTitle(const string& title) {
         _windowTitle = title;
@@ -98,16 +101,30 @@ public:
 
     virtual std::shared_ptr<Mesh> CreateMesh() = 0;
 
+    virtual std::shared_ptr<Material> CreateMaterial() = 0;
+
     virtual std::shared_ptr<Primitive> CreatePrimitive() = 0;
 
     virtual UpdateContext * GetUpdateContext();
 
     virtual RenderContext * GetRenderContext();
 
-    //Event<Toon::WindowResizedEventData> WindowResizedEvent;
+    Event<Toon::WindowResizedEventData> WindowResizedEvent;
 
-    std::shared_ptr<Buffer> GetShaderGlobalsBuffer() {
+    virtual inline std::shared_ptr<Buffer> GetShaderGlobalsBuffer() {
         return _shaderGlobalsBuffer;
+    }
+
+    virtual inline std::shared_ptr<Texture> GetDefaultTexture() {
+        return _defaultTexture;
+    }
+
+    virtual inline std::shared_ptr<Pipeline> GetDefaultPipeline() {
+        return _defaultPipeline;
+    }
+
+    virtual inline std::shared_ptr<Material> GetDefaultMaterial() {
+        return _defaultMaterial;
     }
 
 protected:
@@ -137,6 +154,12 @@ protected:
     std::unordered_map<unsigned, std::shared_ptr<Buffer>> _constantBufferBindings;
 
     std::shared_ptr<Buffer> _shaderGlobalsBuffer;
+
+    std::shared_ptr<Texture> _defaultTexture;
+
+    std::shared_ptr<Pipeline> _defaultPipeline;
+
+    std::shared_ptr<Material> _defaultMaterial;
 
 }; // class GraphicsDriver
 

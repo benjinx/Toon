@@ -40,7 +40,7 @@ public:
         TextureFilterType MagFilter = TextureFilterType::Nearest;
         TextureFilterType MinFilter = TextureFilterType::Nearest;
 
-        bool GenerateMipmaps = false;
+        bool GenerateMipmaps = true;
 
     }; // struct Options
 

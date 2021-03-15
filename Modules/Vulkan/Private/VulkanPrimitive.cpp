@@ -1,6 +1,6 @@
 #include <Toon/Vulkan/VulkanPrimitive.hpp>
-
 #include <Toon/Vulkan/VulkanGraphicsDriver.hpp>
+#include <Toon/Benchmark.hpp>
 
 namespace Toon::Vulkan {
 
@@ -18,7 +18,16 @@ void VulkanPrimitive::Terminate()
 
 bool VulkanPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
 {
+    ToonBenchmarkStart();
+
+    auto gfx = GetGraphicsDriver();
+
     bool result;
+
+    _material = data->GetMaterial();
+    if (_material) {
+        _material = gfx->GetDefaultMaterial();
+    }
 
     const auto& indexList = data->GetIndexList();
     const auto& vertexList = data->GetVertexList();
@@ -56,6 +65,7 @@ bool VulkanPrimitive::Load(const std::unique_ptr<PrimitiveData>& data)
         }
     }
 
+    ToonBenchmarkEnd();
     return true;
 }
 

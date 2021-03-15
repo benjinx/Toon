@@ -55,15 +55,19 @@
     // Microsoft VisualStudio C/C++
     #define TOON_COMPILER_MSVC _MSC_VER
 
-#elif defined(__GNUC__)
-    
-    // GNU Compiler Collection
-    #define TOON_COMPILER_GCC __GNUC__
-
 #elif defined(__clang__)
 
     // Apple Clang Compiler
     #define TOON_COMPILER_CLANG __clang__
+
+#elif defined(__GNUC__) || defined(__GNUG__)
+    
+    // GNU Compiler Collection
+    #define TOON_COMPILER_GCC __GNUC__
+
+#elif defined(__ICC) || defined(__INTEL_COMPILER)
+
+    #define TOON_COMPILER_ICC __INTEL_COMPILER
 
 #else
 

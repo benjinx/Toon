@@ -1,4 +1,5 @@
 #include <Toon/GraphicsDriver.hpp>
+#include <Toon/Log.hpp>
 
 namespace Toon {
 
@@ -51,6 +52,37 @@ bool GraphicsDriver::InitializeConstantBuffers()
     );
 
     return result;
+}
+
+TOON_ENGINE_API
+bool GraphicsDriver::InitializeDefaults()
+{
+    uint8_t pixel[4] = { 255, 255, 255, 255 };
+    std::unique_ptr<TextureData> textureData(new ConstantTextureData(
+        pixel, uvec2(1, 1), 4, TextureDataType::UnsignedByte
+    ));
+
+    _defaultTexture = CreateTexture();
+    if (!_defaultTexture->Load(textureData, Texture::Options())) {
+        ToonLogError("Failed to create default texture");
+        return false;
+    }
+
+    _defaultMaterial = CreateMaterial();
+    _defaultMaterial->Initialize();
+
+    auto shader = CreateShader();
+    if (!shader->LoadFromFiles({
+        "Toon/Default.vert",
+        "Toon/Default.frag",
+    })) {
+        ToonLogError("Failed to create default shader");
+        return false;
+    }
+
+    _defaultPipeline = CreatePipeline(shader);
+
+    return true;
 }
 
 TOON_ENGINE_API

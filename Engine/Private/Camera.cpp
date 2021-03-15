@@ -13,12 +13,12 @@ Camera::Camera()
     SetAspect(size);
     SetViewportSize(size);
 
-    /*_windowResizedEventHandlerID = gfx->WindowResizedEvent.AddListener(
+    _windowResizedEventHandlerID = gfx->WindowResizedEvent.AddListener(
         [=](const WindowResizedEventData * data) {
             SetAspect(data->Size);
             SetViewportSize(data->Size);
         }
-    );*/
+    );
 }
 
 TOON_ENGINE_API
