@@ -33,8 +33,8 @@ void main()
             Lights[i].Color,
             Lights[i].Position,
             CameraPosition,
-            v_Position,
-            v_Normal
+            v_Position.xyz,
+            v_Normal.xyz
         );
     }
 

@@ -2,33 +2,33 @@
 #define TOON_BLINN_PHONG_LIGHTING_INC_GLSL
 
 vec4 BlinnPhongLighting(
-    vec4 LightColor,
-    vec4 LightPosition,
-    vec4 CameraPosition,
-    vec4 Position,
-    vec4 Normal
+    vec3 LightColor,
+    vec3 LightPosition,
+    vec3 CameraPosition,
+    vec3 Position,
+    vec3 Normal
 )
 {
     // Ambient
     float ambientStrength = 0.1;
-    vec4 ambient = ambientStrength * LightColor;
+    vec3 ambient = ambientStrength * LightColor;
       
     // Diffuse 
-    vec4 norm = normalize(Normal);
-    vec4 lightDir = normalize(LightPosition - Position);
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(LightPosition - Position);
 
     float diff = max(dot(norm, lightDir), 0.0);
-    vec4 diffuse = diff * LightColor;
+    vec3 diffuse = diff * LightColor;
 
     // Specular
-    vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
 
     // We dot the normal and lightDir to make sure it won't 'leak' through the model.
     if (dot(norm, lightDir) >= 0.0f) {
 	    // specular
         float specularStrength = 0.5;
-        vec4 viewDir = normalize(CameraPosition - Position);
-        vec4 halfwayDir = normalize(lightDir + viewDir);
+        vec3 viewDir = normalize(CameraPosition - Position);
+        vec3 halfwayDir = normalize(lightDir + viewDir);
         float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
         specular = specularStrength * spec * LightColor;
     }

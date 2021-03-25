@@ -274,6 +274,8 @@ GLuint OpenGLShader::LoadGLSL(const std::string& filename, bool useAssetPath)
 
     glCompileShader(shader);
 
+    glSpecializeShader(shader, "main", 0, nullptr, nullptr);
+
     return shader;
 }
 

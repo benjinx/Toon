@@ -7,6 +7,12 @@
 namespace Toon {
 
 TOON_ENGINE_API
+MeshComponent::MeshComponent(std::shared_ptr<Mesh> mesh)
+{
+    SetMesh(mesh);
+}
+
+TOON_ENGINE_API
 void MeshComponent::SetMesh(std::shared_ptr<Mesh> mesh)
 {
     _mesh = mesh;

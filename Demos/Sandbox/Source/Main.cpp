@@ -73,15 +73,22 @@ void Run()
 
     // Create an entity
     auto entity = std::unique_ptr<Entity>(new Entity());
-    Entity * tmpEntity = entity.get();
+    auto e = entity.get();
 
     // Add components to entity
     auto meshComponent = std::unique_ptr<MeshComponent>(new MeshComponent());
-    meshComponent->SetMesh(mesh);
+    meshComponent->SetMesh(LoadMeshFromFile("DamagedHelmet/DamagedHelmet.gltf"));
+    //entity->AddComponent(new MeshComponent(LoadMeshFromFile("DamagedHelmet/DamagedHelmet.gltf")));
     entity->AddComponent(std::move(meshComponent));
 
     // Add the new entity to the scene
-    auto e = scene.AddChild(std::move(entity));
+    scene.AddChild(std::move(entity));
+
+    // auto eBush = scene.CreateEntity();
+    // eBush->CreateComponent<MeshComponent>(Mesh::LoadFromFile("PATHTOFILE"));
+    // eBush->CreateComponent<MeshComponent>(LoadMeshFromFile("Path"));
+    // eBush->CreateComponent<RigidBodyComponent>();
+    // eBush->AddComponent(new RigidBodyComponent());
 
     // Create a render context and transform data
     RenderContext * renderCtx = gfx->GetRenderContext();
@@ -114,6 +121,7 @@ void Run()
         gfx->ProcessEvents();
 
         //camera.HandleMovement(gfx->GetUpdateContext()->GetFrameSpeedRatio());
+
 
         // Set our view and proj matrix (in shaders).
         shaderTransform->View = camera.GetView();
