@@ -22,28 +22,6 @@ using namespace Toon;
 
 void Run()
 {
-    // Load Modules
-    LoadModule("ToonSTBI");
-    //LoadModule("ToonTinyOBJ");
-    LoadModule("ToonGLTF2");
-
-    // Decide our Graphics driver
-    const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
-    
-    if (!graphicsDriver) {
-        graphicsDriver = "OpenGL";
-    }
-
-    if (strcmp(graphicsDriver, "OpenGL") == 0) {
-        LoadModule("ToonOpenGL");
-    }
-    else if (strcmp(graphicsDriver, "DirectX") == 0) {
-        LoadModule("ToonDirectX");
-    }
-    else {
-        LoadModule("ToonVulkan");
-    }
-
     // Grab the current graphicsdriver
     auto gfx = GetGraphicsDriver();
     if (!gfx) {

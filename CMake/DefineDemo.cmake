@@ -46,7 +46,7 @@ MACRO(DEFINE_DEMO _target)
         #Assets/Shaders/*.hlsl
     )
 
-    LIST(INSERT ASSET_PATH 0
+    LIST(INSERT TOON_ASSET_PATH 0
         ${CMAKE_CURRENT_SOURCE_DIR}/Assets
         ${CMAKE_CURRENT_BINARY_DIR}/Assets
     )
@@ -62,7 +62,7 @@ MACRO(DEFINE_DEMO _target)
         Assets/*
     )
 
-    LIST(INSERT ASSET_PATH 0
+    LIST(INSERT TOON_ASSET_PATH 0
         ${CMAKE_CURRENT_SOURCE_DIR}/Assets/
     )
 
@@ -155,119 +155,26 @@ MACRO(DEFINE_DEMO _target)
             FOLDER "${folder}"
     )
 
-    IF(MSVC)
-        SET_TARGET_PROPERTIES(
-            ${_target}
-            PROPERTIES
-                VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                VS_DEBUGGER_ENVIRONMENT "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}\nTOON_ASSET_PATH=${ASSET_PATH}"
-        )
+    STRING(REPLACE " " "\\ " TOON_MODULE_PATH "${TOON_MODULE_PATH}")
+    STRING(REPLACE " " "\\ " TOON_ASSET_PATH "${TOON_ASSET_PATH}")
 
-        ADD_CUSTOM_TARGET(
-            run-${_target}
-            COMMAND ${CMAKE_COMMAND} -E env "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
-            DEPENDS ${_target}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-
-        SET_TARGET_PROPERTIES(
-            run-${_target}
-            PROPERTIES 
-                FOLDER "Automation"
-        )
-
-        # Append debug target to .vscode/launch.json if .vscode/ exists
-        IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode AND Python3_Interpreter_FOUND)
-            SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
-            SET(_graphics_drivers "")
-
-            IF("OpenGL" IN_LIST REQUIRED_MODULES)
-                LIST(APPEND _graphics_drivers "OpenGL")
-            ENDIF()
-
-            IF("Vulkan" IN_LIST REQUIRED_MODULES)
-                LIST(APPEND _graphics_drivers "Vulkan")
-            ENDIF()
-
-            IF("DirectX" IN_LIST REQUIRED_MODULES)
-                LIST(APPEND _graphics_drivers "DirectX")
-            ENDIF()
-
-            FOREACH(_driver ${_graphics_drivers})
-                ADD_CUSTOM_COMMAND(
-                    TARGET ${_target} POST_BUILD
-                    BYPRODUCTS ${_launch_json}
-                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} (${_driver}, $<CONFIG>)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "PATH=${RUNTIME_SEARCH_PATH};$<$<CONFIG:Debug>:${RUNTIME_SEARCH_PATH_DEBUG};>$<$<CONFIG:Release>:${RUNTIME_SEARCH_PATH_RELEASE};>$ENV{PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" "TOON_GRAPHICS_DRIVER=${_driver}"
-                )
-            ENDFOREACH()
-        ENDIF()
-    ELSE()
-
-        STRING(JOIN ":" LD_LIBRARY_PATH ${RUNTIME_SEARCH_PATH})
-        STRING(JOIN ":" ASSET_PATH ${ASSET_PATH})
-
-        ADD_CUSTOM_TARGET(
-            run-${_target}
-            COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" $<TARGET_FILE:${_target}>
-            DEPENDS ${_target}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-
-        SET_TARGET_PROPERTIES(
-            run-${_target}
-            PROPERTIES
-                FOLDER "Automation"
-        )
-
-        IF(gdb_COMMAND)
-            ADD_CUSTOM_TARGET(
-                gdb-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" gdb --args $<TARGET_FILE:${_target}>
-                DEPENDS ${_target}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            )
-
-            SET_TARGET_PROPERTIES(
-                gdb-${_target}
-                PROPERTIES
-                    FOLDER "Automation"
-            )
-        ENDIF()
-
-        IF(valgrind_COMMAND)
-            ADD_CUSTOM_TARGET(
-                valgrind-${_target}
-                COMMAND ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" valgrind $<TARGET_FILE:${_target}>
-                DEPENDS ${_target}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            )
-
-            SET_TARGET_PROPERTIES(
-                valgrind-${_target}
-                PROPERTIES
-                    FOLDER "Automation"
-            )
-        ENDIF()
-
-        IF(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.vscode)
-            SET(_launch_json ${CMAKE_SOURCE_DIR}/.vscode/launch.json)
-            SET(_graphics_drivers "")
-
-            IF("OpenGL" IN_LIST REQUIRED_MODULES)
-                LIST(APPEND _graphics_drivers "OpenGL")
-            ENDIF()
-
-            IF("Vulkan" IN_LIST REQUIRED_MODULES)
-                LIST(APPEND _graphics_drivers "Vulkan")
-            ENDIF()
-
-            FOREACH(_driver ${_graphics_drivers})
-                ADD_CUSTOM_COMMAND(
-                    TARGET ${_target} POST_BUILD
-                    BYPRODUCTS ${_launch_json}
-                    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Scripts/add-vscode-launch-target.py ${_launch_json} "${_target} \\(${_driver}\\)" $<TARGET_FILE:${_target}> ${CMAKE_CURRENT_BINARY_DIR} "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" "TOON_ASSET_PATH=${ASSET_PATH}" "TOON_GRAPHICS_DRIVER=${_driver}"
-                )
-            ENDFOREACH()
-        ENDIF()
+    # TODO: Improve
+    SET(_ext "")
+    IF(WIN32)
+        SET(_ext ".exe")
     ENDIF()
+
+    FILE(RELATIVE_PATH _executable ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${_target}${_ext})
+    FILE(TO_NATIVE_PATH ${_executable} _executable)
+
+    EXECUTE_PROCESS(
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_SOURCE_DIR}/Scripts/generate-launch-targets.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/${_target}.toonproj
+            ${CMAKE_BINARY_DIR}
+            ${_executable}
+            "${TOON_ASSET_PATH}"
+            "${TOON_MODULE_PATH}"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
 ENDMACRO()

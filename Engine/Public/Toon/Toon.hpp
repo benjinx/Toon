@@ -6,6 +6,7 @@
 #include <Toon/String.hpp>
 
 #include <functional>
+#include <Toon/Path.hpp>
 // #include <Toon/Camera.hpp>
 // #include <Toon/Entity.hpp>
 // #include <Toon/RenderContext.hpp>
@@ -30,6 +31,9 @@ bool Initialize(int argc, char ** argv);
 
 TOON_ENGINE_API
 void Terminate();
+
+TOON_ENGINE_API
+void LoadConfigurationFile(const Path& path, string_view configName);
 
 TOON_ENGINE_API
 void SetRunning(bool running);

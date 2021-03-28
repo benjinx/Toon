@@ -139,3 +139,25 @@ IF("GTest" IN_LIST REQUIRED_DEPENDENCIES)
         )
     ENDIF()
 ENDIF()
+
+# cflags
+
+IF("cflags" IN_LIST REQUIRED_DEPENDENCIES)
+    SET(cflags_ROOT       ${CMAKE_BINARY_DIR}/cflags)
+    SET(cflags_SOURCE_DIR ${CMAKE_BINARY_DIR}/cflags_src)
+
+    FIND_PACKAGE(cflags CONFIG QUIET)
+
+    IF(NOT cflags_FOUND)
+        ExternalProject_Add(
+            ThirdParty_cflags
+            URL                 "https://github.com/WhoBrokeTheBuild/cflags/archive/v2.0.1.zip"
+            URL_HASH            MD5=957b2e6a481efd96c0ce72f291176cb4
+            SOURCE_DIR          ${cflags_SOURCE_DIR}
+            CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${cflags_ROOT}
+            BUILD_COMMAND       ""
+            UPDATE_COMMAND      ""
+        )
+    ENDIF()
+ENDIF()
+

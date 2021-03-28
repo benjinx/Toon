@@ -29,6 +29,13 @@ Path::Path(const string& str)
     Normalize();
 }
 
+TOON_ENGINE_API
+Path::Path(const char * cstr)
+    : _path(cstr)
+{
+    Normalize();
+}
+
 Path& Path::Append(const Path& rhs)
 {
     // If path is empty, and doesn't have a trailing separator, append one

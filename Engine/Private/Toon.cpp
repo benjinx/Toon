@@ -5,7 +5,6 @@
 #include <Toon/GraphicsDriver.hpp>
 #include <Toon/Time.hpp>
 #include <Toon/Scene.hpp>
-#include <Toon/Path.hpp>
 
 // #include <Python/PyDusk.hpp>
 
@@ -13,24 +12,28 @@
 // #include <frameobject.h>
 
 #include <Toon/String.hpp>
+
+#include <Toon/JSON.hpp>
 #include <vector>
 #include <cstdio>
 #include <thread>
 
-// #include <cflags.h>
+#include <cflags.h>
+
+#include <fstream>
 
 namespace Toon {
 
 TOON_ENGINE_API
 bool Initialize(int argc, char ** argv) 
 {
-    /*cflags_t * flags = cflags_init();
+    cflags_t * flags = cflags_init();
 
     bool help = false;
     cflags_add_bool(flags, '\0', "help", &help, "Display this help and exit");
 
-    bool verbose = false;
-    cflags_add_bool(flags, 'v', "verbose", &verbose, "Enable verbose logging");
+    const char * config = NULL;
+    cflags_add_string(flags, 'c', "config", &config, "Configuration to use");
 
     cflags_parse(flags, argc, argv);
 
@@ -43,26 +46,24 @@ bool Initialize(int argc, char ** argv)
         );
     }
 
-    const char * envVerbose = getenv("TOON_VERBOSE");
-
-    if (verbose || envVerbose) {
-        ToonLogInfo("Enabling verbose logging");
-        SetVerboseLoggingEnabled(true);
+    if (flags->argc > 1) {
+        LoadConfigurationFile(flags->argv[1], (config ? config : ""));
     }
 
-    InitMemoryTracking();
+    // InitMemoryTracking();
 
-    PyImport_AppendInittab("Toon", PyInit_Toon);
+    // PyImport_AppendInittab("Toon", PyInit_Toon);
 
-    wchar_t *program = Py_DecodeLocale(argv[0], NULL);
-    if (program) {
-        Py_SetProgramName(program);
-    }
+    // wchar_t *program = Py_DecodeLocale(argv[0], NULL);
+    // if (program) {
+    //     Py_SetProgramName(program);
+    // }
 
-    PyMem_RawFree(program);
+    // PyMem_RawFree(program);
     
-    Py_Initialize();
-    PyImport_ImportModule("Toon");*/
+    // Py_Initialize();
+
+    // PyImport_ImportModule("Toon");
     
     ToonLogVerbose("Toon Version: %s", GetVersion().GetString());
     ToonLogVerbose("Application Name: %s", GetApplicationName());
@@ -81,6 +82,43 @@ void Terminate()
     //TermMemoryTracking();
     
     //CloseAllLogFiles();
+}
+
+TOON_ENGINE_API
+void LoadConfigurationFile(const Path& path, string_view configName)
+{
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        ToonLogFatal("No.");
+    }
+
+    json data;
+    data << file;
+
+    auto applyConfig = [](json& data) {
+        const auto& modules = data.value<std::vector<string>>("modules", {});
+        for (const auto& name : modules) {
+            LoadModule(name);
+        }
+    };
+
+    SetApplicationName(data.value("name", ""));
+    //SetApplicationVersion(data.value("version", ""));
+
+    applyConfig(data);
+
+    if (!configName.empty()) {
+        auto it = data.find("configurations");
+        if (it != data.end()) {
+            auto& configurations = it.value();
+            if (configurations.is_object()) {
+                it = configurations.find(configName);
+                if (it != configurations.end()) {
+                    applyConfig(it.value());
+                }
+            }
+        }
+    }
 }
 
 static bool _Running = true;

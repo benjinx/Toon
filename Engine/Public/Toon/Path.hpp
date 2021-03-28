@@ -2,16 +2,20 @@
 #define TOON_PATH_HPP
 
 #include <Toon/Config.hpp>
-#include <Toon/Platform.hpp>
-
 #include <Toon/String.hpp>
+
 #include <vector>
 
 namespace Toon {
 
+// class PathIterator;
+
 class TOON_ENGINE_API Path
 {
 public:
+
+    // typedef PathIterator Iterator;
+    // typedef PathIterator ConstIterator;
 
     static const char Separator = TOON_PATH_SLASH;
 
@@ -20,6 +24,8 @@ public:
     Path(const Path& rhs);
 
     Path(const string& str);
+
+    Path(const char * cstr);
 
     // Appends a new element to the path with a separator
     Path& Append(const Path& rhs);
@@ -65,7 +71,7 @@ public:
         if (HasRootDirectory()) {
             return string(1, Separator);
         }
-        return string();
+        return Path();
     }
 
     inline bool HasRootPath() const {
@@ -123,11 +129,6 @@ public:
         return Append(rhs);
     }
 
-    inline Path& operator/=(const string& rhs) {
-        return Append(Path(rhs));
-    }
-
-
     inline Path& operator+=(const Path& rhs) {
         return Concatenate(rhs);
     }
@@ -146,13 +147,6 @@ public:
     {
         Path tmp(lhs);
         tmp /= rhs;
-        return tmp;
-    }
-
-    inline friend Path operator/(const Path& lhs, const string& rhs)
-    {
-        Path tmp(lhs);
-        tmp /= Path(rhs);
         return tmp;
     }
 
@@ -183,6 +177,13 @@ private:
 
 }; // class Path
 
+// class TOON_ENGINE_API Path::Iterator
+// {
+// public:
+
+    
+
+// }; // class Iterator
 
 TOON_ENGINE_API
 Path GetCurrentPath();

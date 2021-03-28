@@ -30,25 +30,6 @@ using namespace Toon;
 
 void run()
 {
-    LoadModule("ToonSTBI");
-    LoadModule("ToonTinyOBJ");
-
-    const char * graphicsDriver = getenv("TOON_GRAPHICS_DRIVER");
-    
-    if (!graphicsDriver) {
-        graphicsDriver = "Vulkan";
-    }
-
-    if (strcmp(graphicsDriver, "OpenGL") == 0) {
-        LoadModule("ToonOpenGL");
-    }
-    else if (strcmp(graphicsDriver, "DirectX") == 0) {
-        LoadModule("ToonDirectX");
-    }
-    else {
-        LoadModule("ToonVulkan");
-    }
-
     auto gfx = GetGraphicsDriver();
     if (!gfx) {
         return;

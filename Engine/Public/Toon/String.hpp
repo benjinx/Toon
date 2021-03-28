@@ -9,6 +9,7 @@
 namespace Toon {
 
 using std::string;
+using std::string_view;
 
 inline bool StringEqualCaseInsensitive(const string& a, const string& b) {
     return std::equal(

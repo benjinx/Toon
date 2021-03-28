@@ -13,14 +13,9 @@ TARGET_LINK_LIBRARIES(
         glm::glm
         GSL::GSL
         nlohmann_json::nlohmann_json
+        cflags::cflags
         ${CMAKE_DL_LIBS}
 )
-
-LIST(APPEND ASSET_PATH
-    ${CMAKE_CURRENT_SOURCE_DIR}/Assets/
-)
-
-SET(ASSET_PATH ${ASSET_PATH} PARENT_SCOPE)
 
 ###
 ### Shader Processing
@@ -33,12 +28,12 @@ FILE(
     #Assets/Shaders/*.hlsl
 )
 
-LIST(APPEND ASSET_PATH
+LIST(APPEND TOON_ASSET_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Assets
     ${CMAKE_CURRENT_BINARY_DIR}/Assets
 )
 
-SET(ASSET_PATH ${ASSET_PATH} PARENT_SCOPE)
+SET(TOON_ASSET_PATH ${TOON_ASSET_PATH} PARENT_SCOPE)
 
 COMPILE_SHADERS("${_shaders_in}" _shaders_out)
 

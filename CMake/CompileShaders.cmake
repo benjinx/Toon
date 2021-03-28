@@ -16,7 +16,7 @@ MACRO(COMPILE_SHADERS shaders_in shaders_out)
                 FILE(MAKE_DIRECTORY ${shader_out_path})
 
                 SET(shader_cflags "")
-                FOREACH(dir ${ASSET_PATH})
+                FOREACH(dir ${TOON_ASSET_PATH})
                     SET(shader_cflags ${shader_cflags} -I"${dir}/Shaders/")
                 ENDFOREACH()
 

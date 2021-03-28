@@ -1,0 +1,22 @@
+{
+    "name": "HelloWorld",
+    "version": "1.0.0",
+    "modules": [
+        "ToonSTBI",
+        "ToonTinyOBJ",
+        "ToonGLTF2"
+    ],
+    "configurations": {
+        "Vulkan": {
+            "modules": [
+                "ToonVulkan"
+            ]
+        },
+        "OpenGL": {
+            "modules": [
+                "ToonOpenGL"
+            ]
+        }
+    },
+    "defaultConfiguration": "Vulkan"
+}
