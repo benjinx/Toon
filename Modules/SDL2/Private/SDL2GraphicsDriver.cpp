@@ -38,7 +38,7 @@ void SDL2GraphicsDriver::Terminate()
 TOON_SDL2_API
 bool SDL2GraphicsDriver::CreateWindow(unsigned flags)
 {
-    _windowTitle = GetApplicationName() + " (" + GetApplicationVersion().GetString() + ")";
+    _windowTitle = GetApplicationName() + " (" + GetApplicationVersion().ToString() + ")";
 
     glm::ivec2 size = GetWindowSize();
 

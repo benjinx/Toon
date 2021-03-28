@@ -65,9 +65,9 @@ bool Initialize(int argc, char ** argv)
 
     // PyImport_ImportModule("Toon");
     
-    ToonLogVerbose("Toon Version: %s", GetVersion().GetString());
+    ToonLogVerbose("Toon Version: %s", GetVersion());
     ToonLogVerbose("Application Name: %s", GetApplicationName());
-    ToonLogVerbose("Application Version: %s", GetApplicationVersion().GetString());
+    ToonLogVerbose("Application Version: %s", GetApplicationVersion());
 
     return true;
 }
@@ -103,7 +103,7 @@ void LoadConfigurationFile(const Path& path, string_view configName)
     };
 
     SetApplicationName(data.value("name", ""));
-    //SetApplicationVersion(data.value("version", ""));
+    SetApplicationVersion(data.value("version", ""));
 
     applyConfig(data);
 

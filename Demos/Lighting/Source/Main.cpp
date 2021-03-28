@@ -125,10 +125,6 @@ int main(int argc, char ** argv)
     // Lets log things
     AddLogFile("lastrun.log");
 
-    // Set application info
-    SetApplicationName("Lighting");
-    SetApplicationVersion({TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH});
-
     // Initialize our demo
     if (!Initialize(argc, argv)) {
         return 1;

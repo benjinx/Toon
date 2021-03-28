@@ -93,11 +93,6 @@ void run()
 
 int main(int argc, char ** argv)
 {
-
-    SetApplicationName("HelloWorld");
-    SetApplicationVersion({TOON_VERSION_MAJOR, TOON_VERSION_MINOR, TOON_VERSION_PATCH});
-
-
     if (!Initialize(argc, argv)) {
         return 1;
     }
